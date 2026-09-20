@@ -17,21 +17,20 @@ import {
 
 const CORE_TEAM_MEMBERS = [
   {
-    id: 'adithya-rao',
-    name: 'Adithya Rao',
+    id: 'Mohammed-ajmal ',
+    name: 'Mohammed Ajmal ',
     role: 'President',
     division: 'Executive Committee',
-    dept: 'Computer Science & Engineering',
-    year: 'Final Year',
-    memberId: 'IEEE STB-94821',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
-    bio: 'Oversees branch operations, strategic collaborations with IEEE Bangalore Section, and annual flagship conferences. Passionate about systems architecture and distributed computing.',
-    skills: ['Strategic Planning', 'Distributed Systems', 'Team Leadership', 'Community Building'],
+    dept: 'Information Science & Engineering',
+    year: 'Third Year',
+    memberId: '101215214',
+    image: 'https://drive.google.com/open?id=1KFqbhQae8wd5asv0STTWwB76NZxcSdwS',
+    bio: 'I am a tech enthusiastic and also a extrovert who loves discovering new topics and learning continuously ',
+    quote:'My code works perfectly until a user touches it 😃',
     socials: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      instagram: 'https://instagram.com',
-      email: 'president.ieee@nmamit.in',
+      linkedin: 'https://www.linkedin.com/in/mohammed-ajmal-a3bb6533a?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      github: 'https://github.com/nnm24is127-droid',
+      email: 'azmalhack1@gmail.com',
     },
   },
   {
@@ -541,21 +540,15 @@ export default function TeamPage() {
               </p>
             </div>
 
-            <div className="relative z-10 mt-5">
+            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800/80">
               <h4 className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2 font-bold">
-                Focus Areas & Competencies
+                
               </h4>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedMember.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-100 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
+              <p className="text-xs sm:text-sm text-slate-700 dark:text-zinc-300 leading-relaxed font-normal">
+                {selectedMember.quote}
+              </p>
             </div>
+            
 
             <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
@@ -577,31 +570,19 @@ export default function TeamPage() {
                 >
                   <Github size={15} />
                 </a>
-                <a
-                  href={selectedMember.socials.instagram}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors"
-                  aria-label="Instagram"
-                >
-                  <Instagram size={15} />
-                </a>
-                <a
-                  href={`mailto:${selectedMember.socials.email}`}
-                  className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors"
-                  aria-label="Email"
-                >
-                  <Mail size={15} />
-                </a>
+                
+                <a 
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(selectedMember.socials.email)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors" 
+                aria-label="Email"
+              >
+                <Mail size={15} />
+              </a>
               </div>
 
-              <a
-                href={`mailto:${selectedMember.socials.email}`}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#00629B] hover:bg-[#0077b6] text-white text-xs font-mono uppercase tracking-wider font-semibold transition-colors shadow-md"
-              >
-                <span>Connect via Email</span>
-                <ExternalLink size={13} />
-              </a>
+              
             </div>
           </div>
         </div>
