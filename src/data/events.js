@@ -1,14 +1,48 @@
-// STUB by Dev A. Dev B: replace this whole file.
+// TODO: replace with real events
+
 export const events = [
   {
     id: 'placeholder-1',
-    title: 'Placeholder Event',
-    date: '2027-01-01',
-    time: '10:00 AM',
-    location: 'Main Auditorium',
-    description: 'This is a placeholder event for the contract stub.',
-    image: '/images/placeholder.jpg',
-    tags: ['Technical'],
-    registrationLink: '#'
-  }
+    title: 'Flagship Tech Event (placeholder)',
+    date: '2027-03-15',
+    venue: 'Main Auditorium (placeholder)',
+    description: 'Hands-on coding workshop exploring modern distributed architectures and cloud development.',
+    tag: 'Workshop',
+    image: null,
+    featured: true,
+    link: '/events',
+  },
+  {
+    id: 'placeholder-2',
+    title: 'Annual Hackathon Sprint (placeholder)',
+    date: '2027-04-20',
+    venue: 'Centre for HPC (placeholder)',
+    description: 'Annual 24-hour hackathon bringing collegiate engineering teams together to solve real problems.',
+    tag: 'Competition',
+    image: null,
+    featured: true,
+    link: '/events',
+  },
+  {
+    id: 'placeholder-3',
+    title: 'Distinguished Guest Lecture (placeholder)',
+    date: '2027-05-12',
+    venue: 'Seminar Hall 1 (placeholder)',
+    description: 'Distinguished technical talk featuring research pioneers discussing future computing paradigms.',
+    tag: 'Talk',
+    image: null,
+    featured: true,
+    link: '/events',
+  },
+  {
+    id: 'placeholder-4',
+    title: 'Student Project Showcase (placeholder)',
+    date: '2027-06-08',
+    venue: 'Exhibition Quad (placeholder)',
+    description: 'Introductory technical symposium highlighting emerging trends and student project presentations.',
+    tag: 'Competition',
+    image: null,
+    featured: false,
+    link: '/events',
+  },
 ];
