@@ -1,200 +1,185 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 
-export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
-  const mobileMenuRef = useRef(null);
-  const buttonRef = useRef(null);
-  const firstLinkRef = useRef(null);
+export default function Navbar({ activePage, onNavigate, theme, onToggleTheme }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Handle scroll state for navbar background
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY >= 10);
+      setScrolled(window.scrollY > 20);
     };
-    
-    // Initial check
-    handleScroll();
-    
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle closing mobile menu on route change
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location.pathname]);
-
-  // Handle body scroll lock and focus management when mobile menu opens
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      // Slight delay to allow render before focus
-      setTimeout(() => {
-        firstLinkRef.current?.focus();
-      }, 50);
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileMenuOpen]);
-
-  // Handle Escape key to close menu and click outside
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-        buttonRef.current?.focus();
-      }
-    };
-
-    const handleClickOutside = (e) => {
-      if (
-        isMobileMenuOpen &&
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(e.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(e.target)
-      ) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mousedown', handleClickOutside);
-    
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isMobileMenuOpen]);
-
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'Events', path: '/events' },
-    { name: 'Team / Profile', path: '/team' },
+  const navItems = [
+    { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About' },
+    { id: 'events', label: 'Events' },
+    { id: 'team', label: 'Team' },
   ];
+
+  const handleLinkClick = (id) => {
+    onNavigate(id);
+    setMobileMenuOpen(false);
+  };
+
+  const isLight = theme === 'light';
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 h-16 ${
-        isScrolled
-          ? 'bg-ieee-black/80 backdrop-blur-md border-b border-white/10 shadow-lg'
-          : 'bg-transparent border-transparent shadow-none'
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? isLight
+            ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200/80 py-3 shadow-lg shadow-slate-200/50'
+            : 'bg-[#05070a]/90 backdrop-blur-xl border-b border-zinc-800/80 py-3 shadow-2xl shadow-black/50'
+          : 'bg-transparent py-5'
       }`}
     >
-      <nav
-        aria-label="Main navigation"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between"
-      >
-        {/* Logo and Wordmark */}
-        <Link to="/" className="flex items-center gap-3 z-50 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ieee-blue">
-          {/* // TODO: replace with real logo file */}
-          <img
-            src="/images/ieee-nmamit-logo.png"
-            alt="IEEE NMAMIT Student Branch logo"
-            className="w-10 h-10 object-contain"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
-          <span className="font-heading font-bold text-xl tracking-tight text-white">
-            IEEE NMAMIT
-          </span>
-        </Link>
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 flex items-center justify-between">
+        {/* Brand Logo */}
+        <button
+          type="button"
+          onClick={() => handleLinkClick('home')}
+          className="flex items-center gap-3 text-left group cursor-pointer focus:outline-none"
+        >
+          <div className={`relative w-9 h-9 rounded-lg border flex items-center justify-center font-mono font-bold text-xs transition-all duration-300 overflow-hidden ${
+            isLight
+              ? 'border-slate-300 bg-white text-[ieee-blue] group-hover:border-[ieee-blue] group-hover:shadow-[0_0_15px_rgba(0,98,155,0.2)]'
+              : 'border-zinc-700/80 bg-zinc-900/90 text-[ieee-teal] group-hover:border-[ieee-teal] group-hover:shadow-[0_0_15px_rgba(0,150,214,0.4)]'
+          }`}>
+            <span className="relative z-10">IE</span>
+            <div className="absolute inset-0 bg-gradient-to-tr from-[ieee-blue]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
+          <div className="flex flex-col">
+            <span className={`text-sm font-bold tracking-tight transition-colors flex items-center gap-1.5 ${
+              isLight ? 'text-slate-900 group-hover:text-[ieee-blue]' : 'text-zinc-100 group-hover:text-white'
+            }`}>
+              IEEE NMAMIT
+              <span className="w-1.5 h-1.5 rounded-full bg-[ieee-teal] animate-pulse" />
+            </span>
+            <span className={`text-[10px] font-mono tracking-wider uppercase transition-colors ${
+              isLight ? 'text-slate-500 group-hover:text-slate-700' : 'text-zinc-400 group-hover:text-zinc-300'
+            }`}>
+              Student Branch
+            </span>
+          </div>
+        </button>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8 font-body">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              className={({ isActive }) =>
-                `group relative py-2 font-medium transition-colors duration-200 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue focus-visible:ring-offset-4 focus-visible:ring-offset-transparent ${
-                  isActive ? 'text-ieee-teal active' : 'text-slate-300 hover:text-ieee-teal'
-                }`
-              }
-            >
-              {link.name}
-              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-ieee-teal origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100 group-[.active]:scale-x-100 motion-reduce:transition-none" />
-            </NavLink>
-          ))}
-          <NavLink
-            to="/join"
-            className={({ isActive }) =>
-              `btn-primary text-sm px-5 py-2 min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-offset-ieee-black ${
-                isActive ? 'ring-2 ring-ieee-teal ring-offset-4 ring-offset-ieee-black' : ''
-              }`
-            }
+        <div className="hidden md:flex items-center gap-4">
+          <nav className={`flex items-center gap-1.5 p-1 rounded-full border backdrop-blur-md shadow-inner transition-colors duration-300 ${
+            isLight
+              ? 'border-slate-200 bg-slate-100/90'
+              : 'border-zinc-800/80 bg-zinc-900/70'
+          }`}>
+            {navItems.map((item) => {
+              const isActive = activePage === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleLinkClick(item.id)}
+                  className={`relative px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5 cursor-pointer focus:outline-none ${
+                    isActive
+                      ? isLight
+                        ? 'text-white font-bold bg-[ieee-blue] border border-[ieee-blue] shadow-md shadow-[ieee-blue]/25'
+                        : 'text-white font-bold bg-[ieee-blue]/80 border border-[ieee-teal]/60 shadow-[0_0_15px_rgba(0,150,214,0.35)]'
+                      : isLight
+                        ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                  }`}
+                >
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_6px_#ffffff]" />
+                  )}
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Theme Toggle Button */}
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            aria-label="Toggle Light and Dark Theme"
+            className={`p-2 rounded-full border transition-all duration-300 flex items-center justify-center cursor-pointer focus:outline-none ${
+              isLight
+                ? 'border-slate-300 bg-slate-100 text-amber-500 hover:bg-amber-50 hover:border-amber-400 hover:shadow-md'
+                : 'border-zinc-800 bg-zinc-900 text-sky-400 hover:bg-zinc-800 hover:border-sky-500 hover:shadow-[0_0_15px_rgba(56,189,248,0.3)]'
+            }`}
           >
-            Join Us
-          </NavLink>
+            {isLight ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
         </div>
 
-        {/* Mobile Hamburger Button */}
-        <button
-          ref={buttonRef}
-          type="button"
-          aria-expanded={isMobileMenuOpen}
-          aria-controls="mobile-menu"
-          aria-label="Toggle navigation menu"
-          className="md:hidden p-2 z-50 text-slate-100 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ieee-blue rounded-md min-w-[44px] min-h-[44px] flex items-center justify-center"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={24} stroke="currentColor" /> : <Menu size={24} stroke="currentColor" />}
-        </button>
-      </nav>
+        {/* Mobile Action Controls */}
+        <div className="md:hidden flex items-center gap-2">
+          {/* Mobile Theme Toggle */}
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            aria-label="Toggle Light and Dark Theme"
+            className={`p-2 rounded-lg border transition-colors ${
+              isLight
+                ? 'border-slate-300 bg-slate-100 text-amber-500'
+                : 'border-zinc-800 bg-zinc-900/80 text-sky-400'
+            }`}
+          >
+            {isLight ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
 
-      {/* Mobile Menu Panel */}
-      <div
-        id="mobile-menu"
-        ref={mobileMenuRef}
-        className={`md:hidden absolute top-16 left-0 w-full bg-ieee-black/95 backdrop-blur-xl border-b border-white/10 shadow-2xl transition-all duration-300 ease-out origin-top motion-reduce:transition-none ${
-          isMobileMenuOpen ? 'opacity-100 scale-y-100 pointer-events-auto' : 'opacity-0 scale-y-0 pointer-events-none'
-        }`}
-      >
-        <div className="px-4 pt-2 pb-6 space-y-2 flex flex-col font-body">
-          {navLinks.map((link, index) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              ref={index === 0 ? firstLinkRef : null}
-              className={({ isActive }) =>
-                `block px-4 py-3 min-h-[44px] text-base font-medium rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ieee-blue ${
-                  isActive
-                    ? 'bg-ieee-blue/10 text-ieee-teal'
-                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                }`
-              }
-            >
-              {link.name}
-            </NavLink>
-          ))}
-          <div className="pt-4 pb-2 px-2">
-            <NavLink
-              to="/join"
-              className={({ isActive }) =>
-                `btn-primary w-full min-h-[44px] text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ieee-blue ${
-                  isActive ? 'ring-2 ring-ieee-teal ring-offset-4 ring-offset-ieee-black' : ''
-                }`
-              }
-            >
-              Join Us
-            </NavLink>
-          </div>
+          {/* Mobile Hamburger Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className={`p-2 rounded-lg border transition-colors ${
+              isLight
+                ? 'border-slate-300 bg-slate-100 text-slate-700 hover:text-slate-900'
+                : 'border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:text-white'
+            }`}
+            aria-label="Toggle Navigation"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
-      
-      {/* Mobile Menu Backdrop (allows clicking outside below the panel) */}
-      {isMobileMenuOpen && (
-        <div 
-          className="md:hidden fixed inset-0 top-16 bg-black/40 z-[-1] motion-reduce:transition-none"
-          aria-hidden="true"
-        />
+
+      {/* Mobile Drawer Menu */}
+      {mobileMenuOpen && (
+        <div className={`md:hidden border-b backdrop-blur-2xl px-6 py-5 mt-2 space-y-2 font-mono text-xs uppercase tracking-wider shadow-2xl animate-in slide-in-from-top-3 duration-200 ${
+          isLight
+            ? 'border-slate-200 bg-white/95'
+            : 'border-zinc-800/80 bg-[#07090e]/95'
+        }`}>
+          {navItems.map((item, idx) => {
+            const isActive = activePage === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleLinkClick(item.id)}
+                className={`w-full text-left py-2.5 px-3 rounded-lg flex items-center justify-between transition-all duration-200 ${
+                  isActive
+                    ? isLight
+                      ? 'bg-[ieee-blue]/10 border border-[ieee-blue]/30 text-[ieee-blue] font-bold shadow-sm'
+                      : 'bg-[ieee-blue]/30 border border-[ieee-teal]/50 text-white font-bold shadow-[0_0_12px_rgba(0,150,214,0.2)]'
+                    : isLight
+                      ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/40'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? (isLight ? 'bg-[ieee-blue]' : 'bg-[ieee-teal]') : (isLight ? 'bg-slate-300' : 'bg-zinc-600')}`} />
+                  <span>{item.label}</span>
+                </div>
+                <span className={`text-[10px] ${isLight ? 'text-slate-400' : 'text-zinc-500'}`}>0{idx + 1}</span>
+              </button>
+            );
+          })}
+        </div>
       )}
     </header>
   );
