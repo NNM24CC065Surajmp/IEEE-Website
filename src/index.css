@@ -135,3 +135,23 @@
 .animate-page-fade {
   animation: pageFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+@keyframes svg-trace {
+  0% { stroke-dashoffset: 200; }
+  50%, 100% { stroke-dashoffset: -200; }
+}
+
+.svg-trace-anim {
+  stroke-dasharray: 60 140;
+  stroke-dashoffset: 200;
+  animation: svg-trace 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svg-trace-anim {
+    animation: none;
+    stroke-dashoffset: 0;
+    stroke-dasharray: none;
+  }
+}
+
