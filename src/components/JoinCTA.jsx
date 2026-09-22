@@ -7,17 +7,17 @@ export default function JoinCTA() {
   return (
     <section className="section-container py-16 md:py-24">
       <Reveal>
-        <div className="relative overflow-hidden rounded-2xl border border-ieee-border bg-gradient-to-br from-ieee-surface via-[#101321] to-[#00629B]/20 p-8 sm:p-12 md:p-16 shadow-2xl">
+        <div className="relative overflow-hidden rounded-2xl border border-ieee-border bg-gradient-to-br from-ieee-surface via-[#101321] to-[ieee-blue]/20 p-8 sm:p-12 md:p-16 shadow-2xl">
           {/* Subtle blue accent blur / glow in top right */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#00629B]/20 dark:bg-[#22D3EE]/10 blur-3xl"
+            className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[ieee-blue]/20 dark:bg-[ieee-teal]/10 blur-3xl"
           />
 
           <div className="relative z-10 max-w-2xl">
             {/* Tag pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider text-[#22D3EE] bg-[#00629B]/20 border border-[#22D3EE]/30 mb-6">
-              <Sparkles size={13} className="text-[#22D3EE]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider text-[ieee-teal] bg-[ieee-blue]/20 border border-[ieee-teal]/30 mb-6">
+              <Sparkles size={13} className="text-[ieee-teal]" />
               <span>Become a Member</span>
             </div>
 
@@ -32,7 +32,7 @@ export default function JoinCTA() {
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 to="/join"
-                className="btn-primary group gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22D3EE]"
+                className="btn-primary group gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[ieee-teal]"
               >
                 <span>Join Our Chapter</span>
                 <ArrowRight
@@ -42,7 +42,7 @@ export default function JoinCTA() {
               </Link>
               <Link
                 to="/about"
-                className="btn-outline text-xs font-mono uppercase tracking-wider py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B]"
+                className="btn-outline text-xs font-mono uppercase tracking-wider py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[ieee-blue]"
               >
                 <span>Explore Initiatives</span>
               </Link>

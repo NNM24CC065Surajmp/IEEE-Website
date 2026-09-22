@@ -14,7 +14,7 @@ export default function FeaturedEvents() {
     <section className="section-container section-padding">
       <Reveal>
         <div className="flex flex-col items-center text-center mb-12">
-          <span className="text-xs font-mono uppercase tracking-widest text-[#00629B] dark:text-[#22D3EE] font-bold mb-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-[ieee-blue] dark:text-[ieee-teal] font-bold mb-2">
             Flagship Initiatives
           </span>
           <h2 className="section-title mb-3">Featured Events</h2>
@@ -44,7 +44,7 @@ export default function FeaturedEvents() {
         <div className="flex justify-center mt-12">
           <Link
             to="/events"
-            className="btn-outline group gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B]"
+            className="btn-outline group gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[ieee-blue]"
           >
             <span>View All Events</span>
             <ArrowRight

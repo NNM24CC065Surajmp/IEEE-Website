@@ -10,16 +10,16 @@ export default function Intro() {
       {/* Subtle decorative glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-12 -left-12 w-64 h-64 bg-[#00629B]/10 dark:bg-[#22D3EE]/10 rounded-full blur-3xl"
+        className="pointer-events-none absolute -top-12 -left-12 w-64 h-64 bg-[ieee-blue]/10 dark:bg-[ieee-teal]/10 rounded-full blur-3xl"
       />
 
       <Reveal>
         <div className="relative z-10 max-w-[65ch]">
           {/* Subtle decorative accent line */}
-          <div className="w-12 h-1 bg-[#22D3EE] rounded-full mb-6" />
+          <div className="w-12 h-1 bg-[ieee-teal] rounded-full mb-6" />
 
           {/* Eyebrow label */}
-          <span className="text-xs font-mono uppercase tracking-widest text-[#00629B] dark:text-[#22D3EE] font-bold block mb-3">
+          <span className="text-xs font-mono uppercase tracking-widest text-[ieee-blue] dark:text-[ieee-teal] font-bold block mb-3">
             About The Branch
           </span>
 
@@ -34,7 +34,7 @@ export default function Intro() {
           <div>
             <Link
               to="/about"
-              className="group inline-flex items-center gap-2 text-sm font-semibold text-[#00629B] dark:text-[#22D3EE] hover:text-[#0077b6] dark:hover:text-cyan-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B] dark:focus-visible:ring-[#22D3EE] rounded px-1 py-0.5 transition-colors"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-[ieee-blue] dark:text-[ieee-teal] hover:text-[#0077b6] dark:hover:text-cyan-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[ieee-blue] dark:focus-visible:ring-[ieee-teal] rounded px-1 py-0.5 transition-colors"
             >
               <span>Learn More</span>
               <ArrowRight

@@ -33,7 +33,7 @@ export default function EventCard({ event }) {
   const formattedDate = formatDate(event.date);
 
   return (
-    <article className="card h-full flex flex-col justify-between group transition-all duration-300 hover:border-[#00629B] dark:hover:border-[#22D3EE]/50 hover:shadow-xl hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none">
+    <article className="card h-full flex flex-col justify-between group transition-all duration-300 hover:border-[ieee-blue] dark:hover:border-[ieee-teal]/50 hover:shadow-xl hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none">
       <div>
         {/* Top Image Container (Fixed 16:9 aspect ratio) */}
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg mb-5 bg-slate-900">
@@ -46,14 +46,14 @@ export default function EventCard({ event }) {
             />
           ) : (
             // TODO: replace null image with real event banner image
-            <div className="w-full h-full bg-gradient-to-br from-[#00629B]/40 via-slate-900 to-[#0A1224] flex items-center justify-center">
-              <TagIcon size={44} className="text-[#22D3EE]/60" />
+            <div className="w-full h-full bg-gradient-to-br from-[ieee-blue]/40 via-slate-900 to-[#0A1224] flex items-center justify-center">
+              <TagIcon size={44} className="text-[ieee-teal]/60" />
             </div>
           )}
 
           {/* Event Tag Chip */}
           {event.tag && (
-            <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-black/70 backdrop-blur-md text-[#22D3EE] border border-[#22D3EE]/30 shadow-sm">
+            <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-black/70 backdrop-blur-md text-[ieee-teal] border border-[ieee-teal]/30 shadow-sm">
               {event.tag}
             </span>
           )}
@@ -75,7 +75,7 @@ export default function EventCard({ event }) {
         </div>
 
         {/* Title (clamped to 2 lines) */}
-        <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white mb-2 leading-snug line-clamp-2 group-hover:text-[#00629B] dark:group-hover:text-[#22D3EE] transition-colors">
+        <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white mb-2 leading-snug line-clamp-2 group-hover:text-[ieee-blue] dark:group-hover:text-[ieee-teal] transition-colors">
           {event.title}
         </h3>
 
@@ -89,7 +89,7 @@ export default function EventCard({ event }) {
       <div className="pt-4 border-t border-slate-200 dark:border-zinc-800/80 mt-auto">
         <Link
           to={event.link || '/events'}
-          className="inline-flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider font-semibold text-[#00629B] dark:text-[#22D3EE] hover:text-[#0077b6] dark:hover:text-cyan-300 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B] dark:focus-visible:ring-[#22D3EE] rounded transition-colors"
+          className="inline-flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider font-semibold text-[ieee-blue] dark:text-[ieee-teal] hover:text-[#0077b6] dark:hover:text-cyan-300 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[ieee-blue] dark:focus-visible:ring-[ieee-teal] rounded transition-colors"
         >
           <span>Details</span>
           <ArrowRight
