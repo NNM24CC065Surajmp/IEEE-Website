@@ -576,7 +576,7 @@ export default function TeamPage() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onWheel={handleWheel}
-        className="relative w-full max-w-6xl mx-auto h-[320px] sm:h-[360px] flex items-center justify-center my-4"
+        className="relative w-full max-w-6xl mx-auto h-[380px] sm:h-[430px] flex items-center justify-center my-4"
         style={{ perspective: isMobile ? '850px' : '1200px' }}
       >
         {/* Left Arrow Button */}
@@ -644,57 +644,47 @@ export default function TeamPage() {
                   opacity: opacity,
                 }}
               >
-                {/* The Profile Card */}
+                {/* Top-Avatar Vertical Profile Card */}
                 <div
-                  className={`relative w-[310px] sm:w-[380px] h-[195px] sm:h-[230px] rounded-xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-lg ${
+                  className={`relative w-[280px] sm:w-[320px] h-[310px] sm:h-[340px] rounded-2xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xl ${
                     isCenter
-                      ? 'bg-white dark:bg-[#0a0d16] border-2 border-[#00629B] shadow-[0_0_35px_rgba(0,98,155,0.25)] ring-1 ring-[#00629B]/30'
-                      : 'bg-slate-100/90 dark:bg-[#080a11]/90 border border-slate-300 dark:border-zinc-800/90 hover:border-slate-400 dark:hover:border-zinc-700'
+                      ? 'bg-white dark:bg-[#0a0d16] border-2 border-[#00629B] shadow-[0_0_35px_rgba(0,98,155,0.3)] ring-1 ring-[#00629B]/40'
+                      : 'bg-slate-100/95 dark:bg-[#080a11]/95 border border-slate-300 dark:border-zinc-800/90 hover:border-slate-400 dark:hover:border-zinc-700'
                   }`}
                 >
-                  <div className="absolute right-[-10px] bottom-[-10px] text-slate-300/40 dark:text-zinc-800/15 pointer-events-none">
-                    <ShieldCheck size={120} />
+                  {/* Decorative Background Shield Ornament */}
+                  <div className="absolute right-[-20px] bottom-[-20px] text-slate-300/30 dark:text-zinc-800/15 pointer-events-none">
+                    <ShieldCheck size={160} />
                   </div>
 
-                  <div className="relative z-10 flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3.5">
-                      <div className="relative">
-                        <img
-                          src={member.image}
-                          alt={member.name}
-                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg object-cover border transition-colors ${
-                            isCenter
-                              ? 'border-[#00629B] shadow-sm shadow-[#00629B]/50'
-                              : 'border-slate-300 dark:border-zinc-700'
-                          }`}
-                          loading="lazy"
-                        />
-                        {isCenter && (
-                          <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#00629B] border-2 border-white dark:border-[#0a0d16] flex items-center justify-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#0096D6]" />
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <h3
-                          className={`font-bold tracking-tight text-base sm:text-lg transition-colors leading-tight ${
-                            isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-zinc-200'
-                          }`}
-                        >
-                          {member.name}
-                        </h3>
-                        <p className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 mt-0.5 truncate max-w-[170px]">
-                          {member.dept}
-                        </p>
-                        <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400">
-                          {member.year}
+                  {/* TOP SECTION: Centered Top Profile Picture & Information */}
+                  <div className="relative z-10 flex flex-col items-center text-center pt-1">
+                    {/* Top Profile Picture Avatar */}
+                    <div className="relative mb-3">
+                      <img
+                        src={getMemberImage(member.image)}
+                        alt={member.name}
+                        loading="eager"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+                        }}
+                        className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover object-center border-2 transition-all duration-300 ${
+                          isCenter
+                            ? 'border-[#00629B] shadow-lg shadow-[#00629B]/35 scale-105'
+                            : 'border-slate-300 dark:border-zinc-700'
+                        }`}
+                      />
+                      {isCenter && (
+                        <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#00629B] border-2 border-white dark:border-[#0a0d16] flex items-center justify-center">
+                          <span className="w-2 h-2 rounded-full bg-[#0096D6]" />
                         </span>
-                      </div>
+                      )}
                     </div>
 
+                    {/* Division Badge */}
                     <span
-                      className={`text-[9px] font-mono tracking-wider uppercase px-2 py-0.5 rounded border whitespace-nowrap font-semibold ${
+                      className={`text-[9px] font-mono tracking-wider uppercase px-2.5 py-0.5 rounded-full border font-semibold mb-2 ${
                         isCenter
                           ? 'border-[#00629B]/70 bg-[#00629B]/15 text-[#00629B] dark:text-[#5db4e8]'
                           : 'border-slate-300 dark:border-zinc-800 bg-slate-200/60 dark:bg-zinc-900/60 text-slate-600 dark:text-zinc-400'
@@ -702,8 +692,26 @@ export default function TeamPage() {
                     >
                       {member.division}
                     </span>
+
+                    {/* Member Name */}
+                    <h3
+                      className={`font-bold tracking-tight text-lg sm:text-xl transition-colors leading-tight mb-1 ${
+                        isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-zinc-200'
+                      }`}
+                    >
+                      {member.name.replace(/\n/g, ' ')}
+                    </h3>
+
+                    {/* Dept & Year */}
+                    <p className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 truncate max-w-[240px]">
+                      {member.dept}
+                    </p>
+                    <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 mt-0.5">
+                      {member.year}
+                    </span>
                   </div>
 
+                  {/* BOTTOM FOOTER: Role & View Details Action */}
                   <div className="relative z-10 pt-3 border-t border-slate-200 dark:border-zinc-800/80 flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                       <Award
@@ -719,9 +727,9 @@ export default function TeamPage() {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[10px] font-mono text-slate-500 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-zinc-200">
-                      <span>Details</span>
-                      <ArrowRight size={11} />
+                    <div className="flex items-center gap-1 text-[11px] font-mono text-[#00629B] dark:text-[#5db4e8] font-bold group-hover:underline">
+                      <span>View Details</span>
+                      <ArrowRight size={12} />
                     </div>
                   </div>
                 </div>
