@@ -15,16 +15,36 @@ import {
   BookOpen,
 } from 'lucide-react';
 
+
+// Vite eager asset glob resolver for team profile pictures
+const localImages = import.meta.glob('/src/imgs/*.{jpg,jpeg,png,webp,HEIC,JPG,PNG,jpeg,JPEG}', { eager: true, import: 'default' });
+
+const getMemberImage = (imgPath) => {
+  if (!imgPath) return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+  if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) return imgPath;
+
+  const normalized = imgPath.startsWith('/') ? imgPath : `/${imgPath}`;
+  if (localImages[normalized]) return localImages[normalized];
+
+  const fileName = normalized.split('/').pop().toLowerCase();
+  for (const path in localImages) {
+    if (path.toLowerCase().endsWith(fileName)) {
+      return localImages[path];
+    }
+  }
+  return imgPath;
+};
+
 const CORE_TEAM_MEMBERS = [
   {
     id: 'Mohammed-ajmal ',
-    name: 'Mohammed \nAjmal ',
+    name: 'Mohammed  Ajmal ',
     role: 'President',
     division: 'Executive Committee',
     dept: 'Information Science & Engineering',
     year: 'Third Year',
     memberId: '101215214',
-    image: "src/imgs/Azmal.HEIC",
+    image: "src/imgs/Azmal.jpg",
     bio: 'I am a tech enthusiastic and also a extrovert who loves discovering new topics and learning continuously ',
     quote:'My code works perfectly until a user touches it 😃',
     socials: {
@@ -35,7 +55,7 @@ const CORE_TEAM_MEMBERS = [
   },
   {
     id: 'ninaad-y',
-    name:'Ninaad \nY',
+    name:'Ninaad  Y',
     role:'Vice president ',
     division: 'Executive Committee',
     dept: 'Information Science engineering ',
@@ -385,7 +405,7 @@ const CORE_TEAM_MEMBERS = [
         dept: 'ECE(ACT)',
         year: '3RD',
         memberId: '102732308',
-        image:"src/imgs/Bhavish Kumar M_.jpg",
+        image:"/src/imgs/Bhavish Kumar M_ .jpg",
         bio: 'Marketing Head at IEEE, always juggling multiple clubs and events.Into sports and I love turning ideas into things people actually notice and talk about.',
         quote: 'Marketing Head — 50% content creation, 50% chasing people for likes and shares.',
         socials: {
@@ -402,7 +422,7 @@ const CORE_TEAM_MEMBERS = [
         dept: 'Biotechnology ',
         year: '2ND',
         memberId: '102726797',
-        image:"src/imgs/Jiya Bawankar.jpg",
+        image:"/src/imgs/Jiya bawankar_.png",
         bio: 'I’m a curious, creative, and enthusiastic person who enjoys learning new things and taking on new challenges. I’m currently pursuing B.Tech in Biotechnology, and I’m especially interested in combining my technical knowledge with creativity, communication, and teamwork. I’m someone who likes being involved in events and activities, takes responsibility seriously, and always tries toimprove myself. I would describe myself as adaptable, approachable, and willing to step out of my comfort zone to gain new experiences.',
         quote: '“Don’t wait for the right opportunity, create it.”',
         socials: {
@@ -767,7 +787,7 @@ export default function TeamPage() {
             <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start">
               <div className="relative shrink-0">
                 <img
-                  src={selectedMember.image}
+                  src={getMemberImage(selectedMember.image)}
                   alt={selectedMember.name}
                   className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover border-2 border-[#00629B] shadow-lg shadow-[#00629B]/30"
                 />
