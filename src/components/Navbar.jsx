@@ -46,18 +46,18 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
         >
           <div className={`relative w-9 h-9 rounded-lg border flex items-center justify-center font-mono font-bold text-xs transition-all duration-300 overflow-hidden ${
             isLight
-              ? 'border-slate-300 bg-white text-[ieee-blue] group-hover:border-[ieee-blue] group-hover:shadow-[0_0_15px_rgba(0,98,155,0.2)]'
-              : 'border-zinc-700/80 bg-zinc-900/90 text-[ieee-teal] group-hover:border-[ieee-teal] group-hover:shadow-[0_0_15px_rgba(0,150,214,0.4)]'
+              ? 'border-slate-300 bg-white text-ieee-blue group-hover:border-ieee-blue group-hover:shadow-[0_0_15px_rgba(0,98,155,0.2)]'
+              : 'border-zinc-700/80 bg-zinc-900/90 text-ieee-teal group-hover:border-ieee-teal group-hover:shadow-[0_0_15px_rgba(0,150,214,0.4)]'
           }`}>
             <span className="relative z-10">IE</span>
-            <div className="absolute inset-0 bg-gradient-to-tr from-[ieee-blue]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-ieee-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
           <div className="flex flex-col">
             <span className={`text-sm font-bold tracking-tight transition-colors flex items-center gap-1.5 ${
-              isLight ? 'text-slate-900 group-hover:text-[ieee-blue]' : 'text-zinc-100 group-hover:text-white'
+              isLight ? 'text-slate-900 group-hover:text-ieee-blue' : 'text-zinc-100 group-hover:text-white'
             }`}>
               IEEE NMAMIT
-              <span className="w-1.5 h-1.5 rounded-full bg-[ieee-teal] animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-ieee-teal animate-pulse" />
             </span>
             <span className={`text-[10px] font-mono tracking-wider uppercase transition-colors ${
               isLight ? 'text-slate-500 group-hover:text-slate-700' : 'text-zinc-400 group-hover:text-zinc-300'
@@ -84,8 +84,8 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
                   className={`relative px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5 cursor-pointer focus:outline-none ${
                     isActive
                       ? isLight
-                        ? 'text-white font-bold bg-[ieee-blue] border border-[ieee-blue] shadow-md shadow-[ieee-blue]/25'
-                        : 'text-white font-bold bg-[ieee-blue]/80 border border-[ieee-teal]/60 shadow-[0_0_15px_rgba(0,150,214,0.35)]'
+                        ? 'text-white font-bold bg-ieee-blue border border-ieee-blue shadow-md shadow-ieee-blue/25'
+                        : 'text-white font-bold bg-ieee-blue/80 border border-ieee-teal/60 shadow-[0_0_15px_rgba(0,150,214,0.35)]'
                       : isLight
                         ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                         : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
@@ -164,15 +164,15 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
                 className={`w-full text-left py-2.5 px-3 rounded-lg flex items-center justify-between transition-all duration-200 ${
                   isActive
                     ? isLight
-                      ? 'bg-[ieee-blue]/10 border border-[ieee-blue]/30 text-[ieee-blue] font-bold shadow-sm'
-                      : 'bg-[ieee-blue]/30 border border-[ieee-teal]/50 text-white font-bold shadow-[0_0_12px_rgba(0,150,214,0.2)]'
+                      ? 'bg-ieee-blue/10 border border-ieee-blue/30 text-ieee-blue font-bold shadow-sm'
+                      : 'bg-ieee-blue/30 border border-ieee-teal/50 text-white font-bold shadow-[0_0_12px_rgba(0,150,214,0.2)]'
                     : isLight
                       ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                       : 'text-zinc-400 hover:text-white hover:bg-zinc-800/40'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? (isLight ? 'bg-[ieee-blue]' : 'bg-[ieee-teal]') : (isLight ? 'bg-slate-300' : 'bg-zinc-600')}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? (isLight ? 'bg-ieee-blue' : 'bg-ieee-teal') : (isLight ? 'bg-slate-300' : 'bg-zinc-600')}`} />
                   <span>{item.label}</span>
                 </div>
                 <span className={`text-[10px] ${isLight ? 'text-slate-400' : 'text-zinc-500'}`}>0{idx + 1}</span>

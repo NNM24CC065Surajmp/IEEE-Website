@@ -26,7 +26,7 @@ export default function Footer({ onNavigate }) {
           {/* Column 1: Brand & Description */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-7 h-7 rounded border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center text-[ieee-blue] dark:text-[ieee-teal] font-mono font-bold text-xs">
+              <div className="w-7 h-7 rounded border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center text-ieee-blue dark:text-ieee-teal font-mono font-bold text-xs">
                 IE
               </div>
               <span className="font-heading font-bold text-base text-slate-900 dark:text-white tracking-tight">
@@ -47,7 +47,7 @@ export default function Footer({ onNavigate }) {
                     href={social.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-8 h-8 rounded-lg border border-slate-300 dark:border-zinc-800 hover:border-[ieee-blue] dark:hover:border-[ieee-teal] bg-white dark:bg-zinc-900/60 flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-[ieee-blue] dark:hover:text-[ieee-teal] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[ieee-blue]"
+                    className="w-8 h-8 rounded-lg border border-slate-300 dark:border-zinc-800 hover:border-ieee-blue dark:hover:border-ieee-teal bg-white dark:bg-zinc-900/60 flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue"
                     aria-label={social.label}
                   >
                     <IconComp size={15} />
@@ -67,7 +67,7 @@ export default function Footer({ onNavigate }) {
                 <Link
                   to="/"
                   onClick={() => handleNav('home')}
-                  className="hover:text-[ieee-blue] dark:hover:text-[ieee-teal] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[ieee-blue] rounded"
+                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
                 >
                   Home
                 </Link>
@@ -76,7 +76,7 @@ export default function Footer({ onNavigate }) {
                 <Link
                   to="/about"
                   onClick={() => handleNav('about')}
-                  className="hover:text-[ieee-blue] dark:hover:text-[ieee-teal] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[ieee-blue] rounded"
+                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
                 >
                   About Chapter
                 </Link>
@@ -85,7 +85,7 @@ export default function Footer({ onNavigate }) {
                 <Link
                   to="/events"
                   onClick={() => handleNav('events')}
-                  className="hover:text-[ieee-blue] dark:hover:text-[ieee-teal] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[ieee-blue] rounded"
+                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
                 >
                   Events & Labs
                 </Link>
@@ -94,7 +94,7 @@ export default function Footer({ onNavigate }) {
                 <Link
                   to="/team"
                   onClick={() => handleNav('team')}
-                  className="hover:text-[ieee-blue] dark:hover:text-[ieee-teal] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[ieee-blue] rounded"
+                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
                 >
                   Core Team
                 </Link>
@@ -103,7 +103,7 @@ export default function Footer({ onNavigate }) {
                 <Link
                   to="/join"
                   onClick={() => handleNav('join')}
-                  className="hover:text-[ieee-blue] dark:hover:text-[ieee-teal] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[ieee-blue] rounded"
+                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
                 >
                   Join Us
                 </Link>
@@ -125,10 +125,10 @@ export default function Footer({ onNavigate }) {
               )}
               {site.contact.email && (
                 <div className="flex items-center gap-2">
-                  <Mail size={14} className="text-[ieee-blue] dark:text-[ieee-teal] shrink-0" />
+                  <Mail size={14} className="text-ieee-blue dark:text-ieee-teal shrink-0" />
                   <a
                     href={`mailto:${site.contact.email}`}
-                    className="hover:text-[ieee-blue] dark:hover:text-[ieee-teal] transition-colors"
+                    className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors"
                   >
                     {site.contact.email}
                   </a>
@@ -136,10 +136,10 @@ export default function Footer({ onNavigate }) {
               )}
               {site.contact.phone && (
                 <div className="flex items-center gap-2">
-                  <Phone size={14} className="text-[ieee-blue] dark:text-[ieee-teal] shrink-0" />
+                  <Phone size={14} className="text-ieee-blue dark:text-ieee-teal shrink-0" />
                   <a
                     href={`tel:${site.contact.phone}`}
-                    className="hover:text-[ieee-blue] dark:hover:text-[ieee-teal] transition-colors"
+                    className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors"
                   >
                     {site.contact.phone}
                   </a>
