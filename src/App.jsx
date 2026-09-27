@@ -5,12 +5,13 @@ import HomePage from './pages/HomePage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import EventsPage from './pages/EventsPage.jsx';
 import TeamPage from './pages/TeamPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
 
 export default function App() {
   // Read initial page from URL hash if available (e.g. #about, #events, #team)
   const getInitialPage = () => {
     const hash = window.location.hash.replace('#', '').toLowerCase();
-    if (['home', 'about', 'events', 'team'].includes(hash)) {
+    if (['home', 'about', 'events', 'team','profile'].includes(hash)) {
       return hash;
     }
     return 'home';
@@ -47,7 +48,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').toLowerCase();
-      if (['home', 'about', 'events', 'team'].includes(hash)) {
+      if (['home', 'about', 'events', 'team', 'profile'].includes(hash)) {
         setCurrentPage(hash);
       }
     };
@@ -70,6 +71,8 @@ export default function App() {
         return <EventsPage onNavigate={navigateTo} />;
       case 'team':
         return <TeamPage onNavigate={navigateTo} />;
+      case 'profile':
+        return <ProfilePage onNavigate={navigateTo} />;
       case 'home':
       default:
         return <HomePage onNavigate={navigateTo} />;

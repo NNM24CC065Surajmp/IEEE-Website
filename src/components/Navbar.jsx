@@ -18,6 +18,7 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
     { id: 'about', label: 'About' },
     { id: 'events', label: 'Events' },
     { id: 'team', label: 'Team' },
+    { id: 'profile', label: 'Profile' },
   ];
 
   const handleLinkClick = (id) => {
