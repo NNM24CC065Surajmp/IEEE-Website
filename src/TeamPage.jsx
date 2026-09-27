@@ -33,6 +33,113 @@ import {
  */
 
 // ============================================================================
+// ROLE-BASED COLOR THEMING (Muted & Professional Palette)
+// ============================================================================
+const DEPARTMENT_THEMES = {
+  leadership: {
+    name: 'Top Leadership',
+    badgeBg: 'bg-[#991b1b]', // Deep Red
+    badgeText: 'text-white',
+    badgeDot: 'bg-[#fca5a5]',
+    activeBorder: 'border-[#991b1b]',
+    activeShadow: 'shadow-[0_0_35px_rgba(153,27,27,0.35)] ring-1 ring-[#991b1b]/40',
+    dotBg: 'bg-[#991b1b]',
+    dotInner: 'bg-[#f87171]',
+    roleText: 'text-[#b91c1c] dark:text-[#f87171]',
+  },
+  secretariat: {
+    name: 'Secretariat',
+    badgeBg: 'bg-[#6b21a8]', // Purple
+    badgeText: 'text-white',
+    badgeDot: 'bg-[#d8b4fe]',
+    activeBorder: 'border-[#6b21a8]',
+    activeShadow: 'shadow-[0_0_35px_rgba(107,33,168,0.35)] ring-1 ring-[#6b21a8]/40',
+    dotBg: 'bg-[#6b21a8]',
+    dotInner: 'bg-[#c084fc]',
+    roleText: 'text-[#7e22ce] dark:text-[#c084fc]',
+  },
+  technical: {
+    name: 'Technical Team',
+    badgeBg: 'bg-[#00629B]', // Blue (IEEE Blue)
+    badgeText: 'text-white',
+    badgeDot: 'bg-[#7dd3fc]',
+    activeBorder: 'border-[#00629B]',
+    activeShadow: 'shadow-[0_0_35px_rgba(0,98,155,0.35)] ring-1 ring-[#00629B]/40',
+    dotBg: 'bg-[#00629B]',
+    dotInner: 'bg-[#38bdf8]',
+    roleText: 'text-[#00629B] dark:text-[#5db4e8]',
+  },
+  finance: {
+    name: 'Finance',
+    badgeBg: 'bg-[#92400e]', // Gold / Amber
+    badgeText: 'text-white',
+    badgeDot: 'bg-[#fde68a]',
+    activeBorder: 'border-[#b45309]',
+    activeShadow: 'shadow-[0_0_35px_rgba(180,83,9,0.35)] ring-1 ring-[#b45309]/40',
+    dotBg: 'bg-[#92400e]',
+    dotInner: 'bg-[#fcd34d]',
+    roleText: 'text-[#b45309] dark:text-[#fbbf24]',
+  },
+  events: {
+    name: 'Events Team',
+    badgeBg: 'bg-[#eab308]', // Yellow
+    badgeText: 'text-zinc-950', // Dark text for contrast against bright yellow
+    badgeDot: 'bg-zinc-900',
+    activeBorder: 'border-[#eab308]',
+    activeShadow: 'shadow-[0_0_35px_rgba(234,179,8,0.35)] ring-1 ring-[#eab308]/40',
+    dotBg: 'bg-[#eab308]',
+    dotInner: 'bg-[#fef08a]',
+    roleText: 'text-[#ca8a04] dark:text-[#facc15]',
+  },
+  design: {
+    name: 'Design Team',
+    badgeBg: 'bg-[#9d174d]', // Pink / Magenta
+    badgeText: 'text-white',
+    badgeDot: 'bg-[#f9a8d4]',
+    activeBorder: 'border-[#be185d]',
+    activeShadow: 'shadow-[0_0_35px_rgba(190,24,93,0.35)] ring-1 ring-[#be185d]/40',
+    dotBg: 'bg-[#9d174d]',
+    dotInner: 'bg-[#f472b6]',
+    roleText: 'text-[#be185d] dark:text-[#f472b6]',
+  },
+  content: {
+    name: 'Content Team',
+    badgeBg: 'bg-[#0f766e]', // Teal
+    badgeText: 'text-white',
+    badgeDot: 'bg-[#5eead4]',
+    activeBorder: 'border-[#0f766e]',
+    activeShadow: 'shadow-[0_0_35px_rgba(15,118,110,0.35)] ring-1 ring-[#0f766e]/40',
+    dotBg: 'bg-[#0f766e]',
+    dotInner: 'bg-[#2dd4bf]',
+    roleText: 'text-[#0d9488] dark:text-[#2dd4bf]',
+  },
+  marketing: {
+    name: 'Marketing Team',
+    badgeBg: 'bg-[#166534]', // Green
+    badgeText: 'text-white',
+    badgeDot: 'bg-[#86efac]',
+    activeBorder: 'border-[#15803d]',
+    activeShadow: 'shadow-[0_0_35px_rgba(21,128,61,0.35)] ring-1 ring-[#15803d]/40',
+    dotBg: 'bg-[#166534]',
+    dotInner: 'bg-[#4ade80]',
+    roleText: 'text-[#15803d] dark:text-[#4ade80]',
+  },
+};
+
+const getDepartmentTheme = (role) => {
+  const r = (role || '').toLowerCase().trim();
+  if (r.includes('president')) return DEPARTMENT_THEMES.leadership;
+  if (r.includes('secretary')) return DEPARTMENT_THEMES.secretariat;
+  if (r.includes('tech') || r.includes('coding') || r.includes('hardware')) return DEPARTMENT_THEMES.technical;
+  if (r.includes('treasur') || r.includes('finance')) return DEPARTMENT_THEMES.finance;
+  if (r.includes('event') || r.includes('logistics')) return DEPARTMENT_THEMES.events;
+  if (r.includes('design') || r.includes('creative')) return DEPARTMENT_THEMES.design;
+  if (r.includes('content') || r.includes('editorial')) return DEPARTMENT_THEMES.content;
+  if (r.includes('market') || r.includes('sponsor') || r.includes('outreach')) return DEPARTMENT_THEMES.marketing;
+  return DEPARTMENT_THEMES.technical;
+};
+
+// ============================================================================
 // DATA: ~25 Core Team Members (President First)
 // ============================================================================
 const CORE_TEAM_MEMBERS = [
@@ -611,6 +718,7 @@ export default function TeamPage() {
   };
 
   const activeMember = CORE_TEAM_MEMBERS[currentIndex];
+  const selectedTheme = selectedMember ? getDepartmentTheme(selectedMember.role) : null;
 
   return (
     <div className="min-h-screen bg-[#05070a] text-zinc-100 font-sans selection:bg-[#00629B] selection:text-white relative overflow-hidden flex flex-col justify-between">
@@ -707,6 +815,8 @@ export default function TeamPage() {
               // Only render cards within visible offset window to maximize performance
               if (Math.abs(offset) > 4) return null;
 
+              const theme = getDepartmentTheme(member.role);
+
               // Horizontal Barrel Physics:
               const angleStep = isMobile ? 22 : 18; // degrees per card
               const spacingStep = isMobile ? 180 : 255; // pixels per card
@@ -735,7 +845,7 @@ export default function TeamPage() {
                   {/* Rectangular Headshot Profile Card */}
                   <div
                     className={`group relative w-[270px] sm:w-[310px] h-[380px] sm:h-[420px] rounded-2xl transition-all duration-300 flex flex-col overflow-hidden shadow-xl ${isCenter
-                        ? 'bg-[#0a0d16] border-2 border-[#00629B] shadow-[0_0_35px_rgba(0,98,155,0.35)] ring-1 ring-[#5db4e8]/40'
+                        ? `bg-[#0a0d16] border-2 ${theme.activeBorder} ${theme.activeShadow}`
                         : 'bg-[#080a11]/90 border border-zinc-800/90 hover:border-zinc-700'
                       }`}
                   >
@@ -758,16 +868,16 @@ export default function TeamPage() {
 
                       {/* Colored Badge/Pill Label at Top-Left Corner */}
                       <div className="absolute top-3 left-3 z-20">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-[#00629B] text-white shadow-md shadow-[#00629B]/50 border border-white/20 backdrop-blur-md max-w-[210px] truncate">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#5db4e8] shrink-0" />
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase ${theme.badgeBg} ${theme.badgeText} shadow-md border border-white/20 backdrop-blur-md max-w-[210px] truncate`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${theme.badgeDot} shrink-0`} />
                           <span className="truncate">{member.role.trim().toUpperCase()}</span>
                         </span>
                       </div>
 
                       {/* Center Active indicator dot */}
                       {isCenter && (
-                        <span className="absolute bottom-2.5 right-3 w-3 h-3 rounded-full bg-[#00629B] border-2 border-[#0a0d16] flex items-center justify-center shadow">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#5db4e8]" />
+                        <span className={`absolute bottom-2.5 right-3 w-3 h-3 rounded-full ${theme.dotBg} border-2 border-[#0a0d16] flex items-center justify-center shadow`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${theme.dotInner}`} />
                         </span>
                       )}
                     </div>
@@ -784,7 +894,7 @@ export default function TeamPage() {
                         </h3>
 
                         {/* Role & Department as Smaller Subtitle */}
-                        <p className="text-xs sm:text-sm font-semibold text-[#5db4e8] mb-0.5 truncate">
+                        <p className={`text-xs sm:text-sm font-semibold ${theme.roleText} mb-0.5 truncate`}>
                           {member.role.trim()}
                         </p>
                         <p className="text-[11px] font-mono text-zinc-400 truncate">
@@ -797,7 +907,7 @@ export default function TeamPage() {
                         <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-semibold truncate max-w-[140px]">
                           {member.division}
                         </span>
-                        <div className="flex items-center gap-1 text-[11px] font-mono text-[#5db4e8] font-bold group-hover:underline">
+                        <div className={`flex items-center gap-1 text-[11px] font-mono ${theme.roleText} font-bold group-hover:underline`}>
                           <span>Details</span>
                           <ArrowRight size={12} />
                         </div>
@@ -819,21 +929,21 @@ export default function TeamPage() {
               {String(currentIndex + 1).padStart(2, '0')} / {String(CORE_TEAM_MEMBERS.length).padStart(2, '0')}
             </span>
             <span className="text-zinc-400 hidden sm:inline">·</span>
-            <span className="text-[#5db4e8] font-medium hidden sm:inline">
+            <span className={`font-medium hidden sm:inline ${getDepartmentTheme(activeMember?.role).roleText}`}>
               {activeMember?.role}
             </span>
           </div>
 
           {/* Clickable mini scrub-dots */}
           <div className="flex items-center gap-1.5 max-w-[85vw] overflow-x-auto py-1 px-2 no-scrollbar">
-            {CORE_TEAM_MEMBERS.map((_, i) => (
+            {CORE_TEAM_MEMBERS.map((m, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => goToIndex(i)}
                 aria-label={`Jump to ${CORE_TEAM_MEMBERS[i].name}`}
                 className={`h-1.5 rounded-full transition-all duration-200 ${i === currentIndex
-                    ? 'w-6 bg-[#5db4e8]'
+                    ? `w-6 ${getDepartmentTheme(m.role).badgeBg}`
                     : 'w-1.5 bg-zinc-800 hover:bg-zinc-600'
                   }`}
               />
@@ -890,7 +1000,7 @@ export default function TeamPage() {
                 <img
                   src={selectedMember.image}
                   alt={selectedMember.name}
-                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover border-2 border-[#00629B] shadow-lg shadow-[#00629B]/30"
+                  className={`w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover border-2 ${selectedTheme?.activeBorder || 'border-[#00629B]'} shadow-lg shadow-black/30`}
                 />
                 <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 whitespace-nowrap">
                   {selectedMember.memberId}
@@ -899,14 +1009,16 @@ export default function TeamPage() {
 
               {/* Name, Role & Details */}
               <div className="flex-1 pr-10 sm:pr-12">
-                <div className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest text-[#5db4e8] uppercase mb-1">
-                  <span>{selectedMember.division}</span>
+                <div className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase mb-1 font-bold">
+                  <span className={`px-2.5 py-0.5 rounded-full ${selectedTheme?.badgeText || 'text-white'} ${selectedTheme?.badgeBg || 'bg-[#00629B]'}`}>
+                    {selectedMember.division}
+                  </span>
                 </div>
                 <h2 className="text-2xl font-bold text-white tracking-tight leading-tight">
                   {selectedMember.name}
                 </h2>
-                <div className="text-sm font-semibold text-zinc-300 flex items-center gap-1.5 mt-0.5">
-                  <Award size={15} className="text-[#5db4e8]" />
+                <div className={`text-sm font-semibold flex items-center gap-1.5 mt-0.5 ${selectedTheme?.roleText || 'text-[#5db4e8]'}`}>
+                  <Award size={15} />
                   <span>{selectedMember.role}</span>
                 </div>
 
