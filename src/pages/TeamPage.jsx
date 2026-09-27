@@ -398,6 +398,23 @@ const CORE_TEAM_MEMBERS = [
         },
     },
     {
+        id: 'likithraj',
+        name: 'LIKITHRAJ',
+        role: 'Content Core',
+        division: 'Executive Committee',
+        dept: 'Information Science Engineering',
+        year: '3RD',
+        memberId: 'IEEE Member',
+        image: "src/imgs/LIKITHRAJ.png",
+        bio: 'Passionate about content creation, communication, and contributing to the IEEE Student Branch initiatives.',
+        quote: 'Happy to work for IEEE',
+        socials: {
+            linkedin: '#',
+            github: '#',
+            email: '',
+        },
+    },
+    {
         id:'bhavish-m-kumar',
         name:'Bhavish Kumar M ',
         role:'Marketing Head ',
