@@ -636,7 +636,7 @@ export default function TeamPage() {
               IEEE NMAMIT
             </h1>
             <p className="text-[10px] font-mono text-zinc-400 tracking-wider uppercase">
-              Core Committee · 2025–2026
+              Core Committee · 2026–2027
             </p>
           </div>
         </div>
@@ -665,7 +665,7 @@ export default function TeamPage() {
 
         {/* 3D Barrel Carousel Stage */}
         <div
-          className="relative w-full max-w-5xl h-[310px] sm:h-[350px] flex items-center justify-center"
+          className="relative w-full max-w-5xl h-[420px] sm:h-[480px] flex items-center justify-center"
           style={{ perspective: isMobile ? '850px' : '1200px' }}
         >
           {/* Left Arrow Button */}
@@ -673,11 +673,10 @@ export default function TeamPage() {
             type="button"
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className={`absolute left-3 sm:left-6 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 ${
-              currentIndex === 0
+            className={`absolute left-3 sm:left-6 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 ${currentIndex === 0
                 ? 'border-zinc-800/50 bg-zinc-900/30 text-zinc-600 cursor-not-allowed'
                 : 'border-zinc-700/80 bg-zinc-900/90 text-zinc-300 hover:text-white hover:border-[#00629B] hover:shadow-[0_0_20px_rgba(0,98,155,0.4)] active:scale-95'
-            }`}
+              }`}
             aria-label="Previous member"
           >
             <ChevronLeft size={22} />
@@ -688,11 +687,10 @@ export default function TeamPage() {
             type="button"
             onClick={handleNext}
             disabled={currentIndex === CORE_TEAM_MEMBERS.length - 1}
-            className={`absolute right-3 sm:right-6 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 ${
-              currentIndex === CORE_TEAM_MEMBERS.length - 1
+            className={`absolute right-3 sm:right-6 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 ${currentIndex === CORE_TEAM_MEMBERS.length - 1
                 ? 'border-zinc-800/50 bg-zinc-900/30 text-zinc-600 cursor-not-allowed'
                 : 'border-zinc-700/80 bg-zinc-900/90 text-zinc-300 hover:text-white hover:border-[#00629B] hover:shadow-[0_0_20px_rgba(0,98,155,0.4)] active:scale-95'
-            }`}
+              }`}
             aria-label="Next member"
           >
             <ChevronRight size={22} />
@@ -710,10 +708,6 @@ export default function TeamPage() {
               if (Math.abs(offset) > 4) return null;
 
               // Horizontal Barrel Physics:
-              // R: radius of horizontal drum
-              // theta: rotation around Y-axis (curves cards away on left and right)
-              // translateZ: cards recede as they curve away from the front plane
-              // translateX: horizontal spread along the cylindrical face
               const angleStep = isMobile ? 22 : 18; // degrees per card
               const spacingStep = isMobile ? 180 : 255; // pixels per card
               const depthStep = isMobile ? 65 : 85; // pixels receding in depth
@@ -730,99 +724,83 @@ export default function TeamPage() {
                 <div
                   key={member.id}
                   onClick={() => handleCardClick(member, index)}
-                  className={`absolute cursor-pointer transition-all duration-300 ease-out will-change-transform ${
-                    isCenter ? 'z-30' : 'z-10'
-                  }`}
+                  className={`absolute cursor-pointer transition-all duration-300 ease-out will-change-transform ${isCenter ? 'z-30' : 'z-10'
+                    }`}
                   style={{
                     transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                     transformOrigin: 'center center',
                     opacity: opacity,
                   }}
                 >
-                  {/* The Profile Card */}
+                  {/* Rectangular Headshot Profile Card */}
                   <div
-                    className={`relative w-[310px] sm:w-[380px] h-[195px] sm:h-[230px] rounded-xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between overflow-hidden ${
-                      isCenter
-                        ? 'bg-[#0a0d16] border-2 border-[#00629B] shadow-[0_0_35px_rgba(0,98,155,0.25)] ring-1 ring-[#5db4e8]/30'
+                    className={`group relative w-[270px] sm:w-[310px] h-[380px] sm:h-[420px] rounded-2xl transition-all duration-300 flex flex-col overflow-hidden shadow-xl ${isCenter
+                        ? 'bg-[#0a0d16] border-2 border-[#00629B] shadow-[0_0_35px_rgba(0,98,155,0.35)] ring-1 ring-[#5db4e8]/40'
                         : 'bg-[#080a11]/90 border border-zinc-800/90 hover:border-zinc-700'
-                    }`}
+                      }`}
                   >
                     {/* Background subtle watermark icon */}
-                    <div className="absolute right-[-10px] bottom-[-10px] text-zinc-800/15 pointer-events-none">
-                      <ShieldCheck size={120} />
+                    <div className="absolute right-[-10px] bottom-[-10px] text-zinc-800/15 pointer-events-none z-0">
+                      <ShieldCheck size={140} />
                     </div>
 
-                    {/* Top Row: Avatar + Role Badge */}
-                    <div className="relative z-10 flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3.5">
-                        {/* Avatar */}
-                        <div className="relative">
-                          <img
-                            src={member.image}
-                            alt={member.name}
-                            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg object-cover border transition-colors ${
-                              isCenter
-                                ? 'border-[#00629B] shadow-sm shadow-[#00629B]/50'
-                                : 'border-zinc-700'
-                            }`}
-                            loading="lazy"
-                          />
-                          {isCenter && (
-                            <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#00629B] border-2 border-[#0a0d16] flex items-center justify-center">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#5db4e8]" />
-                            </span>
-                          )}
-                        </div>
+                    {/* TOP SECTION: Rectangular Photo filling top portion */}
+                    <div className="relative w-full h-[240px] sm:h-[270px] overflow-hidden bg-zinc-900 shrink-0">
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-full h-full object-cover object-top sm:object-center transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
 
-                        {/* Name & Dept */}
-                        <div>
-                          <h3
-                            className={`font-bold tracking-tight text-base sm:text-lg transition-colors leading-tight ${
-                              isCenter ? 'text-white' : 'text-zinc-200'
-                            }`}
-                          >
-                            {member.name}
-                          </h3>
-                          <p className="text-[11px] font-mono text-zinc-400 mt-0.5 truncate max-w-[170px]">
-                            {member.dept}
-                          </p>
-                          <span className="text-[10px] font-mono text-zinc-400">
-                            {member.year}
-                          </span>
-                        </div>
-                      </div>
+                      {/* Gradient Overlay at bottom of photo */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent pointer-events-none" />
 
-                      {/* Division Pill */}
-                      <span
-                        className={`text-[9px] font-mono tracking-wider uppercase px-2 py-0.5 rounded border whitespace-nowrap ${
-                          isCenter
-                            ? 'border-[#00629B]/70 bg-[#00629B]/20 text-[#5db4e8]'
-                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400'
-                        }`}
-                      >
-                        {member.division}
-                      </span>
-                    </div>
-
-                    {/* Bottom Row: Official Title & Click Prompt */}
-                    <div className="relative z-10 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <Award
-                          size={14}
-                          className={isCenter ? 'text-[#5db4e8]' : 'text-zinc-500'}
-                        />
-                        <span
-                          className={`text-xs font-semibold tracking-wide ${
-                            isCenter ? 'text-zinc-100' : 'text-zinc-400'
-                          }`}
-                        >
-                          {member.role}
+                      {/* Colored Badge/Pill Label at Top-Left Corner */}
+                      <div className="absolute top-3 left-3 z-20">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-[#00629B] text-white shadow-md shadow-[#00629B]/50 border border-white/20 backdrop-blur-md max-w-[210px] truncate">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#5db4e8] shrink-0" />
+                          <span className="truncate">{member.role.trim().toUpperCase()}</span>
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[10px] font-mono text-zinc-400 group-hover:text-zinc-200">
-                        <span>Details</span>
-                        <ArrowRight size={11} />
+                      {/* Center Active indicator dot */}
+                      {isCenter && (
+                        <span className="absolute bottom-2.5 right-3 w-3 h-3 rounded-full bg-[#00629B] border-2 border-[#0a0d16] flex items-center justify-center shadow">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#5db4e8]" />
+                        </span>
+                      )}
+                    </div>
+
+                    {/* BOTTOM SECTION: Name, Role & Department Subtitle */}
+                    <div className="p-4 sm:p-5 flex flex-col justify-between flex-1 relative z-10">
+                      <div>
+                        {/* Member Name in Bold */}
+                        <h3
+                          className={`font-bold tracking-tight text-lg sm:text-xl transition-colors leading-tight mb-1 truncate ${isCenter ? 'text-white' : 'text-zinc-200'
+                            }`}
+                        >
+                          {member.name.replace(/\n/g, ' ').trim()}
+                        </h3>
+
+                        {/* Role & Department as Smaller Subtitle */}
+                        <p className="text-xs sm:text-sm font-semibold text-[#5db4e8] mb-0.5 truncate">
+                          {member.role.trim()}
+                        </p>
+                        <p className="text-[11px] font-mono text-zinc-400 truncate">
+                          {member.dept.trim()} {member.year ? `· ${member.year.trim()}` : ''}
+                        </p>
+                      </div>
+
+                      {/* Footer Row: Division & View Details Prompt */}
+                      <div className="pt-2.5 border-t border-zinc-800/80 flex items-center justify-between mt-2">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-semibold truncate max-w-[140px]">
+                          {member.division}
+                        </span>
+                        <div className="flex items-center gap-1 text-[11px] font-mono text-[#5db4e8] font-bold group-hover:underline">
+                          <span>Details</span>
+                          <ArrowRight size={12} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -854,11 +832,10 @@ export default function TeamPage() {
                 type="button"
                 onClick={() => goToIndex(i)}
                 aria-label={`Jump to ${CORE_TEAM_MEMBERS[i].name}`}
-                className={`h-1.5 rounded-full transition-all duration-200 ${
-                  i === currentIndex
+                className={`h-1.5 rounded-full transition-all duration-200 ${i === currentIndex
                     ? 'w-6 bg-[#5db4e8]'
                     : 'w-1.5 bg-zinc-800 hover:bg-zinc-600'
-                }`}
+                  }`}
               />
             ))}
           </div>
@@ -882,13 +859,13 @@ export default function TeamPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-black/85 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-black/85 animate-in fade-in duration-200 cursor-pointer"
           onClick={() => setSelectedMember(null)}
         >
           {/* Modal Card */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-xl rounded-2xl bg-[#0a0d16] border border-zinc-700/80 p-6 sm:p-8 shadow-2xl shadow-black/80 overflow-hidden"
+            className="cursor-default relative w-full max-w-xl rounded-2xl bg-[#0a0d16] border border-zinc-700/80 p-6 sm:p-8 shadow-2xl shadow-black/80 overflow-hidden"
           >
             {/* Ambient accent inside modal */}
             <div className="absolute top-0 right-0 w-72 h-72 bg-[#00629B]/15 rounded-full blur-3xl pointer-events-none" />
@@ -896,11 +873,14 @@ export default function TeamPage() {
             {/* Close Button */}
             <button
               type="button"
-              onClick={() => setSelectedMember(null)}
-              className="absolute top-5 right-5 p-2 rounded-lg border border-zinc-800 bg-zinc-900/80 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedMember(null);
+              }}
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 p-2 rounded-lg border border-zinc-800 bg-zinc-900/90 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors cursor-pointer shadow-sm"
               aria-label="Close profile modal"
             >
-              <X size={18} />
+              <X size={18} className="pointer-events-none" />
             </button>
 
             {/* Profile Content */}
@@ -918,7 +898,7 @@ export default function TeamPage() {
               </div>
 
               {/* Name, Role & Details */}
-              <div className="flex-1">
+              <div className="flex-1 pr-10 sm:pr-12">
                 <div className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest text-[#5db4e8] uppercase mb-1">
                   <span>{selectedMember.division}</span>
                 </div>

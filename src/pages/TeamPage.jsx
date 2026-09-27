@@ -405,7 +405,7 @@ const CORE_TEAM_MEMBERS = [
         dept: 'Information Science Engineering',
         year: '3RD',
         memberId: 'IEEE Member',
-        image: "src/imgs/LIKITHRAJ.png",
+        image: "src/imgs/Likith.jpeg",
         bio: 'Passionate about content creation, communication, and contributing to the IEEE Student Branch initiatives.',
         quote: 'Happy to work for IEEE',
         socials: {
@@ -580,7 +580,7 @@ export default function TeamPage() {
       <section className="max-w-6xl mx-auto px-5 sm:px-8 pb-10 text-center">
         <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 text-slate-600 dark:text-zinc-400 font-mono text-[11px] uppercase tracking-wider mb-4 shadow-sm">
           <span className="w-1.5 h-1.5 rounded-full bg-[#0096D6]" />
-          EXECUTIVE COMMITTEE & LEADS · 2025–2026
+          EXECUTIVE COMMITTEE & LEADS · 2026–2027
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
           The Engineers Behind IEEE NMAMIT
@@ -593,7 +593,7 @@ export default function TeamPage() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onWheel={handleWheel}
-        className="relative w-full max-w-6xl mx-auto h-[380px] sm:h-[430px] flex items-center justify-center my-4"
+        className="relative w-full max-w-6xl mx-auto h-[440px] sm:h-[490px] flex items-center justify-center my-4"
         style={{ perspective: isMobile ? '850px' : '1200px' }}
       >
         {/* Left Arrow Button */}
@@ -661,92 +661,81 @@ export default function TeamPage() {
                   opacity: opacity,
                 }}
               >
-                {/* Top-Avatar Vertical Profile Card */}
+                {/* Rectangular Headshot Profile Card */}
                 <div
-                  className={`relative w-[280px] sm:w-[320px] h-[310px] sm:h-[340px] rounded-2xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xl ${
+                  className={`group relative w-[270px] sm:w-[310px] h-[380px] sm:h-[420px] rounded-2xl transition-all duration-300 flex flex-col overflow-hidden shadow-xl ${
                     isCenter
-                      ? 'bg-white dark:bg-[#0a0d16] border-2 border-[#00629B] shadow-[0_0_35px_rgba(0,98,155,0.3)] ring-1 ring-[#00629B]/40'
+                      ? 'bg-white dark:bg-[#0a0d16] border-2 border-[#00629B] shadow-[0_0_35px_rgba(0,98,155,0.35)] ring-1 ring-[#00629B]/40'
                       : 'bg-slate-100/95 dark:bg-[#080a11]/95 border border-slate-300 dark:border-zinc-800/90 hover:border-slate-400 dark:hover:border-zinc-700'
                   }`}
                 >
                   {/* Decorative Background Shield Ornament */}
-                  <div className="absolute right-[-20px] bottom-[-20px] text-slate-300/30 dark:text-zinc-800/15 pointer-events-none">
-                    <ShieldCheck size={160} />
+                  <div className="absolute right-[-20px] bottom-[-20px] text-slate-300/30 dark:text-zinc-800/15 pointer-events-none z-0">
+                    <ShieldCheck size={140} />
                   </div>
 
-                  {/* TOP SECTION: Centered Top Profile Picture & Information */}
-                  <div className="relative z-10 flex flex-col items-center text-center pt-1">
-                    {/* Top Profile Picture Avatar */}
-                    <div className="relative mb-3">
-                      <img
-                        src={getMemberImage(member.image)}
-                        alt={member.name}
-                        loading="eager"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
-                        }}
-                        className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover object-center border-2 transition-all duration-300 ${
-                          isCenter
-                            ? 'border-[#00629B] shadow-lg shadow-[#00629B]/35 scale-105'
-                            : 'border-slate-300 dark:border-zinc-700'
-                        }`}
-                      />
-                      {isCenter && (
-                        <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#00629B] border-2 border-white dark:border-[#0a0d16] flex items-center justify-center">
-                          <span className="w-2 h-2 rounded-full bg-[#0096D6]" />
-                        </span>
-                      )}
-                    </div>
+                  {/* TOP SECTION: Rectangular Photo filling top portion (portrait orientation headshot) */}
+                  <div className="relative w-full h-[240px] sm:h-[270px] overflow-hidden bg-slate-200 dark:bg-zinc-900 shrink-0">
+                    <img
+                      src={getMemberImage(member.image)}
+                      alt={member.name}
+                      loading="eager"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+                      }}
+                      className="w-full h-full object-cover object-top sm:object-center transition-transform duration-500 group-hover:scale-105"
+                    />
 
-                    {/* Division Badge */}
-                    <span
-                      className={`text-[9px] font-mono tracking-wider uppercase px-2.5 py-0.5 rounded-full border font-semibold mb-2 ${
-                        isCenter
-                          ? 'border-[#00629B]/70 bg-[#00629B]/15 text-[#00629B] dark:text-[#5db4e8]'
-                          : 'border-slate-300 dark:border-zinc-800 bg-slate-200/60 dark:bg-zinc-900/60 text-slate-600 dark:text-zinc-400'
-                      }`}
-                    >
-                      {member.division}
-                    </span>
+                    {/* Gradient Overlay at bottom of photo for visual transition */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent pointer-events-none" />
 
-                    {/* Member Name */}
-                    <h3
-                      className={`font-bold tracking-tight text-lg sm:text-xl transition-colors leading-tight mb-1 ${
-                        isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-zinc-200'
-                      }`}
-                    >
-                      {member.name.replace(/\n/g, ' ')}
-                    </h3>
-
-                    {/* Dept & Year */}
-                    <p className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 truncate max-w-[240px]">
-                      {member.dept}
-                    </p>
-                    <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 mt-0.5">
-                      {member.year}
-                    </span>
-                  </div>
-
-                  {/* BOTTOM FOOTER: Role & View Details Action */}
-                  <div className="relative z-10 pt-3 border-t border-slate-200 dark:border-zinc-800/80 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <Award
-                        size={14}
-                        className={isCenter ? 'text-[#00629B] dark:text-[#5db4e8]' : 'text-slate-400 dark:text-zinc-500'}
-                      />
-                      <span
-                        className={`text-xs font-semibold tracking-wide ${
-                          isCenter ? 'text-slate-900 dark:text-zinc-100' : 'text-slate-600 dark:text-zinc-400'
-                        }`}
-                      >
-                        {member.role}
+                    {/* Colored Badge/Pill Label at Top-Left Corner */}
+                    <div className="absolute top-3 left-3 z-20">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-[#00629B] text-white shadow-md shadow-[#00629B]/50 border border-white/20 backdrop-blur-md max-w-[210px] truncate">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#5db4e8] shrink-0" />
+                        <span className="truncate">{member.role.trim().toUpperCase()}</span>
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[11px] font-mono text-[#00629B] dark:text-[#5db4e8] font-bold group-hover:underline">
-                      <span>View Details</span>
-                      <ArrowRight size={12} />
+                    {/* Center Active indicator dot */}
+                    {isCenter && (
+                      <span className="absolute bottom-2.5 right-3 w-3 h-3 rounded-full bg-[#00629B] border-2 border-white dark:border-[#0a0d16] flex items-center justify-center shadow">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#0096D6]" />
+                      </span>
+                    )}
+                  </div>
+
+                  {/* BOTTOM SECTION: Name, Role & Department Subtitle */}
+                  <div className="p-4 sm:p-5 flex flex-col justify-between flex-1 relative z-10">
+                    <div>
+                      {/* Member Name in Bold */}
+                      <h3
+                        className={`font-bold tracking-tight text-lg sm:text-xl transition-colors leading-tight mb-1 truncate ${
+                          isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-zinc-200'
+                        }`}
+                      >
+                        {member.name.replace(/\n/g, ' ').trim()}
+                      </h3>
+
+                      {/* Role & Department as Smaller Subtitle */}
+                      <p className="text-xs sm:text-sm font-semibold text-[#00629B] dark:text-[#5db4e8] mb-0.5 truncate">
+                        {member.role.trim()}
+                      </p>
+                      <p className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 truncate">
+                        {member.dept.trim()} {member.year ? `· ${member.year.trim()}` : ''}
+                      </p>
+                    </div>
+
+                    {/* Footer Row: Division & View Details Prompt */}
+                    <div className="pt-2.5 border-t border-slate-200 dark:border-zinc-800/80 flex items-center justify-between mt-2">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold truncate max-w-[140px]">
+                        {member.division}
+                      </span>
+                      <div className="flex items-center gap-1 text-[11px] font-mono text-[#00629B] dark:text-[#5db4e8] font-bold group-hover:underline">
+                        <span>View Details</span>
+                        <ArrowRight size={12} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -791,22 +780,25 @@ export default function TeamPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-slate-900/60 dark:bg-black/85 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-slate-900/60 dark:bg-black/85 animate-in fade-in duration-200 cursor-pointer"
           onClick={() => setSelectedMember(null)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-xl rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-300 dark:border-zinc-700/80 p-6 sm:p-8 shadow-2xl overflow-hidden"
+            className="cursor-default relative w-full max-w-xl rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-300 dark:border-zinc-700/80 p-6 sm:p-8 shadow-2xl overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-72 h-72 bg-[#00629B]/15 rounded-full blur-3xl pointer-events-none" />
 
             <button
               type="button"
-              onClick={() => setSelectedMember(null)}
-              className="absolute top-5 right-5 p-2 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/80 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-600 transition-colors cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedMember(null);
+              }}
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 p-2 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/90 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-600 transition-colors cursor-pointer shadow-sm"
               aria-label="Close profile modal"
             >
-              <X size={18} />
+              <X size={18} className="pointer-events-none" />
             </button>
 
             <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start">
@@ -821,7 +813,7 @@ export default function TeamPage() {
                 </span>
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 pr-10 sm:pr-12">
                 <div className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest text-[#00629B] dark:text-[#5db4e8] uppercase mb-1 font-bold">
                   <span>{selectedMember.division}</span>
                 </div>
