@@ -75,7 +75,7 @@ export default function Footer({ onNavigate }) {
                   onClick={() => onNavigate('events')}
                   className="hover:text-[#00629B] dark:hover:text-white transition-colors"
                 >
-                  Events & Labs
+                  Events
                 </button>
               </li>
               <li>
