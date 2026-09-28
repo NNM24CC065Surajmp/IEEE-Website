@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import Reveal from './Reveal';
+
 import { site } from '../data/site';
 
 export default function Intro() {
@@ -13,7 +13,7 @@ export default function Intro() {
         className="pointer-events-none absolute -top-12 -left-12 w-64 h-64 bg-ieee-blue/10 dark:bg-ieee-teal/10 rounded-full blur-3xl"
       />
 
-      <Reveal>
+      
         <div className="relative z-10 max-w-[65ch]">
           {/* Subtle decorative accent line */}
           <div className="w-12 h-1 bg-ieee-teal rounded-full mb-6" />
@@ -44,7 +44,7 @@ export default function Intro() {
             </Link>
           </div>
         </div>
-      </Reveal>
+      
     </section>
   );
 }

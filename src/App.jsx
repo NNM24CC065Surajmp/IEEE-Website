@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+
+import Preloader from './components/Preloader';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import HomePage from './pages/HomePage.jsx';
@@ -46,7 +48,9 @@ function AppContent({ theme, toggleTheme }) {
           : 'from-[#00629B]/[0.10] via-transparent to-transparent'
       }`} />
 
-      <Navbar activePage={activePage} onNavigate={navigateTo} theme={theme} onToggleTheme={toggleTheme} />
+      <Preloader />
+          
+          <Navbar activePage={activePage} onNavigate={navigateTo} theme={theme} onToggleTheme={toggleTheme} />
 
       <main id="main" key={location.pathname} className="animate-page-fade relative z-10 flex-1">
         <Routes>

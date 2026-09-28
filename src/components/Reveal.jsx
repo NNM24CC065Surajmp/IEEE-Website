@@ -1,47 +1,38 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
+import { gsap, useGSAP } from '../lib/gsap';
+import { prefersReducedMotion } from '../lib/motion';
 
 export default function Reveal({ children, delay = 0, className = '' }) {
-  const ref = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mediaQuery.matches || !window.IntersectionObserver) {
-      setIsVisible(true);
+  useGSAP(() => {
+    if (prefersReducedMotion()) {
+      gsap.set(containerRef.current, { autoAlpha: 1, y: 0 });
       return;
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
+    gsap.fromTo(
+      containerRef.current,
+      { autoAlpha: 0, y: 24 },
       {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px',
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.6,
+        delay: delay / 1000,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
       }
     );
+  }, { scope: containerRef });
 
-    const currentRef = ref.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, []);
-
+  // Use autoAlpha for better performance/accessibility than raw opacity
+  // Initially hide it to prevent FOUC, GSAP will handle showing it
   return (
-    <div
-      ref={ref}
-      className={`reveal ${isVisible ? 'reveal-visible' : ''} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+    <div ref={containerRef} className={className} style={{ visibility: 'hidden' }}>
       {children}
     </div>
   );

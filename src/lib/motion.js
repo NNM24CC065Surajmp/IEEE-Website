@@ -1,0 +1,1 @@
+export const prefersReducedMotion = () => { if (typeof window !== 'undefined') { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } return false; }; console.log('Prefers Reduced Motion:', prefersReducedMotion());

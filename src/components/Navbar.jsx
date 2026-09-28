@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { gsap, useGSAP } from '../lib/gsap';
+import { prefersReducedMotion } from '../lib/motion';
 import { Menu, X, Sun, Moon } from 'lucide-react';
+
 
 export default function Navbar({ activePage, onNavigate, theme, onToggleTheme }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navRef = React.useRef(null);
+
+  useGSAP(() => {
+    if (prefersReducedMotion()) return;
+    gsap.from('.nav-anim-item', {
+      y: -20, opacity: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out', delay: 0.1
+    });
+  }, { scope: navRef });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,7 +39,7 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
   const isLight = theme === 'light';
 
   return (
-    <header
+    <header ref={navRef}
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled
           ? isLight
@@ -42,7 +53,7 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
         <button
           type="button"
           onClick={() => handleLinkClick('home')}
-          className="flex items-center gap-3 text-left group cursor-pointer focus:outline-none"
+          className="nav-anim-item flex items-center gap-3 text-left group cursor-pointer focus:outline-none"
         >
           <div className={`relative w-9 h-9 rounded-lg border flex items-center justify-center font-mono font-bold text-xs transition-all duration-300 overflow-hidden ${
             isLight
@@ -134,7 +145,12 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
           {/* Mobile Hamburger Button */}
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={(e) => {
+                setMobileMenuOpen(!mobileMenuOpen);
+                if (!prefersReducedMotion()) {
+                  gsap.fromTo(e.currentTarget, { scale: 0.8, rotation: mobileMenuOpen ? 90 : -90 }, { scale: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.5)' });
+                }
+              }}
             className={`p-2 rounded-lg border transition-colors ${
               isLight
                 ? 'border-slate-300 bg-slate-100 text-slate-700 hover:text-slate-900'

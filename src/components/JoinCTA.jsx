@@ -1,13 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { gsap, useGSAP } from '../lib/gsap';
+import { prefersReducedMotion } from '../lib/motion';
+import { useRef } from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Reveal from './Reveal';
 
 export default function JoinCTA() {
+  const containerRef = useRef(null);
+  useGSAP(() => {
+    if (prefersReducedMotion()) return;
+    gsap.from('.cta-heading', { scale: 0.95, opacity: 0, duration: 0.7, ease: 'back.out(1.2)', scrollTrigger: { trigger: containerRef.current, start: 'top 80%' } });
+  }, { scope: containerRef });
   return (
-    <section className="section-container py-16 md:py-24">
+    <section ref={containerRef} className="cta-container section-container py-16 md:py-24">
       <Reveal>
-        <div className="relative overflow-hidden rounded-2xl border border-ieee-border bg-gradient-to-br from-ieee-surface via-[#101321] to-ieee-blue/20 p-8 sm:p-12 md:p-16 shadow-2xl">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-ieee-border bg-gradient-to-br from-slate-50 via-slate-100 to-ieee-blue/10 dark:from-ieee-surface dark:via-[#101321] dark:to-ieee-blue/20 p-8 sm:p-12 md:p-16 shadow-2xl">
           {/* Subtle blue accent blur / glow in top right */}
           <div
             aria-hidden="true"
@@ -17,15 +25,15 @@ export default function JoinCTA() {
           <div className="relative z-10 max-w-2xl">
             {/* Tag pill */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider text-ieee-teal bg-ieee-blue/20 border border-ieee-teal/30 mb-6">
-              <Sparkles size={13} className="text-ieee-teal" />
+              
               <span>Become a Member</span>
             </div>
 
-            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-5 leading-tight">
+            <h2 className="cta-heading font-heading text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-5 leading-tight">
               Ready to innovate, build, and lead?
             </h2>
 
-            <p className="text-sm sm:text-base text-slate-300 dark:text-zinc-300 leading-relaxed mb-8 max-w-xl font-normal">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-zinc-300 leading-relaxed mb-8 max-w-xl font-normal">
               Join IEEE NMAMIT Student Branch to gain hands-on technical experience, collaborate on national hackathon teams, publish research papers, and connect with a worldwide professional network.
             </p>
 

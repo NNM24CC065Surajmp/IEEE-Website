@@ -1,7 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { gsap } from '../lib/gsap';
+import { prefersReducedMotion } from '../lib/motion';
 import { Github, Linkedin, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
 import { site } from '../data/site';
+
+
 
 const SOCIAL_ICON_MAP = {
   Instagram,
@@ -12,6 +16,13 @@ const SOCIAL_ICON_MAP = {
 
 export default function Footer({ onNavigate }) {
   const currentYear = new Date().getFullYear();
+
+  const handleSocialHover = (e, isHover) => {
+    if (window.matchMedia('(hover: none)').matches) return;
+    if (!prefersReducedMotion()) {
+      gsap.to(e.currentTarget, { scale: isHover ? 1.15 : 1, duration: 0.3, ease: 'back.out(2)' });
+    }
+  };
 
   const handleNav = (target) => {
     if (onNavigate) {
@@ -49,6 +60,8 @@ export default function Footer({ onNavigate }) {
                     rel="noreferrer"
                     className="w-8 h-8 rounded-lg border border-slate-300 dark:border-zinc-800 hover:border-ieee-blue dark:hover:border-ieee-teal bg-white dark:bg-zinc-900/60 flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue"
                     aria-label={social.label}
+                    onMouseEnter={(e) => handleSocialHover(e, true)}
+                    onMouseLeave={(e) => handleSocialHover(e, false)}
                   >
                     <IconComp size={15} />
                   </a>
