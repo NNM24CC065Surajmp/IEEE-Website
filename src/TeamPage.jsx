@@ -9,120 +9,52 @@ import {
   Mail,
   ExternalLink,
   Award,
-  Sparkles,
   ArrowRight,
-  ShieldCheck,
   Building2,
   BookOpen,
-  Code2,
-  Cpu,
 } from 'lucide-react';
 
 /**
  * ============================================================================
  * IEEE Student Branch NMAMIT - Team Page Component
  * ============================================================================
- * 
- * Pattern: 3D Horizontal Barrel / Drum Rotation Carousel
- * Physics: Cylinder lying on its horizontal axis, cards curve away on the left & right
- * Theme: Editorial dark (#05070a), IEEE Teal/Blue (#00629B, highlight #5db4e8)
- * 
- * NOTES FOR DEVELOPERS:
- * - The team array below contains ~25 realistic placeholder records.
- * - Replace placeholder avatars, bios, and social handles with real branch data when available.
  */
 
 // ============================================================================
-// ROLE-BASED COLOR THEMING (Muted & Professional Palette)
+// ROLE-BASED COLOR THEMING (Flat & Simple)
 // ============================================================================
 const DEPARTMENT_THEMES = {
   leadership: {
-    name: 'Top Leadership',
-    badgeBg: 'bg-[#991b1b]', // Deep Red
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#fca5a5]',
-    activeBorder: 'border-[#991b1b]',
-    activeShadow: 'shadow-[0_0_35px_rgba(153,27,27,0.35)] ring-1 ring-[#991b1b]/40',
-    dotBg: 'bg-[#991b1b]',
-    dotInner: 'bg-[#f87171]',
-    roleText: 'text-[#b91c1c] dark:text-[#f87171]',
+    activeBorder: 'border-red-600 dark:border-red-500',
+    roleText: 'text-red-600 dark:text-red-400',
   },
   secretariat: {
-    name: 'Secretariat',
-    badgeBg: 'bg-[#6b21a8]', // Purple
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#d8b4fe]',
-    activeBorder: 'border-[#6b21a8]',
-    activeShadow: 'shadow-[0_0_35px_rgba(107,33,168,0.35)] ring-1 ring-[#6b21a8]/40',
-    dotBg: 'bg-[#6b21a8]',
-    dotInner: 'bg-[#c084fc]',
-    roleText: 'text-[#7e22ce] dark:text-[#c084fc]',
+    activeBorder: 'border-purple-600 dark:border-purple-500',
+    roleText: 'text-purple-600 dark:text-purple-400',
   },
   technical: {
-    name: 'Technical Team',
-    badgeBg: 'bg-[#00629B]', // Blue (IEEE Blue)
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#7dd3fc]',
-    activeBorder: 'border-[#00629B]',
-    activeShadow: 'shadow-[0_0_35px_rgba(0,98,155,0.35)] ring-1 ring-[#00629B]/40',
-    dotBg: 'bg-[#00629B]',
-    dotInner: 'bg-[#38bdf8]',
+    activeBorder: 'border-[#00629B] dark:border-[#5db4e8]',
     roleText: 'text-[#00629B] dark:text-[#5db4e8]',
   },
   finance: {
-    name: 'Finance',
-    badgeBg: 'bg-[#92400e]', // Gold / Amber
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#fde68a]',
-    activeBorder: 'border-[#b45309]',
-    activeShadow: 'shadow-[0_0_35px_rgba(180,83,9,0.35)] ring-1 ring-[#b45309]/40',
-    dotBg: 'bg-[#92400e]',
-    dotInner: 'bg-[#fcd34d]',
-    roleText: 'text-[#b45309] dark:text-[#fbbf24]',
+    activeBorder: 'border-amber-600 dark:border-amber-500',
+    roleText: 'text-amber-600 dark:text-amber-400',
   },
   events: {
-    name: 'Events Team',
-    badgeBg: 'bg-[#eab308]', // Yellow
-    badgeText: 'text-zinc-950', // Dark text for contrast against bright yellow
-    badgeDot: 'bg-zinc-900',
-    activeBorder: 'border-[#eab308]',
-    activeShadow: 'shadow-[0_0_35px_rgba(234,179,8,0.35)] ring-1 ring-[#eab308]/40',
-    dotBg: 'bg-[#eab308]',
-    dotInner: 'bg-[#fef08a]',
-    roleText: 'text-[#ca8a04] dark:text-[#facc15]',
+    activeBorder: 'border-yellow-600 dark:border-yellow-500',
+    roleText: 'text-yellow-600 dark:text-yellow-400',
   },
   design: {
-    name: 'Design Team',
-    badgeBg: 'bg-[#9d174d]', // Pink / Magenta
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#f9a8d4]',
-    activeBorder: 'border-[#be185d]',
-    activeShadow: 'shadow-[0_0_35px_rgba(190,24,93,0.35)] ring-1 ring-[#be185d]/40',
-    dotBg: 'bg-[#9d174d]',
-    dotInner: 'bg-[#f472b6]',
-    roleText: 'text-[#be185d] dark:text-[#f472b6]',
+    activeBorder: 'border-pink-600 dark:border-pink-500',
+    roleText: 'text-pink-600 dark:text-pink-400',
   },
   content: {
-    name: 'Content Team',
-    badgeBg: 'bg-[#0f766e]', // Teal
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#5eead4]',
-    activeBorder: 'border-[#0f766e]',
-    activeShadow: 'shadow-[0_0_35px_rgba(15,118,110,0.35)] ring-1 ring-[#0f766e]/40',
-    dotBg: 'bg-[#0f766e]',
-    dotInner: 'bg-[#2dd4bf]',
-    roleText: 'text-[#0d9488] dark:text-[#2dd4bf]',
+    activeBorder: 'border-teal-600 dark:border-teal-500',
+    roleText: 'text-teal-600 dark:text-teal-400',
   },
   marketing: {
-    name: 'Marketing Team',
-    badgeBg: 'bg-[#166534]', // Green
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#86efac]',
-    activeBorder: 'border-[#15803d]',
-    activeShadow: 'shadow-[0_0_35px_rgba(21,128,61,0.35)] ring-1 ring-[#15803d]/40',
-    dotBg: 'bg-[#166534]',
-    dotInner: 'bg-[#4ade80]',
-    roleText: 'text-[#15803d] dark:text-[#4ade80]',
+    activeBorder: 'border-emerald-600 dark:border-emerald-500',
+    roleText: 'text-emerald-600 dark:text-emerald-400',
   },
 };
 
@@ -621,10 +553,15 @@ export default function TeamPage() {
   const [currentIndex, setCurrentIndex] = useState(0); // Starts on President (index 0)
   const [selectedMember, setSelectedMember] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [resetTimerKey, setResetTimerKey] = useState(0);
   const containerRef = useRef(null);
   const touchStartRef = useRef(null);
   const wheelAccumulator = useRef(0);
   const wheelTimeout = useRef(null);
+
+  const resetTimer = useCallback(() => {
+    setResetTimerKey((prev) => prev + 1);
+  }, []);
 
   // Detect mobile screen width for responsive 3D math
   useEffect(() => {
@@ -636,17 +573,32 @@ export default function TeamPage() {
     return () => window.removeEventListener('resize', checkViewport);
   }, []);
 
+  // Auto-slide: advances every 3s, loops back to start after the last card.
+  // Pauses ONLY when a member details popup is open.
+  useEffect(() => {
+    if (selectedMember) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % CORE_TEAM_MEMBERS.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [selectedMember, resetTimerKey]);
+
   // Navigation handlers
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => Math.max(0, prev - 1));
-  }, []);
+    resetTimer();
+  }, [resetTimer]);
 
   const handleNext = useCallback(() => {
     setCurrentIndex((prev) => Math.min(CORE_TEAM_MEMBERS.length - 1, prev + 1));
-  }, []);
+    resetTimer();
+  }, [resetTimer]);
 
   const goToIndex = (index) => {
     setCurrentIndex(Math.max(0, Math.min(CORE_TEAM_MEMBERS.length - 1, index)));
+    resetTimer();
   };
 
   // Keyboard navigation
@@ -687,6 +639,10 @@ export default function TeamPage() {
     touchStartRef.current = null;
   };
 
+  const handleTouchCancel = () => {
+    touchStartRef.current = null;
+  };
+
   // Trackpad / Mouse wheel horizontal scrub
   const handleWheel = (e) => {
     // Only intercept if we're not inside the open modal
@@ -715,6 +671,7 @@ export default function TeamPage() {
   const handleCardClick = (member, index) => {
     setCurrentIndex(index);
     setSelectedMember(member);
+    resetTimer();
   };
 
   const activeMember = CORE_TEAM_MEMBERS[currentIndex];
@@ -730,50 +687,45 @@ export default function TeamPage() {
           backgroundSize: '36px 36px',
         }}
       />
-      {/* Subtle radial ambient blue glow */}
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#00629B]/[0.12] via-transparent to-transparent" />
-
       {/* Header bar / Top Nav */}
-      <header className="relative z-20 max-w-6xl w-full mx-auto px-6 py-8 flex items-center justify-between">
+      <header className="relative z-20 max-w-6xl w-full mx-auto px-6 py-4 sm:py-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded border border-zinc-700 bg-zinc-900 flex items-center justify-center text-[#5db4e8] font-mono font-bold text-xs">
+          <div className="w-8 h-8 rounded border border-zinc-700 bg-zinc-900 flex items-center justify-center text-[#5db4e8] font-bold text-xs">
             IE
           </div>
           <div>
             <h1 className="text-sm font-bold text-white tracking-tight">
               IEEE NMAMIT
             </h1>
-            <p className="text-[10px] font-mono text-zinc-400 tracking-wider uppercase">
+            <p className="text-[10px] text-zinc-400 tracking-wider uppercase">
               Core Committee · 2026–2027
             </p>
           </div>
         </div>
 
-        {/* Minimal status tag */}
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800/80 bg-zinc-900/60 text-xs font-mono text-zinc-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>25 Leaders</span>
+        {/* Plain text label */}
+        <div className="text-xs text-zinc-400 font-semibold tracking-wider uppercase">
+          25 Leaders
         </div>
       </header>
 
       {/* Main Stage: Horizontal Barrel Carousel */}
-      <main
-        ref={containerRef}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onWheel={handleWheel}
-        className="relative z-10 w-full flex-1 flex flex-col items-center justify-center py-6 select-none"
-      >
+      <main className="relative z-10 w-full flex-1 flex flex-col items-center justify-center py-4 select-none">
         {/* Intro Tag & Eyebrow */}
-        <div className="text-center mb-6 px-4">
-          <div className="text-[11px] font-mono tracking-widest text-[#5db4e8] uppercase mb-1">
-            EXECUTIVE COMMITTEE & LEADS
-          </div>
+        <div className="text-center mb-2 sm:mb-3 px-4">
+          <p className="text-xs uppercase tracking-wider text-[#5db4e8] font-semibold mb-1">
+            EXECUTIVE COMMITTEE &amp; LEADS
+          </p>
         </div>
 
         {/* 3D Barrel Carousel Stage */}
         <div
-          className="relative w-full max-w-5xl h-[420px] sm:h-[480px] flex items-center justify-center"
+          ref={containerRef}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
+          onWheel={handleWheel}
+          className="relative w-full max-w-5xl h-[390px] sm:h-[420px] flex items-center justify-center"
           style={{ perspective: isMobile ? '850px' : '1200px' }}
         >
           {/* Left Arrow Button */}
@@ -781,13 +733,14 @@ export default function TeamPage() {
             type="button"
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className={`absolute left-3 sm:left-6 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 ${currentIndex === 0
-                ? 'border-zinc-800/50 bg-zinc-900/30 text-zinc-600 cursor-not-allowed'
-                : 'border-zinc-700/80 bg-zinc-900/90 text-zinc-300 hover:text-white hover:border-[#00629B] hover:shadow-[0_0_20px_rgba(0,98,155,0.4)] active:scale-95'
-              }`}
+            className={`absolute left-3 sm:left-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-lg border flex items-center justify-center transition-colors duration-200 cursor-pointer ${
+              currentIndex === 0
+                ? 'border-zinc-800 bg-zinc-900 text-zinc-600 cursor-not-allowed'
+                : 'border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white hover:border-zinc-500 active:scale-95'
+            }`}
             aria-label="Previous member"
           >
-            <ChevronLeft size={22} />
+            <ChevronLeft size={20} />
           </button>
 
           {/* Right Arrow Button */}
@@ -795,13 +748,14 @@ export default function TeamPage() {
             type="button"
             onClick={handleNext}
             disabled={currentIndex === CORE_TEAM_MEMBERS.length - 1}
-            className={`absolute right-3 sm:right-6 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 ${currentIndex === CORE_TEAM_MEMBERS.length - 1
-                ? 'border-zinc-800/50 bg-zinc-900/30 text-zinc-600 cursor-not-allowed'
-                : 'border-zinc-700/80 bg-zinc-900/90 text-zinc-300 hover:text-white hover:border-[#00629B] hover:shadow-[0_0_20px_rgba(0,98,155,0.4)] active:scale-95'
-              }`}
+            className={`absolute right-3 sm:right-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-lg border flex items-center justify-center transition-colors duration-200 cursor-pointer ${
+              currentIndex === CORE_TEAM_MEMBERS.length - 1
+                ? 'border-zinc-800 bg-zinc-900 text-zinc-600 cursor-not-allowed'
+                : 'border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white hover:border-zinc-500 active:scale-95'
+            }`}
             aria-label="Next member"
           >
-            <ChevronRight size={22} />
+            <ChevronRight size={20} />
           </button>
 
           {/* 3D Drum Container */}
@@ -812,15 +766,13 @@ export default function TeamPage() {
             {CORE_TEAM_MEMBERS.map((member, index) => {
               const offset = index - currentIndex;
 
-              // Only render cards within visible offset window to maximize performance
               if (Math.abs(offset) > 4) return null;
 
               const theme = getDepartmentTheme(member.role);
 
-              // Horizontal Barrel Physics:
-              const angleStep = isMobile ? 22 : 18; // degrees per card
-              const spacingStep = isMobile ? 180 : 255; // pixels per card
-              const depthStep = isMobile ? 65 : 85; // pixels receding in depth
+              const angleStep = isMobile ? 22 : 18;
+              const spacingStep = isMobile ? 180 : 240;
+              const depthStep = isMobile ? 65 : 80;
               const scaleStep = isMobile ? 0.08 : 0.06;
 
               const rotateY = -offset * angleStep;
@@ -834,81 +786,63 @@ export default function TeamPage() {
                 <div
                   key={member.id}
                   onClick={() => handleCardClick(member, index)}
-                  className={`absolute cursor-pointer transition-all duration-300 ease-out will-change-transform ${isCenter ? 'z-30' : 'z-10'
-                    }`}
+                  className={`absolute cursor-pointer transition-all duration-[0.4s] ease-out will-change-transform ${
+                    isCenter ? 'z-30' : 'z-10'
+                  }`}
                   style={{
                     transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                     transformOrigin: 'center center',
                     opacity: opacity,
+                    transitionDuration: '0.4s',
                   }}
                 >
-                  {/* Rectangular Headshot Profile Card */}
+                  {/* Simple Flat Profile Card */}
                   <div
-                    className={`group relative w-[270px] sm:w-[310px] h-[380px] sm:h-[420px] rounded-2xl transition-all duration-300 flex flex-col overflow-hidden shadow-xl ${isCenter
-                        ? `bg-[#0a0d16] border-2 ${theme.activeBorder} ${theme.activeShadow}`
-                        : 'bg-[#080a11]/90 border border-zinc-800/90 hover:border-zinc-700'
-                      }`}
+                    className={`group relative w-[260px] sm:w-[290px] h-[350px] sm:h-[380px] rounded-lg transition-all duration-[0.4s] flex flex-col overflow-hidden ${
+                      isCenter
+                        ? `bg-zinc-900 border-2 ${theme.activeBorder}`
+                        : 'bg-zinc-900 border border-zinc-800 hover:border-zinc-700'
+                    }`}
+                    style={{
+                      maxHeight: 'min(380px, 60vh)',
+                    }}
                   >
-                    {/* Background subtle watermark icon */}
-                    <div className="absolute right-[-10px] bottom-[-10px] text-zinc-800/15 pointer-events-none z-0">
-                      <ShieldCheck size={140} />
-                    </div>
-
-                    {/* TOP SECTION: Rectangular Photo filling top portion */}
-                    <div className="relative w-full h-[240px] sm:h-[270px] overflow-hidden bg-zinc-900 shrink-0">
+                    {/* Photo Section */}
+                    <div className="relative w-full h-[210px] sm:h-[235px] overflow-hidden bg-zinc-800 shrink-0">
                       <img
                         src={member.image}
                         alt={member.name}
-                        className="w-full h-full object-cover object-top sm:object-center transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover object-top sm:object-center"
                         loading="lazy"
                       />
-
-                      {/* Gradient Overlay at bottom of photo */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent pointer-events-none" />
-
-                      {/* Colored Badge/Pill Label at Top-Left Corner */}
-                      <div className="absolute top-3 left-3 z-20">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase ${theme.badgeBg} ${theme.badgeText} shadow-md border border-white/20 backdrop-blur-md max-w-[210px] truncate`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${theme.badgeDot} shrink-0`} />
-                          <span className="truncate">{member.role.trim().toUpperCase()}</span>
-                        </span>
-                      </div>
-
-                      {/* Center Active indicator dot */}
-                      {isCenter && (
-                        <span className={`absolute bottom-2.5 right-3 w-3 h-3 rounded-full ${theme.dotBg} border-2 border-[#0a0d16] flex items-center justify-center shadow`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${theme.dotInner}`} />
-                        </span>
-                      )}
                     </div>
 
-                    {/* BOTTOM SECTION: Name, Role & Department Subtitle */}
-                    <div className="p-4 sm:p-5 flex flex-col justify-between flex-1 relative z-10">
+                    {/* Plain Text Labels & Info */}
+                    <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
                       <div>
-                        {/* Member Name in Bold */}
                         <h3
-                          className={`font-bold tracking-tight text-lg sm:text-xl transition-colors leading-tight mb-1 truncate ${isCenter ? 'text-white' : 'text-zinc-200'
-                            }`}
+                          className={`font-bold text-base sm:text-lg leading-tight mb-1 truncate ${
+                            isCenter ? 'text-white' : 'text-zinc-200'
+                          }`}
                         >
                           {member.name.replace(/\n/g, ' ').trim()}
                         </h3>
 
-                        {/* Role & Department as Smaller Subtitle */}
                         <p className={`text-xs sm:text-sm font-semibold ${theme.roleText} mb-0.5 truncate`}>
                           {member.role.trim()}
                         </p>
-                        <p className="text-[11px] font-mono text-zinc-400 truncate">
-                          {member.dept.trim()} {member.year ? `· ${member.year.trim()}` : ''}
+                        <p className="text-xs text-zinc-400 truncate">
+                          {member.dept.trim()}{member.year ? ` · ${member.year.trim()}` : ''}
                         </p>
                       </div>
 
-                      {/* Footer Row: Division & View Details Prompt */}
-                      <div className="pt-2.5 border-t border-zinc-800/80 flex items-center justify-between mt-2">
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-semibold truncate max-w-[140px]">
+                      {/* Footer Row */}
+                      <div className="pt-2 border-t border-zinc-800 flex items-center justify-between mt-1.5">
+                        <span className="text-xs text-zinc-400 truncate max-w-[130px]">
                           {member.division}
                         </span>
-                        <div className={`flex items-center gap-1 text-[11px] font-mono ${theme.roleText} font-bold group-hover:underline`}>
-                          <span>Details</span>
+                        <div className={`flex items-center gap-1 text-xs ${theme.roleText} font-semibold group-hover:underline`}>
+                          <span>View Details</span>
                           <ArrowRight size={12} />
                         </div>
                       </div>
@@ -920,41 +854,19 @@ export default function TeamPage() {
           </div>
         </div>
 
-        {/* Position Scrubber / Indicator Below Barrel */}
-        <div className="mt-8 flex flex-col items-center gap-3">
-          {/* Position count */}
-          <div className="flex items-center gap-3 font-mono text-xs">
-            <span className="text-zinc-400">INDEX</span>
-            <span className="text-white font-bold tracking-wider px-2.5 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-              {String(currentIndex + 1).padStart(2, '0')} / {String(CORE_TEAM_MEMBERS.length).padStart(2, '0')}
-            </span>
-            <span className="text-zinc-400 hidden sm:inline">·</span>
-            <span className={`font-medium hidden sm:inline ${getDepartmentTheme(activeMember?.role).roleText}`}>
-              {activeMember?.role}
-            </span>
-          </div>
-
-          {/* Clickable mini scrub-dots */}
-          <div className="flex items-center gap-1.5 max-w-[85vw] overflow-x-auto py-1 px-2 no-scrollbar">
-            {CORE_TEAM_MEMBERS.map((m, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => goToIndex(i)}
-                aria-label={`Jump to ${CORE_TEAM_MEMBERS[i].name}`}
-                className={`h-1.5 rounded-full transition-all duration-200 ${i === currentIndex
-                    ? `w-6 ${getDepartmentTheme(m.role).badgeBg}`
-                    : 'w-1.5 bg-zinc-800 hover:bg-zinc-600'
-                  }`}
-              />
-            ))}
-          </div>
+        {/* Plain Text Position Label */}
+        <div className="mt-3 flex items-center justify-center gap-2 text-xs text-zinc-400">
+          <span>{currentIndex + 1} of {CORE_TEAM_MEMBERS.length}</span>
+          <span>·</span>
+          <span className={`font-semibold ${getDepartmentTheme(activeMember?.role).roleText}`}>
+            {activeMember?.role?.trim()}
+          </span>
         </div>
       </main>
 
       {/* Footer Strip */}
       <footer className="relative z-20 py-4 border-t border-zinc-900 bg-[#040507]">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-mono text-zinc-400">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-400">
           <p>© {new Date().getFullYear()} IEEE Student Branch NMAMIT · Team Directory</p>
           <p className="flex items-center gap-1 text-zinc-400">
             <span>NMAM Institute of Technology, Nitte</span>
@@ -1000,20 +912,18 @@ export default function TeamPage() {
                 <img
                   src={selectedMember.image}
                   alt={selectedMember.name}
-                  className={`w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover border-2 ${selectedTheme?.activeBorder || 'border-[#00629B]'} shadow-lg shadow-black/30`}
+                  className={`w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover border-2 ${selectedTheme?.activeBorder || 'border-[#00629B]'}`}
                 />
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 whitespace-nowrap">
-                  {selectedMember.memberId}
+                <span className="block mt-1.5 text-center text-xs text-zinc-400 font-medium">
+                  ID: {selectedMember.memberId}
                 </span>
               </div>
 
               {/* Name, Role & Details */}
               <div className="flex-1 pr-10 sm:pr-12">
-                <div className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase mb-1 font-bold">
-                  <span className={`px-2.5 py-0.5 rounded-full ${selectedTheme?.badgeText || 'text-white'} ${selectedTheme?.badgeBg || 'bg-[#00629B]'}`}>
-                    {selectedMember.division}
-                  </span>
-                </div>
+                <p className="text-xs uppercase tracking-wider text-zinc-400 font-semibold mb-1">
+                  {selectedMember.division}
+                </p>
                 <h2 className="text-2xl font-bold text-white tracking-tight leading-tight">
                   {selectedMember.name}
                 </h2>
@@ -1022,7 +932,7 @@ export default function TeamPage() {
                   <span>{selectedMember.role}</span>
                 </div>
 
-                <div className="mt-2 text-xs font-mono text-zinc-400 space-y-0.5">
+                <div className="mt-2 text-xs text-zinc-400 space-y-0.5">
                   <p className="flex items-center gap-1.5">
                     <Building2 size={12} className="text-zinc-500" />
                     <span>{selectedMember.dept}</span>
@@ -1036,9 +946,9 @@ export default function TeamPage() {
             </div>
 
             {/* Bio Section */}
-            <div className="relative z-10 mt-6 pt-5 border-t border-zinc-800/80">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-2">
-                Executive Overview & Focus
+            <div className="relative z-10 mt-6 pt-5 border-t border-zinc-800">
+              <h4 className="text-xs uppercase tracking-wider text-zinc-400 mb-2 font-semibold">
+                Executive Overview &amp; Focus
               </h4>
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
                 {selectedMember.bio}
@@ -1046,68 +956,80 @@ export default function TeamPage() {
             </div>
 
             {/* Skills & Focus Areas */}
-            <div className="relative z-10 mt-5">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-2">
-                Focus Areas & Competencies
-              </h4>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedMember.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="text-[11px] font-mono px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300"
-                  >
-                    {skill}
-                  </span>
-                ))}
+            {selectedMember.skills && selectedMember.skills.length > 0 && (
+              <div className="relative z-10 mt-5">
+                <h4 className="text-xs uppercase tracking-wider text-zinc-400 mb-2 font-semibold">
+                  Focus Areas &amp; Competencies
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedMember.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="text-xs px-2.5 py-1 rounded bg-zinc-800 border border-zinc-700 text-zinc-300"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Social Links & Action Row */}
-            <div className="relative z-10 mt-6 pt-5 border-t border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="relative z-10 mt-6 pt-5 border-t border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <a
-                  href={selectedMember.socials.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin size={15} />
-                </a>
-                <a
-                  href={selectedMember.socials.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
-                  aria-label="GitHub"
-                >
-                  <Github size={15} />
-                </a>
-                <a
-                  href={selectedMember.socials.instagram}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
-                  aria-label="Instagram"
-                >
-                  <Instagram size={15} />
-                </a>
-                <a
-                  href={`mailto:${selectedMember.socials.email}`}
-                  className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
-                  aria-label="Email"
-                >
-                  <Mail size={15} />
-                </a>
+                {selectedMember.socials?.linkedin && selectedMember.socials.linkedin !== '-' && (
+                  <a
+                    href={selectedMember.socials.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-800 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin size={15} />
+                  </a>
+                )}
+                {selectedMember.socials?.github && selectedMember.socials.github !== '-' && (
+                  <a
+                    href={selectedMember.socials.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
+                    aria-label="GitHub"
+                  >
+                    <Github size={15} />
+                  </a>
+                )}
+                {selectedMember.socials?.instagram && selectedMember.socials.instagram !== '-' && (
+                  <a
+                    href={selectedMember.socials.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
+                    aria-label="Instagram"
+                  >
+                    <Instagram size={15} />
+                  </a>
+                )}
+                {selectedMember.socials?.email && selectedMember.socials.email !== '-' && (
+                  <a
+                    href={`mailto:${selectedMember.socials.email}`}
+                    className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
+                    aria-label="Email"
+                  >
+                    <Mail size={15} />
+                  </a>
+                )}
               </div>
 
-              <a
-                href={`mailto:${selectedMember.socials.email}`}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#00629B] hover:bg-[#0077b6] text-white text-xs font-mono uppercase tracking-wider font-semibold transition-colors"
-              >
-                <span>Connect via Email</span>
-                <ExternalLink size={13} />
-              </a>
+              {selectedMember.socials?.email && selectedMember.socials.email !== '-' && (
+                <a
+                  href={`mailto:${selectedMember.socials.email}`}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#00629B] hover:bg-[#0077b6] text-white text-xs font-semibold transition-colors"
+                >
+                  <span>Connect via Email</span>
+                  <ExternalLink size={13} />
+                </a>
+              )}
             </div>
           </div>
         </div>
