@@ -794,11 +794,7 @@ export default function TeamPage() {
 
                       {/* Designation */}
                       <p
-                        className={`text-[1.1rem] font-bold mb-0.5 truncate w-full text-center ${
-                          isCore
-                            ? 'text-[#00629B] dark:text-[#38bdf8]'
-                            : 'text-slate-600 dark:text-zinc-400'
-                        }`}
+                        className={`text-[1.1rem] font-bold ${theme.roleText} mb-0.5 truncate w-full text-center`}
                       >
                         {member.role.trim()}
                       </p>
@@ -831,7 +827,7 @@ export default function TeamPage() {
       <div className="mt-3 flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-zinc-400">
         <span>{currentIndex + 1} of {CORE_TEAM_MEMBERS.length}</span>
         <span>·</span>
-        <span className={`font-semibold ${getDepartmentTheme(activeMember?.role).roleText}`}>
+        <span className={`font-bold ${getDepartmentTheme(activeMember?.role).roleText}`}>
           {activeMember?.role?.trim()}
         </span>
       </div>
