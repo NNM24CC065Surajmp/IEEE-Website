@@ -1,6 +1,7 @@
 import React from 'react';
 import Hero from '../components/Hero';
 import Intro from '../components/Intro';
+import VelocityMarquee from '../components/VelocityMarquee';
 import GiantReveal from '../components/GiantReveal';
 
 import BgScrubWrapper from '../components/BgScrubWrapper';
@@ -14,6 +15,7 @@ export default function HomePage() {
     <BgScrubWrapper>
       <Hero />
       <Intro />
+      <VelocityMarquee />
       <GiantReveal />
       
       <Societies />

@@ -75,7 +75,7 @@ export default function Hero() {
               Empowering student innovators to build, connect, and lead.
             </p>
 
-            <p className="hero-anim invisible text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-md mb-10">
+            <p className="hero-anim invisible text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-md mb-6">
               Join our hands-on workshops, open-source sprints, and industry network designed for aspiring engineers.
             </p>
 

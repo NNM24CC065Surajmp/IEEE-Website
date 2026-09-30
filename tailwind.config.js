@@ -33,6 +33,7 @@ export default {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
+        'blink': { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0' } },
         'float': {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
@@ -50,6 +51,8 @@ export default {
       animation: {
         'fade-up': 'fade-up 600ms ease-out forwards',
         'fade-in': 'fade-in 600ms ease-out forwards',
+        'blink': { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0' } },
+        'blink': 'blink 1s step-end infinite',
         'float': 'float 4s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'gradient-shift': 'gradient-shift 5s ease infinite',
