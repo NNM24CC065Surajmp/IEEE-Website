@@ -71,6 +71,16 @@ const getDepartmentTheme = (role) => {
   return DEPARTMENT_THEMES.technical;
 };
 
+const isCoreMember = (role = '') => {
+  const r = (role || '').toLowerCase().trim();
+  return (
+    r.includes('president') ||
+    r.includes('secretary') ||
+    r.includes('treasur') ||
+    r.includes('office bearer')
+  );
+};
+
 // ============================================================================
 // DATA: ~25 Core Team Members (President First)
 // ============================================================================
@@ -769,6 +779,7 @@ export default function TeamPage() {
               if (Math.abs(offset) > 4) return null;
 
               const theme = getDepartmentTheme(member.role);
+              const isCore = isCoreMember(member.role);
 
               const angleStep = isMobile ? 22 : 18;
               const spacingStep = isMobile ? 180 : 240;
@@ -818,30 +829,44 @@ export default function TeamPage() {
                     </div>
 
                     {/* Plain Text Labels & Info */}
-                    <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
-                      <div>
+                    <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1">
+                      <div className="flex flex-col items-center text-center w-full">
+                        {/* Name */}
                         <h3
-                          className={`font-bold text-base sm:text-lg leading-tight mb-1 truncate ${
-                            isCenter ? 'text-white' : 'text-zinc-200'
+                          className={`leading-tight mb-1 truncate w-full text-center ${
+                            isCore
+                              ? 'text-lg sm:text-[1.2rem] font-extrabold text-white'
+                              : `text-base sm:text-[1.05rem] font-bold ${
+                                  isCenter ? 'text-white' : 'text-zinc-200'
+                                }`
                           }`}
                         >
                           {member.name.replace(/\n/g, ' ').trim()}
                         </h3>
 
-                        <p className={`text-xs sm:text-sm font-semibold ${theme.roleText} mb-0.5 truncate`}>
+                        {/* Designation */}
+                        <p
+                          className={`text-[1.1rem] font-bold mb-0.5 truncate w-full text-center ${
+                            isCore
+                              ? 'text-[#00629B] dark:text-[#38bdf8]'
+                              : 'text-zinc-400'
+                          }`}
+                        >
                           {member.role.trim()}
                         </p>
-                        <p className="text-xs text-zinc-400 truncate">
+
+                        {/* Department / Year */}
+                        <p className="text-[0.95rem] text-zinc-400 truncate w-full text-center">
                           {member.dept.trim()}{member.year ? ` · ${member.year.trim()}` : ''}
                         </p>
                       </div>
 
                       {/* Footer Row */}
-                      <div className="pt-2 border-t border-zinc-800 flex items-center justify-between mt-1.5">
+                      <div className="pt-2 border-t border-zinc-800 flex items-center justify-between mt-1.5 w-full">
                         <span className="text-xs text-zinc-400 truncate max-w-[130px]">
                           {member.division}
                         </span>
-                        <div className={`flex items-center gap-1 text-xs ${theme.roleText} font-semibold group-hover:underline`}>
+                        <div className="flex items-center gap-1 text-xs text-[#00629B] dark:text-[#38bdf8] font-semibold group-hover:underline">
                           <span>View Details</span>
                           <ArrowRight size={12} />
                         </div>
