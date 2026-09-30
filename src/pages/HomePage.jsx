@@ -4,7 +4,7 @@ import Intro from '../components/Intro';
 import GiantReveal from '../components/GiantReveal';
 
 import BgScrubWrapper from '../components/BgScrubWrapper';
-import FeaturedEvents from '../components/FeaturedEvents';
+
 import Societies from '../components/Societies';
 import StatsBlock from '../components/StatsBlock';
 import JoinCTA from '../components/JoinCTA';
@@ -17,7 +17,7 @@ export default function HomePage() {
       <GiantReveal />
       
       <Societies />
-      <FeaturedEvents />
+
       <StatsBlock />
       <JoinCTA />
     </BgScrubWrapper>

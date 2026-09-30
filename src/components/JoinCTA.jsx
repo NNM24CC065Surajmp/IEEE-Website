@@ -13,7 +13,7 @@ export default function JoinCTA() {
     gsap.from('.cta-heading', { scale: 0.95, opacity: 0, duration: 0.7, ease: 'back.out(1.2)', scrollTrigger: { trigger: containerRef.current, start: 'top 80%' } });
   }, { scope: containerRef });
   return (
-    <section ref={containerRef} className="cta-container section-container py-16 md:py-24">
+    <section ref={containerRef} className="cta-container section-container pb-16 md:pb-24 pt-4 md:pt-8">
       <Reveal>
         <div className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-ieee-border bg-gradient-to-br from-slate-50 via-slate-100 to-ieee-blue/10 dark:from-ieee-surface dark:via-[#101321] dark:to-ieee-blue/20 p-8 sm:p-12 md:p-16 shadow-2xl">
           {/* Subtle blue accent blur / glow in top right */}

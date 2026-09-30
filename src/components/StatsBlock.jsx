@@ -30,7 +30,7 @@ export default function StatsBlock() {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="section-container pb-16 md:pb-24">
+    <section ref={containerRef} className="section-container pb-8 md:pb-12">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-12 border-y border-slate-200 dark:border-ieee-border bg-slate-50/50 dark:bg-ieee-surface/50 rounded-3xl">
         {statsData.map((stat, index) => (
           <div key={stat.id} className="stat-container">
