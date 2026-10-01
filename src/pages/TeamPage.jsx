@@ -3,16 +3,13 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Linkedin,
-  Github,
-  Instagram,
-  Mail,
-  ExternalLink,
   Award,
   ArrowRight,
   Building2,
   BookOpen,
 } from 'lucide-react';
+import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import { SiGmail } from 'react-icons/si';
 
 
 // Vite eager asset glob resolver for team profile pictures
@@ -29,6 +26,18 @@ const getMemberImage = (imgPath) => {
   for (const path in localImages) {
     if (path.toLowerCase().endsWith(fileName)) {
       return localImages[path];
+    }
+  }
+
+  // Fallback match by base name without extension
+  const stem = fileName.substring(0, fileName.lastIndexOf('.')).trim();
+  if (stem) {
+    for (const path in localImages) {
+      const pathFileName = path.split('/').pop().toLowerCase();
+      const pathStem = pathFileName.substring(0, pathFileName.lastIndexOf('.')).trim();
+      if (pathStem === stem) {
+        return localImages[path];
+      }
     }
   }
   return imgPath;
@@ -51,12 +60,12 @@ const DEPARTMENT_THEMES = {
     roleText: 'text-[#00629B] dark:text-[#5db4e8]',
   },
   finance: {
-    activeBorder: 'border-amber-600 dark:border-amber-500',
-    roleText: 'text-amber-600 dark:text-amber-400',
+    activeBorder: 'border-orange-500 dark:border-orange-400',
+    roleText: 'text-orange-600 dark:text-orange-400',
   },
   events: {
-    activeBorder: 'border-yellow-600 dark:border-yellow-500',
-    roleText: 'text-yellow-600 dark:text-yellow-400',
+    activeBorder: 'border-yellow-400 dark:border-yellow-400',
+    roleText: 'text-yellow-500 dark:text-yellow-400',
   },
   design: {
     activeBorder: 'border-pink-600 dark:border-pink-500',
@@ -76,12 +85,12 @@ const getDepartmentTheme = (role) => {
   const r = (role || '').toLowerCase().trim();
   if (r.includes('president')) return DEPARTMENT_THEMES.leadership;
   if (r.includes('secretary')) return DEPARTMENT_THEMES.secretariat;
-  if (r.includes('tech')) return DEPARTMENT_THEMES.technical;
-  if (r.includes('treasur') || r.includes('finance')) return DEPARTMENT_THEMES.finance;
-  if (r.includes('event')) return DEPARTMENT_THEMES.events;
-  if (r.includes('design')) return DEPARTMENT_THEMES.design;
-  if (r.includes('content')) return DEPARTMENT_THEMES.content;
-  if (r.includes('market')) return DEPARTMENT_THEMES.marketing;
+  if (r.includes('tech') || r.includes('coding') || r.includes('hardware')) return DEPARTMENT_THEMES.technical;
+  if (r.includes('treasur') || r.includes('tressur') || r.includes('finance')) return DEPARTMENT_THEMES.finance;
+  if (r.includes('event') || r.includes('logistics')) return DEPARTMENT_THEMES.events;
+  if (r.includes('design') || r.includes('creative')) return DEPARTMENT_THEMES.design;
+  if (r.includes('content') || r.includes('editorial')) return DEPARTMENT_THEMES.content;
+  if (r.includes('market') || r.includes('sponsor') || r.includes('outreach')) return DEPARTMENT_THEMES.marketing;
   return DEPARTMENT_THEMES.technical;
 };
 
@@ -91,8 +100,104 @@ const isCoreMember = (role = '') => {
     r.includes('president') ||
     r.includes('secretary') ||
     r.includes('treasur') ||
+    r.includes('tressur') ||
     r.includes('office bearer')
   );
+};
+
+const DEPARTMENT_ABBREVIATIONS = {
+  'information science and engineering': 'ISE',
+  'information science & engineering': 'ISE',
+  'information science engineering': 'ISE',
+  'information science': 'ISE',
+  'information science and technology': 'ISE',
+  'ise': 'ISE',
+  'computer science and engineering': 'CSE',
+  'computer science & engineering': 'CSE',
+  'computer science engineering': 'CSE',
+  'computer science': 'CSE',
+  'cse': 'CSE',
+  'computer and communication engineering': 'CCE',
+  'computer & communication engineering': 'CCE',
+  'cce': 'CCE',
+  'electronics and communication engineering': 'ECE',
+  'electronics & communication engineering': 'ECE',
+  'electronics and communication': 'ECE',
+  'ece': 'ECE',
+  'electrical and electronics engineering': 'EEE',
+  'electrical & electronics engineering': 'EEE',
+  'eee': 'EEE',
+  'mechanical engineering': 'ME',
+  'me': 'ME',
+  'civil engineering': 'CE',
+  'ce': 'CE',
+  'artificial intelligence and machine learning': 'AIML',
+  'artificial intelligence & machine learning': 'AIML',
+  'aiml': 'AIML',
+  'artificial intelligence and data science': 'AIDS',
+  'artificial intelligence & data science': 'AIDS',
+  'aids': 'AIDS',
+};
+
+const formatDeptYear = (rawDept = '', rawYear = '') => {
+  let dept = (rawDept || '').trim();
+  let year = (rawYear || '').trim();
+
+  // If department and year are stored together in one string (e.g. "ISE - 3RD")
+  if (!year && dept.includes('-')) {
+    const parts = dept.split('-');
+    dept = parts[0].trim();
+    year = parts.slice(1).join('-').trim();
+  }
+
+  // Abbreviate department if in predefined list, otherwise keep unchanged
+  const cleanKey = dept.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, ' ').trim();
+  const formattedDept = DEPARTMENT_ABBREVIATIONS[cleanKey] || dept;
+
+  // Format year (1 -> 1ST, 2 -> 2ND, 3 -> 3RD, 4 -> 4TH, handles "Third Year", etc.)
+  let formattedYear = '';
+  if (year) {
+    const y = year.toLowerCase();
+    if (y.includes('1') || y.includes('first')) formattedYear = '1ST';
+    else if (y.includes('2') || y.includes('second')) formattedYear = '2ND';
+    else if (y.includes('3') || y.includes('third')) formattedYear = '3RD';
+    else if (y.includes('4') || y.includes('fourth') || y.includes('final')) formattedYear = '4TH';
+    else formattedYear = year.toUpperCase();
+  }
+
+  if (formattedDept && formattedYear) {
+    return `${formattedDept} - ${formattedYear}`;
+  }
+  return formattedDept || formattedYear;
+};
+
+const isValidSocial = (val) => {
+  if (!val) return false;
+  const str = String(val).trim();
+  return str !== '' && str !== '-' && str !== '#' && str.toLowerCase() !== 'none';
+};
+
+const getSocialUrl = (platform, val) => {
+  if (!isValidSocial(val)) return null;
+  const str = String(val).trim();
+  if (platform === 'email') {
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(str)}`;
+  }
+  if (str.startsWith('http://') || str.startsWith('https://')) {
+    return str;
+  }
+  if (platform === 'github') {
+    const match = str.match(/https?:\/\/[^\s]+/);
+    if (match) return match[0];
+    return `https://github.com/${str.replace(/\s+/g, '')}`;
+  }
+  if (platform === 'linkedin') {
+    if (str.includes(' ')) {
+      return `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(str)}`;
+    }
+    return `https://www.linkedin.com/in/${str}`;
+  }
+  return str;
 };
 
 const CORE_TEAM_MEMBERS = [
@@ -110,7 +215,7 @@ const CORE_TEAM_MEMBERS = [
     socials: {
       linkedin: 'https://www.linkedin.com/in/mohammed-ajmal-a3bb6533a?utm_source=share_via&utm_content=profile&utm_medium=member_android',
       github: 'https://github.com/nnm24is127-droid',
-      email: 'azmalhack1@gmail.com',
+      email: 'nnm24is127@nmamit.in',
     },
   },
   {
@@ -226,7 +331,7 @@ const CORE_TEAM_MEMBERS = [
         dept: 'Computer Science and Engineering ',
         year: '3RD',
         memberId: '102716802',
-        image:"src/imgs/Aadish Balakrishna Salian_.jpg",
+        image:"src/imgs/Aadish Balakrishna Salian_.jpeg",
         bio: 'I’m someone who loves turning “What if?” into “Let’s build it.” I enjoy experimenting with technology, solving problems, and constantly leveling up my skills.',
         quote: 'The world changes when imagination learns how to execute',
         socials: {
@@ -801,7 +906,7 @@ export default function TeamPage() {
 
                       {/* Department / Year */}
                       <p className="text-[0.95rem] text-slate-500 dark:text-zinc-400 truncate w-full text-center">
-                        {member.dept.trim()}{member.year ? ` · ${member.year.trim()}` : ''}
+                        {formatDeptYear(member.dept, member.year)}
                       </p>
                     </div>
 
@@ -911,38 +1016,38 @@ export default function TeamPage() {
             )}
 
             <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-2.5">
-                {selectedMember.socials?.linkedin && selectedMember.socials.linkedin !== '-' && (
+              <div className="flex items-center gap-4">
+                {getSocialUrl('linkedin', selectedMember.socials?.linkedin) && (
                   <a
-                    href={selectedMember.socials.linkedin}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-800 hover:bg-[#00629B] hover:text-white hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 transition-colors"
-                    aria-label="LinkedIn"
-                  >
-                    <Linkedin size={15} />
-                  </a>
-                )}
-                {selectedMember.socials?.github && selectedMember.socials.github !== '-' && (
-                  <a
-                    href={selectedMember.socials.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-800 hover:bg-[#00629B] hover:text-white hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 transition-colors"
-                    aria-label="GitHub"
-                  >
-                    <Github size={15} />
-                  </a>
-                )}
-                {selectedMember.socials?.email && selectedMember.socials.email !== '-' && (
-                  <a
-                    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(selectedMember.socials.email)}`}
+                    href={getSocialUrl('linkedin', selectedMember.socials?.linkedin)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-800 hover:bg-[#00629B] hover:text-white hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 transition-colors"
-                    aria-label="Email"
+                    className="text-[#0A66C2] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="LinkedIn profile"
                   >
-                    <Mail size={15} />
+                    <FaLinkedin size={26} />
+                  </a>
+                )}
+                {getSocialUrl('github', selectedMember.socials?.github) && (
+                  <a
+                    href={getSocialUrl('github', selectedMember.socials?.github)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#181717] dark:text-white transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="GitHub profile"
+                  >
+                    <FaGithub size={26} />
+                  </a>
+                )}
+                {getSocialUrl('email', selectedMember.socials?.email) && (
+                  <a
+                    href={getSocialUrl('email', selectedMember.socials?.email)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#EA4335] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="Gmail"
+                  >
+                    <SiGmail size={25} />
                   </a>
                 )}
               </div>
