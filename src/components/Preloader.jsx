@@ -2,34 +2,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from '../lib/gsap';
 import { prefersReducedMotion } from '../lib/motion';
 
-// Determine intro eligibility synchronously when file is parsed.
-// This guarantees that child components (like Hero) know exactly
-// if they should wait for the intro to finish before animating.
 let isEligible = false;
 try {
   isEligible = !prefersReducedMotion() && !sessionStorage.getItem('ieee-intro-seen');
 } catch (e) {}
 
-// Exported so other components can check it if needed, though we also set it on window.
 window.ieeeIntroActive = isEligible;
 
 export default function Preloader() {
   const [isVisible, setIsVisible] = useState(isEligible);
-  const containerRef = useRef(null);
+  const bgRef = useRef(null);
   const logoRef = useRef(null);
-  const ringRef = useRef(null);
   const sequenceDone = useRef(false);
 
   useEffect(() => {
     if (!isVisible) return;
-
-    // Lock scrolling while intro plays
     document.body.style.overflow = 'hidden';
-
-    // Mark as seen immediately so reloads during intro don't replay it
-    try {
-      sessionStorage.setItem('ieee-intro-seen', 'true');
-    } catch (e) {}
+    try { sessionStorage.setItem('ieee-intro-seen', 'true'); } catch (e) {}
 
     const markDone = () => {
       if (sequenceDone.current) return;
@@ -40,8 +29,7 @@ export default function Preloader() {
       setIsVisible(false);
     };
 
-    // Hard fallback timeout just in case GSAP stalls
-    const fallback = setTimeout(markDone, 4000);
+    const fallback = setTimeout(markDone, 6000);
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -50,51 +38,53 @@ export default function Preloader() {
       }
     });
 
-    // BEAT 1: Logo Entrance (0 to 0.8s)
+    // BEAT 1: Cinematic Logo Entrance
     tl.fromTo(logoRef.current, 
-      { scale: 0.85, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 0.8, ease: 'power3.out' }
+      { scale: 0.85, opacity: 0, filter: 'blur(20px)' },
+      { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 1.8, ease: 'power2.out' }
     );
 
-    // Subtle glowing underline reveals alongside logo
-    tl.fromTo(ringRef.current,
-      { scaleX: 0, opacity: 0 },
-      { scaleX: 1, opacity: 1, duration: 0.8, ease: 'power3.out' },
-      '<'
-    );
+    // BEAT 2: The Breathe (Hold)
+    tl.to(logoRef.current, { 
+      scale: 1.05, 
+      duration: 1.0, 
+      ease: 'sine.inOut' 
+    });
 
-    // BEAT 2: Brief Hold (Let it breathe)
-    tl.to(logoRef.current, { duration: 0.35 });
+    // BEAT 3: The "Depth of Field" Dissolve
+    // This is the absolute pinnacle of luxury UI animation (Apple style).
+    // No splitting, no grids. Just an incredibly sophisticated rack-focus effect.
+    tl.addLabel('defocus');
 
-    // BEAT 3: Expand and Reveal
-    // We use a CSS variable to animate a radial mask that acts as a "wipe"
-    const maxRadius = Math.max(window.innerWidth, window.innerHeight) * 1.5;
-    
-    // Setting initial state of the mask radius
-    gsap.set(containerRef.current, { '--reveal-r': '0px' });
-    
-    tl.addLabel('expand');
-    
-    // The logo itself slightly scales up and fades out as we "zoom through" it
-    tl.to([logoRef.current, ringRef.current], {
-      scale: 1.5,
+    // The logo gracefully swells and dissolves into a soft light burst
+    tl.to(logoRef.current, {
+      scale: 1.4,
       opacity: 0,
-      duration: 0.7,
+      filter: 'blur(30px)',
+      duration: 1.6,
       ease: 'power2.inOut'
-    }, 'expand');
+    }, 'defocus');
 
-    // Simultaneously, the mask expands outward uncovering the page underneath
-    let proxy = { r: 0 };
+    // The solid black background fades into transparency, revealing the heavily blurred homepage
+    tl.to(bgRef.current, {
+      backgroundColor: 'rgba(5, 6, 10, 0)',
+      duration: 1.4,
+      ease: 'power2.inOut'
+    }, 'defocus');
+
+    // Simultaneously, the frosted glass un-blurs, bringing the homepage into razor-sharp focus
+    let proxy = { blur: 40 };
     tl.to(proxy, {
-      r: maxRadius,
-      duration: 1.0, // Slower for premium feel (1.0s)
-      ease: 'power3.inOut',
+      blur: 0,
+      duration: 1.6,
+      ease: 'power2.inOut',
       onUpdate: () => {
-        if (containerRef.current) {
-          containerRef.current.style.setProperty('--reveal-r', `${proxy.r}px`);
+        if (bgRef.current) {
+          bgRef.current.style.backdropFilter = `blur(${proxy.blur}px)`;
+          bgRef.current.style.WebkitBackdropFilter = `blur(${proxy.blur}px)`;
         }
       }
-    }, 'expand');
+    }, 'defocus');
 
     return () => clearTimeout(fallback);
   }, [isVisible]);
@@ -103,32 +93,45 @@ export default function Preloader() {
 
   return (
     <div 
-      ref={containerRef} 
-      className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto"
+      className="fixed inset-0 z-[100] pointer-events-auto flex items-center justify-center overflow-hidden"
       role="status"
-      style={{
-        backgroundColor: '#05060A', // Matching the dark theme base
-        // The mask creates a transparent circle that grows, cutting a hole through the solid background
-        WebkitMaskImage: 'radial-gradient(circle at center, transparent var(--reveal-r), black calc(var(--reveal-r) + 1px))',
-        maskImage: 'radial-gradient(circle at center, transparent var(--reveal-r), black calc(var(--reveal-r) + 1px))'
-      }}
     >
       <span className="sr-only">Loading IEEE NMAMIT</span>
-      
-      {/* Centered Premium Logo */}
-      <div ref={logoRef} className="flex flex-col items-center gap-6">
-        <div className="w-20 h-20 rounded-full flex items-center justify-center font-mono font-bold text-[28px] bg-ieee-blue text-white shadow-[0_0_40px_rgba(0,98,155,0.4)]">
-          IE
-        </div>
-        <span className="text-3xl md:text-4xl font-bold tracking-tight text-white font-heading">
-          IEEE NMAMIT
-        </span>
-        {/* Subtle glowing underline */}
-        <div 
-          ref={ringRef} 
-          className="w-full max-w-[120px] h-[1px] bg-ieee-teal shadow-[0_0_15px_rgba(0,150,214,0.8)] mt-2" 
-        />
+
+      {/* 
+        The Cinematic Glass Pane
+        Starts completely solid black. 
+        Transitions into a clearing frosted glass window over the homepage.
+      */}
+      <div 
+        ref={bgRef}
+        className="absolute inset-0"
+        style={{ 
+          backgroundColor: 'rgba(5, 6, 10, 1)', 
+          backdropFilter: 'blur(40px)',
+          WebkitBackdropFilter: 'blur(40px)'
+        }} 
+      >
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
       </div>
+
+      {/* Official IEEE Logo colored in IEEE Blue via CSS Mask */}
+      <div 
+        ref={logoRef} 
+        className="relative z-10 w-full max-w-[280px] sm:max-w-sm md:max-w-md lg:max-w-lg aspect-[2/1] bg-[#00629B]"
+        style={{
+          maskImage: 'url(/ieee-logo.svg)',
+          WebkitMaskImage: 'url(/ieee-logo.svg)',
+          maskSize: 'contain',
+          WebkitMaskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: 'center',
+          WebkitMaskPosition: 'center',
+          filter: 'drop-shadow(0 0 40px rgba(0,98,155,0.4))'
+        }}
+      />
+      
     </div>
   );
 }

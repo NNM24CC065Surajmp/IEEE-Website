@@ -42,19 +42,24 @@ export default function HeroVisual() {
 
       {/* 
         PRISTINE LOGO PRESENTATION
-        No glassmorphism, no borders, no pulsing dots. 
-        Just the logo, given space to breathe, with a microscopic hover scale.
+        Rendered flawlessly in pure IEEE Blue via CSS mask, matching the screenshot perfectly.
       */}
       <div 
         ref={logoWrapRef}
         className="relative z-10 w-full max-w-sm lg:max-w-lg px-8 transition-transform duration-700 hover:scale-[1.03] cursor-default flex items-center justify-center"
       >
-        <img 
-          src="/ieee-logo.svg" 
-          alt="Official IEEE Logo" 
-          className="w-full h-auto object-contain"
-          style={{ 
-            filter: 'drop-shadow(0 24px 48px rgba(0,0,0,0.08))' 
+        <div 
+          className="w-full aspect-[2/1] bg-[#00629B]"
+          style={{
+            maskImage: 'url(/ieee-logo.svg)',
+            WebkitMaskImage: 'url(/ieee-logo.svg)',
+            maskSize: 'contain',
+            WebkitMaskSize: 'contain',
+            maskRepeat: 'no-repeat',
+            WebkitMaskRepeat: 'no-repeat',
+            maskPosition: 'center',
+            WebkitMaskPosition: 'center',
+            filter: 'drop-shadow(0 24px 48px rgba(0,98,155,0.15))' 
           }}
         />
       </div>
