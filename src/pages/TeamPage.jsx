@@ -3,17 +3,13 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Linkedin,
-  Github,
-  Instagram,
-  Mail,
-  ExternalLink,
   Award,
   ArrowRight,
-  ShieldCheck,
   Building2,
   BookOpen,
 } from 'lucide-react';
+import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import { SiGmail } from 'react-icons/si';
 
 
 // Vite eager asset glob resolver for team profile pictures
@@ -32,100 +28,56 @@ const getMemberImage = (imgPath) => {
       return localImages[path];
     }
   }
+
+  // Fallback match by base name without extension
+  const stem = fileName.substring(0, fileName.lastIndexOf('.')).trim();
+  if (stem) {
+    for (const path in localImages) {
+      const pathFileName = path.split('/').pop().toLowerCase();
+      const pathStem = pathFileName.substring(0, pathFileName.lastIndexOf('.')).trim();
+      if (pathStem === stem) {
+        return localImages[path];
+      }
+    }
+  }
   return imgPath;
 };
 
 // ============================================================================
-// ROLE-BASED COLOR THEMING (Muted & Professional Palette)
+// ROLE-BASED COLOR THEMING (Flat & Simple)
 // ============================================================================
 const DEPARTMENT_THEMES = {
   leadership: {
-    name: 'Top Leadership',
-    badgeBg: 'bg-[#991b1b]', // Deep Red
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#fca5a5]',
-    activeBorder: 'border-[#991b1b]',
-    activeShadow: 'shadow-[0_0_35px_rgba(153,27,27,0.35)] ring-1 ring-[#991b1b]/40',
-    dotBg: 'bg-[#991b1b]',
-    dotInner: 'bg-[#f87171]',
-    roleText: 'text-[#b91c1c] dark:text-[#f87171]',
+    activeBorder: 'border-red-600 dark:border-red-500',
+    roleText: 'text-red-600 dark:text-red-400',
   },
   secretariat: {
-    name: 'Secretariat',
-    badgeBg: 'bg-[#6b21a8]', // Purple
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#d8b4fe]',
-    activeBorder: 'border-[#6b21a8]',
-    activeShadow: 'shadow-[0_0_35px_rgba(107,33,168,0.35)] ring-1 ring-[#6b21a8]/40',
-    dotBg: 'bg-[#6b21a8]',
-    dotInner: 'bg-[#c084fc]',
-    roleText: 'text-[#7e22ce] dark:text-[#c084fc]',
+    activeBorder: 'border-purple-600 dark:border-purple-500',
+    roleText: 'text-purple-600 dark:text-purple-400',
   },
   technical: {
-    name: 'Technical Team',
-    badgeBg: 'bg-[#00629B]', // Blue (IEEE Blue)
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#7dd3fc]',
-    activeBorder: 'border-[#00629B]',
-    activeShadow: 'shadow-[0_0_35px_rgba(0,98,155,0.35)] ring-1 ring-[#00629B]/40',
-    dotBg: 'bg-[#00629B]',
-    dotInner: 'bg-[#38bdf8]',
+    activeBorder: 'border-[#00629B] dark:border-[#5db4e8]',
     roleText: 'text-[#00629B] dark:text-[#5db4e8]',
   },
   finance: {
-    name: 'Finance',
-    badgeBg: 'bg-[#92400e]', // Gold / Amber
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#fde68a]',
-    activeBorder: 'border-[#b45309]',
-    activeShadow: 'shadow-[0_0_35px_rgba(180,83,9,0.35)] ring-1 ring-[#b45309]/40',
-    dotBg: 'bg-[#92400e]',
-    dotInner: 'bg-[#fcd34d]',
-    roleText: 'text-[#b45309] dark:text-[#fbbf24]',
+    activeBorder: 'border-orange-500 dark:border-orange-400',
+    roleText: 'text-orange-600 dark:text-orange-400',
   },
   events: {
-    name: 'Events Team',
-    badgeBg: 'bg-[#eab308]', // Yellow
-    badgeText: 'text-zinc-950', // Dark text for contrast against bright yellow
-    badgeDot: 'bg-zinc-900',
-    activeBorder: 'border-[#eab308]',
-    activeShadow: 'shadow-[0_0_35px_rgba(234,179,8,0.35)] ring-1 ring-[#eab308]/40',
-    dotBg: 'bg-[#eab308]',
-    dotInner: 'bg-[#fef08a]',
-    roleText: 'text-[#ca8a04] dark:text-[#facc15]',
+    activeBorder: 'border-yellow-400 dark:border-yellow-400',
+    roleText: 'text-yellow-500 dark:text-yellow-400',
   },
   design: {
-    name: 'Design Team',
-    badgeBg: 'bg-[#9d174d]', // Pink / Magenta
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#f9a8d4]',
-    activeBorder: 'border-[#be185d]',
-    activeShadow: 'shadow-[0_0_35px_rgba(190,24,93,0.35)] ring-1 ring-[#be185d]/40',
-    dotBg: 'bg-[#9d174d]',
-    dotInner: 'bg-[#f472b6]',
-    roleText: 'text-[#be185d] dark:text-[#f472b6]',
+    activeBorder: 'border-pink-600 dark:border-pink-500',
+    roleText: 'text-pink-600 dark:text-pink-400',
   },
   content: {
-    name: 'Content Team',
-    badgeBg: 'bg-[#0f766e]', // Teal
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#5eead4]',
-    activeBorder: 'border-[#0f766e]',
-    activeShadow: 'shadow-[0_0_35px_rgba(15,118,110,0.35)] ring-1 ring-[#0f766e]/40',
-    dotBg: 'bg-[#0f766e]',
-    dotInner: 'bg-[#2dd4bf]',
-    roleText: 'text-[#0d9488] dark:text-[#2dd4bf]',
+    activeBorder: 'border-teal-600 dark:border-teal-500',
+    roleText: 'text-teal-600 dark:text-teal-400',
   },
   marketing: {
-    name: 'Marketing Team',
-    badgeBg: 'bg-[#166534]', // Green
-    badgeText: 'text-white',
-    badgeDot: 'bg-[#86efac]',
-    activeBorder: 'border-[#15803d]',
-    activeShadow: 'shadow-[0_0_35px_rgba(21,128,61,0.35)] ring-1 ring-[#15803d]/40',
-    dotBg: 'bg-[#166534]',
-    dotInner: 'bg-[#4ade80]',
-    roleText: 'text-[#15803d] dark:text-[#4ade80]',
+    activeBorder: 'border-emerald-600 dark:border-emerald-500',
+    roleText: 'text-emerald-600 dark:text-emerald-400',
   },
 };
 
@@ -133,13 +85,119 @@ const getDepartmentTheme = (role) => {
   const r = (role || '').toLowerCase().trim();
   if (r.includes('president')) return DEPARTMENT_THEMES.leadership;
   if (r.includes('secretary')) return DEPARTMENT_THEMES.secretariat;
-  if (r.includes('tech')) return DEPARTMENT_THEMES.technical;
-  if (r.includes('treasur') || r.includes('finance')) return DEPARTMENT_THEMES.finance;
-  if (r.includes('event')) return DEPARTMENT_THEMES.events;
-  if (r.includes('design')) return DEPARTMENT_THEMES.design;
-  if (r.includes('content')) return DEPARTMENT_THEMES.content;
-  if (r.includes('market')) return DEPARTMENT_THEMES.marketing;
+  if (r.includes('tech') || r.includes('coding') || r.includes('hardware')) return DEPARTMENT_THEMES.technical;
+  if (r.includes('treasur') || r.includes('tressur') || r.includes('finance')) return DEPARTMENT_THEMES.finance;
+  if (r.includes('event') || r.includes('logistics')) return DEPARTMENT_THEMES.events;
+  if (r.includes('design') || r.includes('creative')) return DEPARTMENT_THEMES.design;
+  if (r.includes('content') || r.includes('editorial')) return DEPARTMENT_THEMES.content;
+  if (r.includes('market') || r.includes('sponsor') || r.includes('outreach')) return DEPARTMENT_THEMES.marketing;
   return DEPARTMENT_THEMES.technical;
+};
+
+const isCoreMember = (role = '') => {
+  const r = (role || '').toLowerCase().trim();
+  return (
+    r.includes('president') ||
+    r.includes('secretary') ||
+    r.includes('treasur') ||
+    r.includes('tressur') ||
+    r.includes('office bearer')
+  );
+};
+
+const DEPARTMENT_ABBREVIATIONS = {
+  'information science and engineering': 'ISE',
+  'information science & engineering': 'ISE',
+  'information science engineering': 'ISE',
+  'information science': 'ISE',
+  'information science and technology': 'ISE',
+  'ise': 'ISE',
+  'computer science and engineering': 'CSE',
+  'computer science & engineering': 'CSE',
+  'computer science engineering': 'CSE',
+  'computer science': 'CSE',
+  'cse': 'CSE',
+  'computer and communication engineering': 'CCE',
+  'computer & communication engineering': 'CCE',
+  'cce': 'CCE',
+  'electronics and communication engineering': 'ECE',
+  'electronics & communication engineering': 'ECE',
+  'electronics and communication': 'ECE',
+  'ece': 'ECE',
+  'electrical and electronics engineering': 'EEE',
+  'electrical & electronics engineering': 'EEE',
+  'eee': 'EEE',
+  'mechanical engineering': 'ME',
+  'me': 'ME',
+  'civil engineering': 'CE',
+  'ce': 'CE',
+  'artificial intelligence and machine learning': 'AIML',
+  'artificial intelligence & machine learning': 'AIML',
+  'aiml': 'AIML',
+  'artificial intelligence and data science': 'AIDS',
+  'artificial intelligence & data science': 'AIDS',
+  'aids': 'AIDS',
+};
+
+const formatDeptYear = (rawDept = '', rawYear = '') => {
+  let dept = (rawDept || '').trim();
+  let year = (rawYear || '').trim();
+
+  // If department and year are stored together in one string (e.g. "ISE - 3RD")
+  if (!year && dept.includes('-')) {
+    const parts = dept.split('-');
+    dept = parts[0].trim();
+    year = parts.slice(1).join('-').trim();
+  }
+
+  // Abbreviate department if in predefined list, otherwise keep unchanged
+  const cleanKey = dept.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, ' ').trim();
+  const formattedDept = DEPARTMENT_ABBREVIATIONS[cleanKey] || dept;
+
+  // Format year (1 -> 1ST, 2 -> 2ND, 3 -> 3RD, 4 -> 4TH, handles "Third Year", etc.)
+  let formattedYear = '';
+  if (year) {
+    const y = year.toLowerCase();
+    if (y.includes('1') || y.includes('first')) formattedYear = '1ST';
+    else if (y.includes('2') || y.includes('second')) formattedYear = '2ND';
+    else if (y.includes('3') || y.includes('third')) formattedYear = '3RD';
+    else if (y.includes('4') || y.includes('fourth') || y.includes('final')) formattedYear = '4TH';
+    else formattedYear = year.toUpperCase();
+  }
+
+  if (formattedDept && formattedYear) {
+    return `${formattedDept} - ${formattedYear}`;
+  }
+  return formattedDept || formattedYear;
+};
+
+const isValidSocial = (val) => {
+  if (!val) return false;
+  const str = String(val).trim();
+  return str !== '' && str !== '-' && str !== '#' && str.toLowerCase() !== 'none';
+};
+
+const getSocialUrl = (platform, val) => {
+  if (!isValidSocial(val)) return null;
+  const str = String(val).trim();
+  if (platform === 'email') {
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(str)}`;
+  }
+  if (str.startsWith('http://') || str.startsWith('https://')) {
+    return str;
+  }
+  if (platform === 'github') {
+    const match = str.match(/https?:\/\/[^\s]+/);
+    if (match) return match[0];
+    return `https://github.com/${str.replace(/\s+/g, '')}`;
+  }
+  if (platform === 'linkedin') {
+    if (str.includes(' ')) {
+      return `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(str)}`;
+    }
+    return `https://www.linkedin.com/in/${str}`;
+  }
+  return str;
 };
 
 const CORE_TEAM_MEMBERS = [
@@ -157,7 +215,7 @@ const CORE_TEAM_MEMBERS = [
     socials: {
       linkedin: 'https://www.linkedin.com/in/mohammed-ajmal-a3bb6533a?utm_source=share_via&utm_content=profile&utm_medium=member_android',
       github: 'https://github.com/nnm24is127-droid',
-      email: 'azmalhack1@gmail.com',
+      email: 'nnm24is127@nmamit.in',
     },
   },
   {
@@ -273,7 +331,7 @@ const CORE_TEAM_MEMBERS = [
         dept: 'Computer Science and Engineering ',
         year: '3RD',
         memberId: '102716802',
-        image:"src/imgs/Aadish Balakrishna Salian_.jpg",
+        image:"src/imgs/Aadish Balakrishna Salian_.jpeg",
         bio: 'I’m someone who loves turning “What if?” into “Let’s build it.” I enjoy experimenting with technology, solving problems, and constantly leveling up my skills.',
         quote: 'The world changes when imagination learns how to execute',
         socials: {
@@ -579,10 +637,15 @@ export default function TeamPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedMember, setSelectedMember] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [resetTimerKey, setResetTimerKey] = useState(0);
   const containerRef = useRef(null);
   const touchStartRef = useRef(null);
   const wheelAccumulator = useRef(0);
   const wheelTimeout = useRef(null);
+
+  const resetTimer = useCallback(() => {
+    setResetTimerKey((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -593,16 +656,31 @@ export default function TeamPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Auto-slide: advances every 3s, loops back to start after the last card.
+  // Pauses ONLY when a member details popup is open.
+  useEffect(() => {
+    if (selectedMember) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % CORE_TEAM_MEMBERS.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [selectedMember, resetTimerKey]);
+
   const handleNext = useCallback(() => {
     setCurrentIndex((prev) => Math.min(prev + 1, CORE_TEAM_MEMBERS.length - 1));
-  }, []);
+    resetTimer();
+  }, [resetTimer]);
 
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
-  }, []);
+    resetTimer();
+  }, [resetTimer]);
 
   const goToIndex = (index) => {
     setCurrentIndex(index);
+    resetTimer();
   };
 
   useEffect(() => {
@@ -638,6 +716,10 @@ export default function TeamPage() {
         handlePrev();
       }
     }
+    touchStartRef.current = null;
+  };
+
+  const handleTouchCancel = () => {
     touchStartRef.current = null;
   };
 
@@ -677,20 +759,20 @@ export default function TeamPage() {
   const handleCardClick = (member, index) => {
     setCurrentIndex(index);
     setSelectedMember(member);
+    resetTimer();
   };
 
   const activeMember = CORE_TEAM_MEMBERS[currentIndex];
   const selectedTheme = selectedMember ? getDepartmentTheme(selectedMember.role) : null;
 
   return (
-    <div className="pt-28 sm:pt-36 pb-20 select-none">
+    <div className="pt-20 sm:pt-24 pb-16 select-none">
       {/* Page Header */}
-      <section className="max-w-6xl mx-auto px-5 sm:px-8 pb-10 text-center">
-        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 text-slate-600 dark:text-zinc-400 font-mono text-[11px] uppercase tracking-wider mb-4 shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#0096D6]" />
-          EXECUTIVE COMMITTEE & LEADS · 2026–2027
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 pb-3 sm:pb-4 text-center">
+        <p className="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-zinc-400 mb-2">
+          Executive Committee &amp; Leads · 2026–2027
+        </p>
+        <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
           The Engineers Behind IEEE NMAMIT
         </h1>
       </section>
@@ -700,8 +782,9 @@ export default function TeamPage() {
         ref={containerRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
         onWheel={handleWheel}
-        className="relative w-full max-w-6xl mx-auto h-[440px] sm:h-[490px] flex items-center justify-center my-4"
+        className="relative w-full max-w-6xl mx-auto h-[390px] sm:h-[420px] flex items-center justify-center my-2"
         style={{ perspective: isMobile ? '850px' : '1200px' }}
       >
         {/* Left Arrow Button */}
@@ -709,14 +792,14 @@ export default function TeamPage() {
           type="button"
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className={`absolute left-4 sm:left-8 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 cursor-pointer ${
+          className={`absolute left-3 sm:left-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-lg border flex items-center justify-center transition-colors duration-200 cursor-pointer ${
             currentIndex === 0
-              ? 'border-slate-300/50 dark:border-zinc-800/50 bg-slate-200/30 dark:bg-zinc-900/30 text-slate-400 dark:text-zinc-600 cursor-not-allowed'
-              : 'border-slate-300 dark:border-zinc-700/80 bg-white/90 dark:bg-zinc-900/90 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:border-[#00629B] hover:shadow-[0_0_20px_rgba(0,98,155,0.4)] active:scale-95'
+              ? 'border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 text-slate-400 dark:text-zinc-600 cursor-not-allowed'
+              : 'border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-500 active:scale-95'
           }`}
           aria-label="Previous member"
         >
-          <ChevronLeft size={22} />
+          <ChevronLeft size={20} />
         </button>
 
         {/* Right Arrow Button */}
@@ -724,14 +807,14 @@ export default function TeamPage() {
           type="button"
           onClick={handleNext}
           disabled={currentIndex === CORE_TEAM_MEMBERS.length - 1}
-          className={`absolute right-4 sm:right-8 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 cursor-pointer ${
+          className={`absolute right-3 sm:right-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-lg border flex items-center justify-center transition-colors duration-200 cursor-pointer ${
             currentIndex === CORE_TEAM_MEMBERS.length - 1
-              ? 'border-slate-300/50 dark:border-zinc-800/50 bg-slate-200/30 dark:bg-zinc-900/30 text-slate-400 dark:text-zinc-600 cursor-not-allowed'
-              : 'border-slate-300 dark:border-zinc-700/80 bg-white/90 dark:bg-zinc-900/90 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:border-[#00629B] hover:shadow-[0_0_20px_rgba(0,98,155,0.4)] active:scale-95'
+              ? 'border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 text-slate-400 dark:text-zinc-600 cursor-not-allowed'
+              : 'border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-500 active:scale-95'
           }`}
           aria-label="Next member"
         >
-          <ChevronRight size={22} />
+          <ChevronRight size={20} />
         </button>
 
         {/* 3D Drum Container */}
@@ -745,10 +828,11 @@ export default function TeamPage() {
             if (Math.abs(offset) > 4) return null;
 
             const theme = getDepartmentTheme(member.role);
+            const isCore = isCoreMember(member.role);
 
             const angleStep = isMobile ? 22 : 18;
-            const spacingStep = isMobile ? 180 : 255;
-            const depthStep = isMobile ? 65 : 85;
+            const spacingStep = isMobile ? 180 : 240;
+            const depthStep = isMobile ? 65 : 80;
             const scaleStep = isMobile ? 0.08 : 0.06;
 
             const rotateY = -offset * angleStep;
@@ -762,30 +846,29 @@ export default function TeamPage() {
               <div
                 key={member.id}
                 onClick={() => handleCardClick(member, index)}
-                className={`absolute cursor-pointer transition-all duration-300 ease-out will-change-transform ${
+                className={`absolute cursor-pointer transition-all duration-[0.4s] ease-out will-change-transform ${
                   isCenter ? 'z-30' : 'z-10'
                 }`}
                 style={{
                   transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                   transformOrigin: 'center center',
                   opacity: opacity,
+                  transitionDuration: '0.4s',
                 }}
               >
-                {/* Rectangular Headshot Profile Card */}
+                {/* Simple Flat Profile Card */}
                 <div
-                  className={`group relative w-[270px] sm:w-[310px] h-[380px] sm:h-[420px] rounded-2xl transition-all duration-300 flex flex-col overflow-hidden shadow-xl ${
+                  className={`group relative w-[260px] sm:w-[290px] h-[350px] sm:h-[380px] rounded-lg transition-all duration-[0.4s] flex flex-col overflow-hidden ${
                     isCenter
-                      ? `bg-white dark:bg-[#0a0d16] border-2 ${theme.activeBorder} ${theme.activeShadow}`
-                      : 'bg-slate-100/95 dark:bg-[#080a11]/95 border border-slate-300 dark:border-zinc-800/90 hover:border-slate-400 dark:hover:border-zinc-700'
+                      ? `bg-white dark:bg-zinc-900 border-2 ${theme.activeBorder}`
+                      : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 hover:border-slate-400 dark:hover:border-zinc-700'
                   }`}
+                  style={{
+                    maxHeight: 'min(380px, 60vh)',
+                  }}
                 >
-                  {/* Decorative Background Shield Ornament */}
-                  <div className="absolute right-[-20px] bottom-[-20px] text-slate-300/30 dark:text-zinc-800/15 pointer-events-none z-0">
-                    <ShieldCheck size={140} />
-                  </div>
-
-                  {/* TOP SECTION: Rectangular Photo filling top portion (portrait orientation headshot) */}
-                  <div className="relative w-full h-[240px] sm:h-[270px] overflow-hidden bg-slate-200 dark:bg-zinc-900 shrink-0">
+                  {/* Photo Section */}
+                  <div className="relative w-full h-[210px] sm:h-[235px] overflow-hidden bg-slate-100 dark:bg-zinc-800 shrink-0">
                     <img
                       src={getMemberImage(member.image)}
                       alt={member.name}
@@ -794,55 +877,45 @@ export default function TeamPage() {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
                       }}
-                      className="w-full h-full object-cover object-top sm:object-center transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover object-top sm:object-center"
                     />
-
-                    {/* Gradient Overlay at bottom of photo for visual transition */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent pointer-events-none" />
-
-                    {/* Colored Badge/Pill Label at Top-Left Corner */}
-                    <div className="absolute top-3 left-3 z-20">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase ${theme.badgeBg} ${theme.badgeText} shadow-md border border-white/20 backdrop-blur-md max-w-[210px] truncate`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${theme.badgeDot} shrink-0`} />
-                        <span className="truncate">{member.role.trim().toUpperCase()}</span>
-                      </span>
-                    </div>
-
-                    {/* Center Active indicator dot */}
-                    {isCenter && (
-                      <span className={`absolute bottom-2.5 right-3 w-3 h-3 rounded-full ${theme.dotBg} border-2 border-white dark:border-[#0a0d16] flex items-center justify-center shadow`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${theme.dotInner}`} />
-                      </span>
-                    )}
                   </div>
 
-                  {/* BOTTOM SECTION: Name, Role & Department Subtitle */}
-                  <div className="p-4 sm:p-5 flex flex-col justify-between flex-1 relative z-10">
-                    <div>
-                      {/* Member Name in Bold */}
+                  {/* Plain Text Labels & Info */}
+                  <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1">
+                    <div className="flex flex-col items-center text-center w-full">
+                      {/* Name */}
                       <h3
-                        className={`font-bold tracking-tight text-lg sm:text-xl transition-colors leading-tight mb-1 truncate ${
-                          isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-zinc-200'
+                        className={`leading-tight mb-1 truncate w-full text-center ${
+                          isCore
+                            ? 'text-lg sm:text-[1.2rem] font-extrabold text-slate-900 dark:text-white'
+                            : `text-base sm:text-[1.05rem] font-bold ${
+                                isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-zinc-200'
+                              }`
                         }`}
                       >
                         {member.name.replace(/\n/g, ' ').trim()}
                       </h3>
 
-                      {/* Role & Department as Smaller Subtitle */}
-                      <p className={`text-xs sm:text-sm font-semibold ${theme.roleText} mb-0.5 truncate`}>
+                      {/* Designation */}
+                      <p
+                        className={`text-[1.1rem] font-bold ${theme.roleText} mb-0.5 truncate w-full text-center`}
+                      >
                         {member.role.trim()}
                       </p>
-                      <p className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 truncate">
-                        {member.dept.trim()} {member.year ? `· ${member.year.trim()}` : ''}
+
+                      {/* Department / Year */}
+                      <p className="text-[0.95rem] text-slate-500 dark:text-zinc-400 truncate w-full text-center">
+                        {formatDeptYear(member.dept, member.year)}
                       </p>
                     </div>
 
-                    {/* Footer Row: Division & View Details Prompt */}
-                    <div className="pt-2.5 border-t border-slate-200 dark:border-zinc-800/80 flex items-center justify-between mt-2">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold truncate max-w-[140px]">
+                    {/* Footer Row */}
+                    <div className="pt-2 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between mt-1.5 w-full">
+                      <span className="text-xs text-slate-500 dark:text-zinc-400 truncate max-w-[130px]">
                         {member.division}
                       </span>
-                      <div className={`flex items-center gap-1 text-[11px] font-mono ${theme.roleText} font-bold group-hover:underline`}>
+                      <div className="flex items-center gap-1 text-xs text-[#00629B] dark:text-[#38bdf8] font-semibold group-hover:underline">
                         <span>View Details</span>
                         <ArrowRight size={12} />
                       </div>
@@ -855,34 +928,13 @@ export default function TeamPage() {
         </div>
       </div>
 
-      {/* Position Indicator Below Barrel */}
-      <div className="mt-8 flex flex-col items-center gap-3">
-        <div className="flex items-center gap-3 font-mono text-xs">
-          <span className="text-slate-500 dark:text-zinc-400">INDEX</span>
-          <span className="text-slate-900 dark:text-white font-bold tracking-wider px-2.5 py-0.5 rounded bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 shadow-sm">
-            {String(currentIndex + 1).padStart(2, '0')} / {String(CORE_TEAM_MEMBERS.length).padStart(2, '0')}
-          </span>
-          <span className="text-slate-400 dark:text-zinc-400 hidden sm:inline">·</span>
-          <span className={`font-semibold hidden sm:inline ${getDepartmentTheme(activeMember?.role).roleText}`}>
-            {activeMember?.role}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-1.5 max-w-[85vw] overflow-x-auto py-1 px-2 no-scrollbar">
-          {CORE_TEAM_MEMBERS.map((m, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => goToIndex(i)}
-              aria-label={`Jump to ${CORE_TEAM_MEMBERS[i].name}`}
-              className={`h-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-                i === currentIndex
-                  ? `w-6 ${getDepartmentTheme(m.role).badgeBg}`
-                  : 'w-1.5 bg-slate-300 dark:bg-zinc-800 hover:bg-slate-400 dark:hover:bg-zinc-600'
-              }`}
-            />
-          ))}
-        </div>
+      {/* Plain Text Position Label */}
+      <div className="mt-3 flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-zinc-400">
+        <span>{currentIndex + 1} of {CORE_TEAM_MEMBERS.length}</span>
+        <span>·</span>
+        <span className={`font-bold ${getDepartmentTheme(activeMember?.role).roleText}`}>
+          {activeMember?.role?.trim()}
+        </span>
       </div>
 
       {/* Modal Profile Zoom */}
@@ -890,22 +942,20 @@ export default function TeamPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-slate-900/60 dark:bg-black/85 animate-in fade-in duration-200 cursor-pointer"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 animate-in fade-in duration-200 cursor-pointer"
           onClick={() => setSelectedMember(null)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="cursor-default relative w-full max-w-xl rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-300 dark:border-zinc-700/80 p-6 sm:p-8 shadow-2xl overflow-hidden"
+            className="cursor-default relative w-full max-w-xl rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-72 h-72 bg-[#00629B]/15 rounded-full blur-3xl pointer-events-none" />
-
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedMember(null);
               }}
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 p-2 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/90 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-600 transition-colors cursor-pointer shadow-sm"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 p-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors cursor-pointer"
               aria-label="Close profile modal"
             >
               <X size={18} className="pointer-events-none" />
@@ -916,19 +966,17 @@ export default function TeamPage() {
                 <img
                   src={getMemberImage(selectedMember.image)}
                   alt={selectedMember.name}
-                  className={`w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover border-2 ${selectedTheme?.activeBorder || 'border-[#00629B]'} shadow-lg shadow-black/20`}
+                  className={`w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover border-2 ${selectedTheme?.activeBorder || 'border-[#00629B]'}`}
                 />
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 whitespace-nowrap font-bold">
-                  {selectedMember.memberId}
+                <span className="block mt-1.5 text-center text-xs text-slate-500 dark:text-zinc-400 font-medium">
+                  ID: {selectedMember.memberId}
                 </span>
               </div>
 
               <div className="flex-1 pr-10 sm:pr-12">
-                <div className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase mb-1 font-bold">
-                  <span className={`px-2.5 py-0.5 rounded-full ${selectedTheme?.badgeText || 'text-white'} ${selectedTheme?.badgeBg || 'bg-[#00629B]'}`}>
-                    {selectedMember.division}
-                  </span>
-                </div>
+                <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold mb-1">
+                  {selectedMember.division}
+                </p>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
                   {selectedMember.name}
                 </h2>
@@ -937,7 +985,7 @@ export default function TeamPage() {
                   <span>{selectedMember.role}</span>
                 </div>
 
-                <div className="mt-2 text-xs font-mono text-slate-600 dark:text-zinc-400 space-y-0.5">
+                <div className="mt-2 text-xs text-slate-600 dark:text-zinc-400 space-y-0.5">
                   <p className="flex items-center gap-1.5">
                     <Building2 size={12} className="text-slate-400 dark:text-zinc-500" />
                     <span>{selectedMember.dept}</span>
@@ -950,58 +998,59 @@ export default function TeamPage() {
               </div>
             </div>
 
-            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800/80">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2 font-bold">
-                Executive Overview & Focus
+            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800">
+              <h4 className="text-xs uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2 font-semibold">
+                Executive Overview &amp; Focus
               </h4>
               <p className="text-xs sm:text-sm text-slate-700 dark:text-zinc-300 leading-relaxed font-normal">
                 {selectedMember.bio}
               </p>
             </div>
 
-            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800/80">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2 font-bold">
-                
-              </h4>
-              <p className="text-xs sm:text-sm text-slate-700 dark:text-zinc-300 leading-relaxed font-normal">
-                {selectedMember.quote}
-              </p>
-            </div>
-            
-
-            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-2.5">
-                <a
-                  href={selectedMember.socials.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin size={15} />
-                </a>
-                <a
-                  href={selectedMember.socials.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors"
-                  aria-label="GitHub"
-                >
-                  <Github size={15} />
-                </a>
-                
-                <a 
-                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(selectedMember.socials.email)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors" 
-                aria-label="Email"
-              >
-                <Mail size={15} />
-              </a>
+            {selectedMember.quote && selectedMember.quote.trim() !== '' && selectedMember.quote.trim().toLowerCase() !== 'nothing' && (
+              <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800">
+                <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-400 leading-relaxed font-normal">
+                  {selectedMember.quote}
+                </p>
               </div>
+            )}
 
-              
+            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                {getSocialUrl('linkedin', selectedMember.socials?.linkedin) && (
+                  <a
+                    href={getSocialUrl('linkedin', selectedMember.socials?.linkedin)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#0A66C2] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="LinkedIn profile"
+                  >
+                    <FaLinkedin size={26} />
+                  </a>
+                )}
+                {getSocialUrl('github', selectedMember.socials?.github) && (
+                  <a
+                    href={getSocialUrl('github', selectedMember.socials?.github)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#181717] dark:text-white transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="GitHub profile"
+                  >
+                    <FaGithub size={26} />
+                  </a>
+                )}
+                {getSocialUrl('email', selectedMember.socials?.email) && (
+                  <a
+                    href={getSocialUrl('email', selectedMember.socials?.email)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#EA4335] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="Gmail"
+                  >
+                    <SiGmail size={25} />
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
