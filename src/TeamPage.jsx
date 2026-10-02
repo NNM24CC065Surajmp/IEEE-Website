@@ -1,36 +1,105 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+
 import {
   ChevronLeft,
   ChevronRight,
   X,
-  Linkedin,
-  Github,
-  Instagram,
-  Mail,
   ExternalLink,
   Award,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   Building2,
   BookOpen,
-  Code2,
-  Cpu,
 } from 'lucide-react';
+
+import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import { SiGmail } from 'react-icons/si';
 
 /**
  * ============================================================================
  * IEEE Student Branch NMAMIT - Team Page Component
  * ============================================================================
- * 
- * Pattern: 3D Horizontal Barrel / Drum Rotation Carousel
- * Physics: Cylinder lying on its horizontal axis, cards curve away on the left & right
- * Theme: Editorial dark (#05070a), IEEE Teal/Blue (#00629B, highlight #5db4e8)
- * 
- * NOTES FOR DEVELOPERS:
- * - The team array below contains ~25 realistic placeholder records.
- * - Replace placeholder avatars, bios, and social handles with real branch data when available.
  */
+
+// ============================================================================
+// ROLE-BASED COLOR THEMING (Flat & Simple)
+// ============================================================================
+const DEPARTMENT_THEMES = {
+  leadership: {
+    activeBorder: 'border-red-600 dark:border-red-500',
+    roleText: 'text-red-600 dark:text-red-400',
+  },
+  secretariat: {
+    activeBorder: 'border-purple-600 dark:border-purple-500',
+    roleText: 'text-purple-600 dark:text-purple-400',
+  },
+  technical: {
+    activeBorder: 'border-[#00629B] dark:border-[#5db4e8]',
+    roleText: 'text-[#00629B] dark:text-[#5db4e8]',
+  },
+  finance: {
+    activeBorder: 'border-orange-500 dark:border-orange-400',
+    roleText: 'text-orange-600 dark:text-orange-400',
+  },
+  events: {
+    activeBorder: 'border-yellow-400 dark:border-yellow-400',
+    roleText: 'text-yellow-500 dark:text-yellow-400',
+  },
+  design: {
+    activeBorder: 'border-pink-600 dark:border-pink-500',
+    roleText: 'text-pink-600 dark:text-pink-400',
+  },
+  content: {
+    activeBorder: 'border-teal-600 dark:border-teal-500',
+    roleText: 'text-teal-600 dark:text-teal-400',
+  },
+  marketing: {
+    activeBorder: 'border-emerald-600 dark:border-emerald-500',
+    roleText: 'text-emerald-600 dark:text-emerald-400',
+  },
+};
+
+const getDepartmentTheme = (role) => {
+  const r = (role || '').toLowerCase().trim();
+  if (r.includes('president')) return DEPARTMENT_THEMES.leadership;
+  if (r.includes('secretary')) return DEPARTMENT_THEMES.secretariat;
+  if (r.includes('tech') || r.includes('coding') || r.includes('hardware')) return DEPARTMENT_THEMES.technical;
+  if (r.includes('treasur') || r.includes('tressur') || r.includes('finance')) return DEPARTMENT_THEMES.finance;
+  if (r.includes('event') || r.includes('logistics')) return DEPARTMENT_THEMES.events;
+  if (r.includes('design') || r.includes('creative')) return DEPARTMENT_THEMES.design;
+  if (r.includes('content') || r.includes('editorial')) return DEPARTMENT_THEMES.content;
+  if (r.includes('market') || r.includes('sponsor') || r.includes('outreach')) return DEPARTMENT_THEMES.marketing;
+  return DEPARTMENT_THEMES.technical;
+};
+
+const isValidSocial = (val) => {
+  if (!val) return false;
+  const str = String(val).trim();
+  return str !== '' && str !== '-' && str !== '#' && str.toLowerCase() !== 'none';
+};
+
+const getSocialUrl = (platform, val) => {
+  if (!isValidSocial(val)) return null;
+  const str = String(val).trim();
+  if (platform === 'email') {
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(str)}`;
+  }
+  if (str.startsWith('http://') || str.startsWith('https://')) {
+    return str;
+  }
+  if (platform === 'github') {
+    const match = str.match(/https?:\/\/[^\s]+/);
+    if (match) return match[0];
+    return `https://github.com/${str.replace(/\s+/g, '')}`;
+  }
+  if (platform === 'linkedin') {
+    if (str.includes(' ')) {
+      return `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(str)}`;
+    }
+    return `https://www.linkedin.com/in/${str}`;
+  }
+  return str;
+};
 
 // ============================================================================
 // DATA: ~25 Core Team Members (President First)
@@ -307,6 +376,25 @@ const CORE_TEAM_MEMBERS = [
     },
   },
   {
+    id: 'likithraj',
+    name: 'LIKITHRAJ',
+    role: 'Content Core',
+    division: 'Content Wing',
+    dept: 'Information Science Engineering',
+    year: '3rd Year',
+    memberId: 'IEEE STB-94843',
+    image: 'src/imgs/LIKITHRAJ.png',
+    bio: 'Passionate about content creation, communication, and contributing to the IEEE Student Branch initiatives.',
+    skills: ['Content Writing', 'Communication', 'Creative Strategy'],
+    quote: 'Happy to work for IEEE',
+    socials: {
+      linkedin: 'https://linkedin.com',
+      github: 'https://github.com',
+      instagram: 'https://instagram.com',
+      email: 'likithraj.ieee@nmamit.in',
+    },
+  },
+  {
     id: 'abhishek-bhandary',
     name: 'Abhishek Bhandary',
     role: 'Logistics Lead',
@@ -495,10 +583,15 @@ export default function TeamPage() {
   const [currentIndex, setCurrentIndex] = useState(0); // Starts on President (index 0)
   const [selectedMember, setSelectedMember] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [resetTimerKey, setResetTimerKey] = useState(0);
   const containerRef = useRef(null);
   const touchStartRef = useRef(null);
   const wheelAccumulator = useRef(0);
   const wheelTimeout = useRef(null);
+
+  const resetTimer = useCallback(() => {
+    setResetTimerKey((prev) => prev + 1);
+  }, []);
 
   // Detect mobile screen width for responsive 3D math
   useEffect(() => {
@@ -510,17 +603,32 @@ export default function TeamPage() {
     return () => window.removeEventListener('resize', checkViewport);
   }, []);
 
+  // Auto-slide: advances every 3s, loops back to start after the last card.
+  // Pauses ONLY when a member details popup is open.
+  useEffect(() => {
+    if (selectedMember) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % CORE_TEAM_MEMBERS.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [selectedMember, resetTimerKey]);
+
   // Navigation handlers
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => Math.max(0, prev - 1));
-  }, []);
+    resetTimer();
+  }, [resetTimer]);
 
   const handleNext = useCallback(() => {
     setCurrentIndex((prev) => Math.min(CORE_TEAM_MEMBERS.length - 1, prev + 1));
-  }, []);
+    resetTimer();
+  }, [resetTimer]);
 
   const goToIndex = (index) => {
     setCurrentIndex(Math.max(0, Math.min(CORE_TEAM_MEMBERS.length - 1, index)));
+    resetTimer();
   };
 
   // Keyboard navigation
@@ -561,6 +669,10 @@ export default function TeamPage() {
     touchStartRef.current = null;
   };
 
+  const handleTouchCancel = () => {
+    touchStartRef.current = null;
+  };
+
   // Trackpad / Mouse wheel horizontal scrub
   const handleWheel = (e) => {
     // Only intercept if we're not inside the open modal
@@ -589,9 +701,11 @@ export default function TeamPage() {
   const handleCardClick = (member, index) => {
     setCurrentIndex(index);
     setSelectedMember(member);
+    resetTimer();
   };
 
   const activeMember = CORE_TEAM_MEMBERS[currentIndex];
+  const selectedTheme = selectedMember ? getDepartmentTheme(selectedMember.role) : null;
 
   return (
     <div className="min-h-screen bg-[#05070a] text-zinc-100 font-sans selection:bg-[#00629B] selection:text-white relative overflow-hidden flex flex-col justify-between">
@@ -616,8 +730,8 @@ export default function TeamPage() {
             <h1 className="text-sm font-bold text-white tracking-tight">
               IEEE NMAMIT
             </h1>
-            <p className="text-[10px] font-mono text-zinc-400 tracking-wider uppercase">
-              Core Committee · 2025–2026
+            <p className="text-[10px] text-zinc-400 tracking-wider uppercase">
+              Core Committee · 2026–2027
             </p>
           </div>
         </div>
@@ -630,13 +744,7 @@ export default function TeamPage() {
       </header>
 
       {/* Main Stage: Horizontal Barrel Carousel */}
-      <main
-        ref={containerRef}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onWheel={handleWheel}
-        className="relative z-10 w-full flex-1 flex flex-col items-center justify-center py-6 select-none"
-      >
+      <main className="relative z-10 w-full flex-1 flex flex-col items-center justify-center py-6 select-none">
         {/* Intro Tag & Eyebrow */}
         <div className="text-center mb-6 px-4">
           <div className="text-[11px] font-mono tracking-widest text-[#5db4e8] uppercase mb-1">
@@ -646,7 +754,12 @@ export default function TeamPage() {
 
         {/* 3D Barrel Carousel Stage */}
         <div
-          className="relative w-full max-w-5xl h-[310px] sm:h-[350px] flex items-center justify-center"
+          ref={containerRef}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
+          onWheel={handleWheel}
+          className="relative w-full max-w-5xl h-[390px] sm:h-[420px] flex items-center justify-center"
           style={{ perspective: isMobile ? '850px' : '1200px' }}
         >
           {/* Left Arrow Button */}
@@ -863,13 +976,13 @@ export default function TeamPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-black/85 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-black/85 animate-in fade-in duration-200 cursor-pointer"
           onClick={() => setSelectedMember(null)}
         >
           {/* Modal Card */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-xl rounded-2xl bg-[#0a0d16] border border-zinc-700/80 p-6 sm:p-8 shadow-2xl shadow-black/80 overflow-hidden"
+            className="cursor-default relative w-full max-w-xl rounded-2xl bg-[#0a0d16] border border-zinc-700/80 p-6 sm:p-8 shadow-2xl shadow-black/80 overflow-hidden"
           >
             {/* Ambient accent inside modal */}
             <div className="absolute top-0 right-0 w-72 h-72 bg-[#00629B]/15 rounded-full blur-3xl pointer-events-none" />
@@ -877,11 +990,14 @@ export default function TeamPage() {
             {/* Close Button */}
             <button
               type="button"
-              onClick={() => setSelectedMember(null)}
-              className="absolute top-5 right-5 p-2 rounded-lg border border-zinc-800 bg-zinc-900/80 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedMember(null);
+              }}
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 p-2 rounded-lg border border-zinc-800 bg-zinc-900/90 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors cursor-pointer shadow-sm"
               aria-label="Close profile modal"
             >
-              <X size={18} />
+              <X size={18} className="pointer-events-none" />
             </button>
 
             {/* Profile Content */}
@@ -891,27 +1007,27 @@ export default function TeamPage() {
                 <img
                   src={selectedMember.image}
                   alt={selectedMember.name}
-                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover border-2 border-[#00629B] shadow-lg shadow-[#00629B]/30"
+                  className={`w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover border-2 ${selectedTheme?.activeBorder || 'border-[#00629B]'}`}
                 />
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 whitespace-nowrap">
-                  {selectedMember.memberId}
+                <span className="block mt-1.5 text-center text-xs text-zinc-400 font-medium">
+                  ID: {selectedMember.memberId}
                 </span>
               </div>
 
               {/* Name, Role & Details */}
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest text-[#5db4e8] uppercase mb-1">
-                  <span>{selectedMember.division}</span>
-                </div>
+              <div className="flex-1 pr-10 sm:pr-12">
+                <p className="text-xs uppercase tracking-wider text-zinc-400 font-semibold mb-1">
+                  {selectedMember.division}
+                </p>
                 <h2 className="text-2xl font-bold text-white tracking-tight leading-tight">
                   {selectedMember.name}
                 </h2>
-                <div className="text-sm font-semibold text-zinc-300 flex items-center gap-1.5 mt-0.5">
-                  <Award size={15} className="text-[#5db4e8]" />
+                <div className={`text-sm font-semibold flex items-center gap-1.5 mt-0.5 ${selectedTheme?.roleText || 'text-[#5db4e8]'}`}>
+                  <Award size={15} />
                   <span>{selectedMember.role}</span>
                 </div>
 
-                <div className="mt-2 text-xs font-mono text-zinc-400 space-y-0.5">
+                <div className="mt-2 text-xs text-zinc-400 space-y-0.5">
                   <p className="flex items-center gap-1.5">
                     <Building2 size={12} className="text-zinc-500" />
                     <span>{selectedMember.dept}</span>
@@ -925,9 +1041,9 @@ export default function TeamPage() {
             </div>
 
             {/* Bio Section */}
-            <div className="relative z-10 mt-6 pt-5 border-t border-zinc-800/80">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-2">
-                Executive Overview & Focus
+            <div className="relative z-10 mt-6 pt-5 border-t border-zinc-800">
+              <h4 className="text-xs uppercase tracking-wider text-zinc-400 mb-2 font-semibold">
+                Executive Overview &amp; Focus
               </h4>
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
                 {selectedMember.bio}
@@ -935,68 +1051,71 @@ export default function TeamPage() {
             </div>
 
             {/* Skills & Focus Areas */}
-            <div className="relative z-10 mt-5">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-2">
-                Focus Areas & Competencies
-              </h4>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedMember.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="text-[11px] font-mono px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300"
-                  >
-                    {skill}
-                  </span>
-                ))}
+            {selectedMember.skills && selectedMember.skills.length > 0 && (
+              <div className="relative z-10 mt-5">
+                <h4 className="text-xs uppercase tracking-wider text-zinc-400 mb-2 font-semibold">
+                  Focus Areas &amp; Competencies
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedMember.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="text-xs px-2.5 py-1 rounded bg-zinc-800 border border-zinc-700 text-zinc-300"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Social Links & Action Row */}
-            <div className="relative z-10 mt-6 pt-5 border-t border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-2.5">
-                <a
-                  href={selectedMember.socials.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin size={15} />
-                </a>
-                <a
-                  href={selectedMember.socials.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
-                  aria-label="GitHub"
-                >
-                  <Github size={15} />
-                </a>
-                <a
-                  href={selectedMember.socials.instagram}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
-                  aria-label="Instagram"
-                >
-                  <Instagram size={15} />
-                </a>
-                <a
-                  href={`mailto:${selectedMember.socials.email}`}
-                  className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
-                  aria-label="Email"
-                >
-                  <Mail size={15} />
-                </a>
+            <div className="relative z-10 mt-6 pt-5 border-t border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                {getSocialUrl('linkedin', selectedMember.socials?.linkedin) && (
+                  <a
+                    href={getSocialUrl('linkedin', selectedMember.socials?.linkedin)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#0A66C2] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="LinkedIn profile"
+                  >
+                    <FaLinkedin size={26} />
+                  </a>
+                )}
+                {getSocialUrl('github', selectedMember.socials?.github) && (
+                  <a
+                    href={getSocialUrl('github', selectedMember.socials?.github)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#181717] dark:text-white transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="GitHub profile"
+                  >
+                    <FaGithub size={26} />
+                  </a>
+                )}
+                {getSocialUrl('email', selectedMember.socials?.email) && (
+                  <a
+                    href={getSocialUrl('email', selectedMember.socials?.email)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#EA4335] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="Gmail"
+                  >
+                    <SiGmail size={25} />
+                  </a>
+                )}
               </div>
 
-              <a
-                href={`mailto:${selectedMember.socials.email}`}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#00629B] hover:bg-[#0077b6] text-white text-xs font-mono uppercase tracking-wider font-semibold transition-colors"
-              >
-                <span>Connect via Email</span>
-                <ExternalLink size={13} />
-              </a>
+              {selectedMember.socials?.email && selectedMember.socials.email !== '-' && (
+                <a
+                  href={`mailto:${selectedMember.socials.email}`}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#00629B] hover:bg-[#0077b6] text-white text-xs font-semibold transition-colors"
+                >
+                  <span>Connect via Email</span>
+                  <ExternalLink size={13} />
+                </a>
+              )}
             </div>
           </div>
         </div>

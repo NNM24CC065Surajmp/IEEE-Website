@@ -3,172 +3,649 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Linkedin,
-  Github,
-  Instagram,
-  Mail,
-  ExternalLink,
   Award,
   ArrowRight,
-  ShieldCheck,
   Building2,
   BookOpen,
 } from 'lucide-react';
+import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import { SiGmail } from 'react-icons/si';
+
+
+// Vite eager asset glob resolver for team profile pictures
+const localImages = import.meta.glob('/src/imgs/*.{jpg,jpeg,png,webp,HEIC,JPG,PNG,jpeg,JPEG}', { eager: true, import: 'default' });
+
+const getMemberImage = (imgPath) => {
+  if (!imgPath) return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+  if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) return imgPath;
+
+  const normalized = imgPath.startsWith('/') ? imgPath : `/${imgPath}`;
+  if (localImages[normalized]) return localImages[normalized];
+
+  const fileName = normalized.split('/').pop().toLowerCase();
+  for (const path in localImages) {
+    if (path.toLowerCase().endsWith(fileName)) {
+      return localImages[path];
+    }
+  }
+
+  // Fallback match by base name without extension
+  const stem = fileName.substring(0, fileName.lastIndexOf('.')).trim();
+  if (stem) {
+    for (const path in localImages) {
+      const pathFileName = path.split('/').pop().toLowerCase();
+      const pathStem = pathFileName.substring(0, pathFileName.lastIndexOf('.')).trim();
+      if (pathStem === stem) {
+        return localImages[path];
+      }
+    }
+  }
+  return imgPath;
+};
+
+// ============================================================================
+// ROLE-BASED COLOR THEMING (Flat & Simple)
+// ============================================================================
+const DEPARTMENT_THEMES = {
+  leadership: {
+    activeBorder: 'border-red-600 dark:border-red-500',
+    roleText: 'text-red-600 dark:text-red-400',
+  },
+  secretariat: {
+    activeBorder: 'border-purple-600 dark:border-purple-500',
+    roleText: 'text-purple-600 dark:text-purple-400',
+  },
+  technical: {
+    activeBorder: 'border-[#00629B] dark:border-[#5db4e8]',
+    roleText: 'text-[#00629B] dark:text-[#5db4e8]',
+  },
+  finance: {
+    activeBorder: 'border-orange-500 dark:border-orange-400',
+    roleText: 'text-orange-600 dark:text-orange-400',
+  },
+  events: {
+    activeBorder: 'border-yellow-400 dark:border-yellow-400',
+    roleText: 'text-yellow-500 dark:text-yellow-400',
+  },
+  design: {
+    activeBorder: 'border-pink-600 dark:border-pink-500',
+    roleText: 'text-pink-600 dark:text-pink-400',
+  },
+  content: {
+    activeBorder: 'border-teal-600 dark:border-teal-500',
+    roleText: 'text-teal-600 dark:text-teal-400',
+  },
+  marketing: {
+    activeBorder: 'border-emerald-600 dark:border-emerald-500',
+    roleText: 'text-emerald-600 dark:text-emerald-400',
+  },
+};
+
+const getDepartmentTheme = (role) => {
+  const r = (role || '').toLowerCase().trim();
+  if (r.includes('president')) return DEPARTMENT_THEMES.leadership;
+  if (r.includes('secretary')) return DEPARTMENT_THEMES.secretariat;
+  if (r.includes('tech') || r.includes('coding') || r.includes('hardware')) return DEPARTMENT_THEMES.technical;
+  if (r.includes('treasur') || r.includes('tressur') || r.includes('finance')) return DEPARTMENT_THEMES.finance;
+  if (r.includes('event') || r.includes('logistics')) return DEPARTMENT_THEMES.events;
+  if (r.includes('design') || r.includes('creative')) return DEPARTMENT_THEMES.design;
+  if (r.includes('content') || r.includes('editorial')) return DEPARTMENT_THEMES.content;
+  if (r.includes('market') || r.includes('sponsor') || r.includes('outreach')) return DEPARTMENT_THEMES.marketing;
+  return DEPARTMENT_THEMES.technical;
+};
+
+const isCoreMember = (role = '') => {
+  const r = (role || '').toLowerCase().trim();
+  return (
+    r.includes('president') ||
+    r.includes('secretary') ||
+    r.includes('treasur') ||
+    r.includes('tressur') ||
+    r.includes('office bearer')
+  );
+};
+
+const DEPARTMENT_ABBREVIATIONS = {
+  'information science and engineering': 'ISE',
+  'information science & engineering': 'ISE',
+  'information science engineering': 'ISE',
+  'information science': 'ISE',
+  'information science and technology': 'ISE',
+  'ise': 'ISE',
+  'computer science and engineering': 'CSE',
+  'computer science & engineering': 'CSE',
+  'computer science engineering': 'CSE',
+  'computer science': 'CSE',
+  'cse': 'CSE',
+  'computer and communication engineering': 'CCE',
+  'computer & communication engineering': 'CCE',
+  'cce': 'CCE',
+  'electronics and communication engineering': 'ECE',
+  'electronics & communication engineering': 'ECE',
+  'electronics and communication': 'ECE',
+  'ece': 'ECE',
+  'electrical and electronics engineering': 'EEE',
+  'electrical & electronics engineering': 'EEE',
+  'eee': 'EEE',
+  'mechanical engineering': 'ME',
+  'me': 'ME',
+  'civil engineering': 'CE',
+  'ce': 'CE',
+  'artificial intelligence and machine learning': 'AIML',
+  'artificial intelligence & machine learning': 'AIML',
+  'aiml': 'AIML',
+  'artificial intelligence and data science': 'AIDS',
+  'artificial intelligence & data science': 'AIDS',
+  'aids': 'AIDS',
+};
+
+const formatDeptYear = (rawDept = '', rawYear = '') => {
+  let dept = (rawDept || '').trim();
+  let year = (rawYear || '').trim();
+
+  // If department and year are stored together in one string (e.g. "ISE - 3RD")
+  if (!year && dept.includes('-')) {
+    const parts = dept.split('-');
+    dept = parts[0].trim();
+    year = parts.slice(1).join('-').trim();
+  }
+
+  // Abbreviate department if in predefined list, otherwise keep unchanged
+  const cleanKey = dept.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, ' ').trim();
+  const formattedDept = DEPARTMENT_ABBREVIATIONS[cleanKey] || dept;
+
+  // Format year (1 -> 1ST, 2 -> 2ND, 3 -> 3RD, 4 -> 4TH, handles "Third Year", etc.)
+  let formattedYear = '';
+  if (year) {
+    const y = year.toLowerCase();
+    if (y.includes('1') || y.includes('first')) formattedYear = '1ST';
+    else if (y.includes('2') || y.includes('second')) formattedYear = '2ND';
+    else if (y.includes('3') || y.includes('third')) formattedYear = '3RD';
+    else if (y.includes('4') || y.includes('fourth') || y.includes('final')) formattedYear = '4TH';
+    else formattedYear = year.toUpperCase();
+  }
+
+  if (formattedDept && formattedYear) {
+    return `${formattedDept} - ${formattedYear}`;
+  }
+  return formattedDept || formattedYear;
+};
+
+const isValidSocial = (val) => {
+  if (!val) return false;
+  const str = String(val).trim();
+  return str !== '' && str !== '-' && str !== '#' && str.toLowerCase() !== 'none';
+};
+
+const getSocialUrl = (platform, val) => {
+  if (!isValidSocial(val)) return null;
+  const str = String(val).trim();
+  if (platform === 'email') {
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(str)}`;
+  }
+  if (str.startsWith('http://') || str.startsWith('https://')) {
+    return str;
+  }
+  if (platform === 'github') {
+    const match = str.match(/https?:\/\/[^\s]+/);
+    if (match) return match[0];
+    return `https://github.com/${str.replace(/\s+/g, '')}`;
+  }
+  if (platform === 'linkedin') {
+    if (str.includes(' ')) {
+      return `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(str)}`;
+    }
+    return `https://www.linkedin.com/in/${str}`;
+  }
+  return str;
+};
 
 const CORE_TEAM_MEMBERS = [
   {
     id: 'Mohammed-ajmal ',
-    name: 'Mohammed Ajmal ',
+    name: 'Mohammed  Ajmal ',
     role: 'President',
     division: 'Executive Committee',
     dept: 'Information Science & Engineering',
     year: 'Third Year',
     memberId: '101215214',
-    image: 'https://drive.google.com/open?id=1KFqbhQae8wd5asv0STTWwB76NZxcSdwS',
+    image: "src/imgs/Azmal.jpg",
     bio: 'I am a tech enthusiastic and also a extrovert who loves discovering new topics and learning continuously ',
     quote:'My code works perfectly until a user touches it 😃',
     socials: {
       linkedin: 'https://www.linkedin.com/in/mohammed-ajmal-a3bb6533a?utm_source=share_via&utm_content=profile&utm_medium=member_android',
       github: 'https://github.com/nnm24is127-droid',
-      email: 'azmalhack1@gmail.com',
+      email: 'nnm24is127@nmamit.in',
     },
   },
   {
-    id: 'sneha-shenoy',
-    name: 'Sneha Shenoy',
-    role: 'Vice President',
+    id: 'ninaad-y',
+    name:'Ninaad  Y',
+    role:'Vice president ',
     division: 'Executive Committee',
-    dept: 'Information Science & Engineering',
-    year: 'Final Year',
-    memberId: 'IEEE STB-94822',
-    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80',
-    bio: 'Directs society integration across CS, RAS, and WIE chapters. Focused on industry sponsorship and student research symposiums.',
-    skills: ['Operations', 'Industry Outreach', 'Full Stack', 'Symposium Lead'],
+    dept: 'Information Science engineering ',
+    year: '3RD',
+    memberId: '102268174',
+    image:"src/imgs/Ninaad.jpg",
+    bio: 'A dedicated programmer and national-level athlete who thrives on discipline, focus, and continuous growth. Passionate about coding, problem-solving, and building software solutions, with a creative side that enjoys exploring traditional culinary arts and analog cooking in free time.',
+    quote: 'Don\'t try to be better than someone else. Just try to be better than you were yesterday.',
     socials: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      instagram: 'https://instagram.com',
-      email: 'vp.ieee@nmamit.in',
+      linkedin: 'https://www.linkedin.com/in/ninaady?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      github: 'https://github.com/ninaad11',
+      email: 'Prananyaninaad@gmail.com',
+        },
     },
-  },
+
   {
-    id: 'rohan-kulkarni',
-    name: 'Rohan Kulkarni',
-    role: 'Secretary',
+    id: 'chandana-tp',
+    name:'Chandana T P',
+    role:'Secretary',
     division: 'Executive Committee',
-    dept: 'Electronics & Communication',
-    year: '3rd Year',
-    memberId: 'IEEE STB-94823',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
-    bio: 'Maintains official branch documentations, Section communications, and compliance with IEEE vTools reporting guidelines.',
-    skills: ['Documentation', 'vTools Reporting', 'Embedded C', 'Operations'],
+    dept: 'Information Science and Technology',
+    year: '2ND',
+    memberId: '102726726',
+    image:"src/imgs/Chandana T P_.jpg",
+    bio: 'I am a confident and motivated Information Science and Technology student who enjoys learning, exploring new technologies, and taking on challenges. I am a quick learner, responsible, and a strong team player who is always ready to contribute, learn, and grow.',
+    quote: 'TRY AND TRY ONE DAY YOU CAN FLY',
     socials: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      instagram: 'https://instagram.com',
-      email: 'secretary.ieee@nmamit.in',
+      linkedin: 'https://www.linkedin.com/in/chandana-t-p-046a04388?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      github: 'https://github.com/Chandanachandu0611-cloud',
+      email: 'chandana.chandu.06.11@gmail.in',
+      },
     },
-  },
-  {
-    id: 'pooja-hegde',
-    name: 'Pooja Hegde',
-    role: 'Treasurer',
+   {
+    id: 'trisha-s-shetty',
+    name:'Trisha S Shetty',
+    role:'Co Secretary ',
     division: 'Executive Committee',
-    dept: 'Computer Science & Engineering',
-    year: '3rd Year',
-    memberId: 'IEEE STB-94824',
-    image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
-    bio: 'Manages financial auditing, annual grant disbursements from IEEE HQ, and workshop budget management for student activities.',
-    skills: ['Budgeting', 'Grant Writing', 'Auditing', 'Financial Planning'],
+    dept: 'Artificial intelligence and Data science ',
+    year: '2ND',
+    memberId: '102726570',
+    image:"src/imgs/TRISHA S SHETTY.jpg" ,
+    bio: 'If I had to describe myself in a few words I\'d say that  I\'ve always been interested in learning and trying different things rather than limiting myself to just one area.',
+    quote: 'You are allowed to outgrow your own opinion, your own habits. The goal was never to stay the same. The goal was always to grow.',
     socials: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      instagram: 'https://instagram.com',
-      email: 'treasurer.ieee@nmamit.in',
+      linkedin: 'Trisha S Shetty ',
+      github: 'Trisha123236',
+      email: 'tshetty014@gmail.com',
+      },
     },
-  },
+
   {
-    id: 'varun-nayak',
-    name: 'Varun Nayak',
-    role: 'Joint Secretary',
+    id:'suraj-m-p',
+    name:'Suraj M P ',
+    role:'Technical Head ',
     division: 'Executive Committee',
-    dept: 'Information Science & Engineering',
-    year: '3rd Year',
-    memberId: 'IEEE STB-94825',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
-    bio: 'Assists with intra-college committee alignment, venue logistics, and coordinating member recruitment drives.',
-    skills: ['Logistics', 'Event Coordination', 'Student Engagement', 'Python'],
+    dept: 'Computer and Communication Engineering ',
+    year: '3RD',
+    memberId: '102728615',
+    image:"src/imgs/Suraj M P.png",
+    bio: 'I’m someone who enjoys building things, exploring new ideas, and turning them into something real. I like taking responsibility, solving problems, and learning along the way.',
+    quote: 'I make ideas work. Eventually.. ',
     socials: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      instagram: 'https://instagram.com',
-      email: 'jointsec.ieee@nmamit.in',
+      linkedin: 'https://www.linkedin.com/in/suraj-m-p-b39001314?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      github: 'https://share.google/62ZTzBB4eUtjHD5Dl',
+      email: 'suraj.mp15@gmail.com',
+        },
     },
-  },
+
   {
-    id: 'ananya-bhat',
-    name: 'Ananya Bhat',
-    role: 'Computer Society Chair',
-    division: 'Computer Society Chapter',
-    dept: 'Computer Science & Engineering',
-    year: 'Final Year',
-    memberId: 'IEEE STB-94826',
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
-    bio: 'Leads weekly algorithmic problem-solving labs, open-source sprints, and coordinates team entries for global coding competitions.',
-    skills: ['Algorithms', 'C++', 'System Design', 'Hackathon Lead'],
+    id:'aditya-kudva-k',
+    name:'Aditya Kudva K',
+    role:'Technical Co-Head ',
+    division: 'Executive Committee',
+    dept: 'CSE ',
+    year: '2ND',
+    memberId: '102728212',
+    image:"src/imgs/Aditya Kudva K.jpg",
+    bio: 'Tech Enthusiast who also enjoyes doing fun and madness filled life',
+    quote: 'My life runs on two loops: while(alive) { engineer(); playGames(); }',
     socials: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      instagram: 'https://instagram.com',
-      email: 'cs.chair@nmamit.in',
+      linkedin: 'https://www.linkedin.com/in/aditya-kudva-k',
+      github: 'kudva70',
+      email: 'k.kudva70@gmail.com',
+      },
     },
-  },
   {
-    id: 'karthik-pai',
-    name: 'Karthik Pai',
-    role: 'Robotics Society Chair',
-    division: 'Robotics & Automation Chapter',
-    dept: 'Mechanical Engineering',
-    year: 'Final Year',
-    memberId: 'IEEE STB-94827',
-    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
-    bio: 'Drives hands-on autonomous robotics labs, ROS simulation workshops, and CAD/hardware fabrication sessions.',
-    skills: ['ROS2', 'SolidWorks', 'Mechatronics', 'Microcontrollers'],
-    socials: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      instagram: 'https://instagram.com',
-      email: 'ras.chair@nmamit.in',
+        id:'madhuresh-kumar',
+        name:'Madhuresh Kumar ',
+        role:'Tech Team',
+        division: 'Executive Committee',
+        dept: 'ISE',
+        year: '3RD',
+        memberId: '102719051',
+        image:"src/imgs/Madhuresh Kumar_.jpg",
+        bio: 'I am a third-year Information Science student with a solid foundation in data structures, database management systems,and software development. Throughout my academic journey, I have developed strong analytical thinking and problem-solving skills, enabling me to design efficient, scalable, and reliable solutions. I have a keen interest in building data-driven applications that canaddress real-world challenges and create meaningful impact.',
+        quote: 'Learn.Build.Fail.Improve.Repeat',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/madhuresh-kumar-539607320?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+        github: 'https://github.com/Madhuresh01',
+        email: 'kumarmadhuresh101@gmail.com',
+        },
     },
-  },
-  {
-    id: 'divya-shetty',
-    name: 'Divya Shetty',
-    role: 'WIE Affinity Chair',
-    division: 'Women in Engineering Group',
-    dept: 'Artificial Intelligence & Data Science',
-    year: '3rd Year',
-    memberId: 'IEEE STB-94828',
-    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80',
-    bio: 'Organizes school STEM outreach drives, women leadership symposiums, and data science bootcamps for undergraduate students.',
-    skills: ['Data Science', 'PyTorch', 'Outreach Lead', 'Mentorship'],
-    socials: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      instagram: 'https://instagram.com',
-      email: 'wie.chair@nmamit.in',
+    {
+        id:'aadhish-balakrishna-salian',
+        name:'Aadish Balakrishna Salian ',
+        role:'Tech Team ',
+        division: 'Executive Committee',
+        dept: 'Computer Science and Engineering ',
+        year: '3RD',
+        memberId: '102716802',
+        image:"src/imgs/Aadish Balakrishna Salian_.jpeg",
+        bio: 'I’m someone who loves turning “What if?” into “Let’s build it.” I enjoy experimenting with technology, solving problems, and constantly leveling up my skills.',
+        quote: 'The world changes when imagination learns how to execute',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/aadish-balakrishna-salian-7191ba37b/',
+        github: 'https://github.com/AadishSalian',
+        email: 'salianaadish@gmail.com',
+        },
     },
-  },
+    {
+        id:'anagha',
+        name:'ANAGHA ',
+        role:'Tech Team',
+        division: 'Executive Committee',
+        dept: 'INFORMATION SCIENCE AND ENGINEERING ',
+        year: '2ND',
+        memberId: '102726626',
+        image:"src/imgs/ANAGHA.png",
+        bio: 'Passionate about technology, innovation, and problem-solving, I enjoy turning ideas into practical solutions. Always curious to learn, build, and take on new challenges.',
+        quote: '"My code works. Please don’t ask why"',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/anagha-b24960377?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+        github: 'anagha15bhat-lang ',
+        email: 'anagha15bhat@gmail.com',
+        },
+    },
+    {
+        id:'poorvi-m-mohare',
+        name:'Poorvi M Mohare',
+        role:'Treasurer ',
+        division: 'Executive Committee',
+        dept: 'Computer science and engineering ',
+        year: '3RD',
+        memberId: '102728168',
+        image:"src/imgs/POORVI M MOHARE.jpg",
+        bio: 'I’m passionate about learning new things and researching new skills.I’m responsible , hardworking and adaptable ',
+        quote: 'Nothing ',
+        socials: {
+        linkedin: 'Poorvi m Mohare ',
+        github: 'https://github.com/Poorvimmohare',
+        email: 'poorvimmohare@gmail.com',
+        },
+    },
+    {
+        id:'prajwala-vasudev-gouda',
+        name:'Prajwala Vasudev Gouda ',
+        role:'Co-Treasurer ',
+        division: 'Executive Committee',
+        dept: 'Information science ',
+        year: '3RD',
+        memberId: '102712569',
+        image:"src/imgs/Prajwala Gouda.jpg",
+        bio: 'I’m a curious and enthusiastic person who loves learning new things, taking up challenges, and working with people. I enjoy coding, leading teams, and turning ideas into reality. I’m always excited to learn, contribute, and have some fun along the way! 😊',
+        quote: '“Do it scared, do it anyway. A little chaos, a lot of curiosity.”',
+        socials: {
+        linkedin: 'prajwalagouda',
+        github: 'prajwalagouda',
+        email: 'prajwalavgouda@gmail.com',
+        },
+    },
+    {
+        id:'thaush-j',
+        name:'THANUSH J',
+        role:'Event Head',
+        division: 'Executive Committee',
+        dept: 'Cybersecurity ',
+        year: '3RD',
+        memberId: '102726413',
+        image:"src/imgs/Thanush J.png",
+        bio: 'Cybersecurity student. Tech enthusiast. Problem solver.Always curious, always learning, and I am Batman.',
+        quote: 'Good morning, good afternoon, good evening, and good night!',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/thanush-j-a24495326?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
+        github: 'https://github.com/ThanushJ46',
+        email: 'mrthanush46@gmail.com',
+        },
+    },
+    {
+        id:'avismayi-hs-gowda',
+        name:'Avismayi HS Gowda',
+        role:'Event Co-Head',
+        division: 'Executive Committee',
+        dept: 'Information science ',
+        year: '2ND',
+        memberId: '102722101',
+        image:"src/imgs/Avismayi HS Gowda_.jpg",
+        bio: 'I’m a responsible, enthusiastic, and approachable person who enjoys taking initiative and being involved in new experiences. I’m a quick learner and enjoy working with people, especially in team-based activities. I like organizing and coordinating things, and I always try to give my best when I take up a responsibility. I’m also someone who is open to learning from others and continuously improving myself.',
+        quote: 'You don’t have to be perfect, you just have to be willing to learn.',
+        socials: {
+        linkedin: 'Avismayi Gowda',
+        github: 'Avismayi gowda',
+        email: 'avismayigowda@gmail.com',
+        },
+    },
+    {
+        id:'tharun-v-shettigar',
+        name:'Tharun V Shettigar ',
+        role:'Events Team',
+        division: 'Executive Committee',
+        dept: 'Electrical And Electronics Engineering ',
+        year: '3RD',
+        memberId: '102731397',
+        image:"src/imgs/Tharun V Shettigar .jpeg",
+        bio: 'Curious,eager to learn ,life long learner',
+        quote: 'Engineer: 1% inspiration, 99% troubleshooting',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/mr-tharun-v-shettigar-721630298?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+        github: 'nnm24ee123-THARUN (nnm24ee123-THARUN)',
+        email: 'tharunvshettigar@gmail.com',
+        },
+    },
+
+{
+        id:'karthik-shenoy',
+        name:'Karthik Shenoy',
+        role:'Events Team',
+        division: 'Executive Committee',
+        dept: 'Information science',
+        year: '3RD',
+        memberId: '102727640',
+        image:"src/imgs/Karthik Shenoy_.jpg",
+        bio: 'So what’s my story,it’s long twisted and not finished yet…',
+        quote: 'I’ll figure it out somehow',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/karthik-shenoy-003423321?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
+        github: 'https://github.com/karthikshenoy444',
+        email: 'karthikshenoy433@gmail.com',
+        },
+    },
+    {
+        id:'nithish-s-kumar',
+        name:'Nithish s kumar',
+        role:'Head Design ',
+        division: 'Executive Committee',
+        dept: 'Information science ',
+        year: '3RD',
+        memberId: '102729613',
+        image:"src/imgs/Nithish Kumar.png",
+        bio: 'A curious, ambitious, and practical tech student who learns fast, loves hands-on work, and keeps things simple 🚀',
+        quote: '    “My destination changes. My algorithm doesn’t.” ',
+        socials: {
+        linkedin: 'Nithish S Kumar',
+        github: 'Nithishh21',
+        email: 'simplejust793@gmail.com',
+        },
+    },
+    {
+        id:'haima-krishna',
+        name:'Haima Krishna ',
+        role:'Design Co-Head ',
+        division: 'Executive Committee',
+        dept: 'Robotics and AI ',
+        year: '3RD',
+        memberId: '101709272',
+        image:"src/imgs/Haima Krishna_.jpg",
+        bio: 'I’m Haima Krishna, a Robotics & AI Engineering student passionate about AI, computer vision, robotics, and industrial automation. I enjoy turning ideas into practical projects and exploring how intelligent technology can solve real-world problems.',
+        quote: '“Dreams on my mind, deadlines behind"💀',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/haima-krishna-25h06?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+        github: 'https://github.com/Haima18',
+        email: 'krishnahaima3@gmail.com',
+        },
+    },
+    {
+        id:'mayur-r-shetty',
+        name:'Mayur R Shetty',
+        role:'Design Team ',
+        division: 'Executive Committee',
+        dept: 'ISE',
+        year: '3RD',
+        memberId: '102697701',
+        image:"src/imgs/Mayur Shetty.jpg",
+        bio: 'Creative and curious tech enthusiast who loves learning and building.',
+        quote: 'Keep it simple, keep learning',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/mayur-r-shetty?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+        github: 'https://github.com/mayurshettyy',
+        email: 'mayurrshettyyy@gmail.com',
+        },
+    },
+    {
+        id:'anika-h-p',
+        name:'Anika H P ',
+        role:'Content Head ',
+        division: 'Executive Committee',
+        dept: 'Information science and engineering ',
+        year: '2ND',
+        memberId: '102726456',
+        image:"src/imgs/Anika H P_.jpg",
+        bio: 'I am a passionate and enthusiastic student with a strong interest in technology and creative problem-solving. I enjoy learning new technical skills, exploring innovative ideas, and working on projects that turn concepts into practical solutions. I am a quick learner, responsible team member, and good collaborator. As part of the Technical Team, I would like to contribute my skills,learn from others, and help the club successfully execute its technical projects and events.',
+        quote: 'Where Ideas Find Their Voice',
+        socials: {
+        linkedin: 'anika-hp-44248a381',
+        github: 'anikahp3001 ',
+        email: 'anikahp3001@gmail.com',
+        },
+    },
+    {
+        id:'niharika-k-addoni',
+        name:'Niharika K Addoni',
+        role:'Content Co-Head',
+        division: 'Executive Committee',
+        dept: 'Information Science ',
+        year: '3RD',
+        memberId: '102727625',
+        image:"src/imgs/Niharika K Addoni.jpg",
+        bio: 'I am a creative, responsible, and enthusiastic person with good communication and teamwork skills. I enjoy event management, marketing, and exploring new ideas. I am always willing to learn, take initiative, and contribute positively to the team.',
+        quote: 'Content Co-Head – 10% ideas, 90% “wait, let’s make it better”',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/niharika-k-addoni-23b89532a?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+        github: 'niharikaaddoni https://share.google/QPAVB2QbrQdlGGUqX',
+        email: 'niharikaaddoni10@gmail.com',
+        },
+    },
+    {
+        id:'neha-p-shetty',
+        name:'Neha P Shetty ',
+        role:'Content Co-Head',
+        division: 'Executive Committee',
+        dept: 'Ise',
+        year: '3RD',
+        memberId: '102729108',
+        image:"src/imgs/Neha P Shetty.jpg",
+        bio: 'I am a curious and enjoys learning new things.I have a strong interest in technology and exploring new ideas.I believe in improving myself continuously and gaining new experiences.I enjoy teamwork and aim to build a successful career through dedication.',
+        quote: 'Content Co- head-10% planning "Wait let\'s Make it interesting" ',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/neha-p-shetty-41701a330?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+        github: 'nehapshetty https://github.com/nehapshetty',
+        email: 'nehapshetty13@gmail.com',
+        },
+    },
+    {
+        id: 'likithraj',
+        name: 'LIKITHRAJ',
+        role: 'Content Core',
+        division: 'Executive Committee',
+        dept: 'Information Science Engineering',
+        year: '3RD',
+        memberId: 'IEEE Member',
+        image: "src/imgs/Likith.jpeg",
+        bio: 'Passionate about content creation, communication, and contributing to the IEEE Student Branch initiatives.',
+        quote: 'Happy to work for IEEE',
+        socials: {
+            linkedin: '#',
+            github: '#',
+            email: '',
+        },
+    },
+    {
+        id:'bhavish-m-kumar',
+        name:'Bhavish Kumar M ',
+        role:'Marketing Head ',
+        division: 'Executive Committee',
+        dept: 'ECE(ACT)',
+        year: '3RD',
+        memberId: '102732308',
+        image:"/src/imgs/Bhavish Kumar M_ .jpg",
+        bio: 'Marketing Head at IEEE, always juggling multiple clubs and events.Into sports and I love turning ideas into things people actually notice and talk about.',
+        quote: 'Marketing Head — 50% content creation, 50% chasing people for likes and shares.',
+        socials: {
+        linkedin: 'bhavish-kumar-m-27a3243a0 ',
+        github: 'bhavishh07',
+        email: 'Bhavishkumarm03@gmail.com',
+        },
+    },
+    {
+        id:'jiya-bawankar',
+        name:'Jiya bawankar ',
+        role:'Marketing Co-Head',
+        division: 'Executive Committee',
+        dept: 'Biotechnology ',
+        year: '2ND',
+        memberId: '102726797',
+        image:"/src/imgs/Jiya bawankar_.png",
+        bio: 'I’m a curious, creative, and enthusiastic person who enjoys learning new things and taking on new challenges. I’m currently pursuing B.Tech in Biotechnology, and I’m especially interested in combining my technical knowledge with creativity, communication, and teamwork. I’m someone who likes being involved in events and activities, takes responsibility seriously, and always tries toimprove myself. I would describe myself as adaptable, approachable, and willing to step out of my comfort zone to gain new experiences.',
+        quote: '“Don’t wait for the right opportunity, create it.”',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/jiya-bawankar-ba174a379',
+        github: '-',
+        email: 'Jiyabawankar8@gmail.com',
+        },
+    },
+    {
+        id:'grahith-kumar-b',
+        name:'Grahith Kumar B ',
+        role:'Marketing Team ',
+        division: 'Executive Committee',
+        dept: 'Artificial intelligence and machine learning ',
+        year: '3RD',
+        memberId: '102729043',
+        image:"src/imgs/Grahith Kumar B_.jpg",
+        bio: 'I am an Artificial Intelligence and Machine Learning student with a strong interest in technology, marketing, and creative problem-solving. I enjoy learning new skills, working with teams, and taking part in projects and college activities that help me grow both technically and professionally.',
+        quote: 'Success is not final, failure is not fatal; it is the courage to continue that counts.',
+        socials: {
+        linkedin: 'https://www.linkedin.com/in/grahith-kumar-b-395a5b325?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+        github: 'https://github.com/Grahithkumar2006',
+        email: 'grahithub2006@gmail.com',
+        },
+    },
+
 ];
 
 export default function TeamPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedMember, setSelectedMember] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [resetTimerKey, setResetTimerKey] = useState(0);
   const containerRef = useRef(null);
   const touchStartRef = useRef(null);
   const wheelAccumulator = useRef(0);
   const wheelTimeout = useRef(null);
+
+  const resetTimer = useCallback(() => {
+    setResetTimerKey((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -179,16 +656,31 @@ export default function TeamPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Auto-slide: advances every 3s, loops back to start after the last card.
+  // Pauses ONLY when a member details popup is open.
+  useEffect(() => {
+    if (selectedMember) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % CORE_TEAM_MEMBERS.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [selectedMember, resetTimerKey]);
+
   const handleNext = useCallback(() => {
     setCurrentIndex((prev) => Math.min(prev + 1, CORE_TEAM_MEMBERS.length - 1));
-  }, []);
+    resetTimer();
+  }, [resetTimer]);
 
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
-  }, []);
+    resetTimer();
+  }, [resetTimer]);
 
   const goToIndex = (index) => {
     setCurrentIndex(index);
+    resetTimer();
   };
 
   useEffect(() => {
@@ -224,6 +716,10 @@ export default function TeamPage() {
         handlePrev();
       }
     }
+    touchStartRef.current = null;
+  };
+
+  const handleTouchCancel = () => {
     touchStartRef.current = null;
   };
 
@@ -263,19 +759,20 @@ export default function TeamPage() {
   const handleCardClick = (member, index) => {
     setCurrentIndex(index);
     setSelectedMember(member);
+    resetTimer();
   };
 
   const activeMember = CORE_TEAM_MEMBERS[currentIndex];
+  const selectedTheme = selectedMember ? getDepartmentTheme(selectedMember.role) : null;
 
   return (
-    <div className="pt-28 sm:pt-36 pb-20 select-none">
+    <div className="pt-20 sm:pt-24 pb-16 select-none">
       {/* Page Header */}
-      <section className="max-w-6xl mx-auto px-5 sm:px-8 pb-10 text-center">
-        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 text-slate-600 dark:text-zinc-400 font-mono text-[11px] uppercase tracking-wider mb-4 shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#0096D6]" />
-          EXECUTIVE COMMITTEE & LEADS · 2025–2026
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 pb-3 sm:pb-4 text-center">
+        <p className="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-zinc-400 mb-2">
+          Executive Committee &amp; Leads · 2026–2027
+        </p>
+        <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
           The Engineers Behind IEEE NMAMIT
         </h1>
       </section>
@@ -285,8 +782,9 @@ export default function TeamPage() {
         ref={containerRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
         onWheel={handleWheel}
-        className="relative w-full max-w-6xl mx-auto h-[320px] sm:h-[360px] flex items-center justify-center my-4"
+        className="relative w-full max-w-6xl mx-auto h-[390px] sm:h-[420px] flex items-center justify-center my-2"
         style={{ perspective: isMobile ? '850px' : '1200px' }}
       >
         {/* Left Arrow Button */}
@@ -294,14 +792,14 @@ export default function TeamPage() {
           type="button"
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className={`absolute left-4 sm:left-8 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 cursor-pointer ${
+          className={`absolute left-3 sm:left-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-lg border flex items-center justify-center transition-colors duration-200 cursor-pointer ${
             currentIndex === 0
-              ? 'border-slate-300/50 dark:border-zinc-800/50 bg-slate-200/30 dark:bg-zinc-900/30 text-slate-400 dark:text-zinc-600 cursor-not-allowed'
-              : 'border-slate-300 dark:border-zinc-700/80 bg-white/90 dark:bg-zinc-900/90 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:border-[#00629B] hover:shadow-[0_0_20px_rgba(0,98,155,0.4)] active:scale-95'
+              ? 'border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 text-slate-400 dark:text-zinc-600 cursor-not-allowed'
+              : 'border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-500 active:scale-95'
           }`}
           aria-label="Previous member"
         >
-          <ChevronLeft size={22} />
+          <ChevronLeft size={20} />
         </button>
 
         {/* Right Arrow Button */}
@@ -309,14 +807,14 @@ export default function TeamPage() {
           type="button"
           onClick={handleNext}
           disabled={currentIndex === CORE_TEAM_MEMBERS.length - 1}
-          className={`absolute right-4 sm:right-8 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center transition-all duration-200 cursor-pointer ${
+          className={`absolute right-3 sm:right-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-lg border flex items-center justify-center transition-colors duration-200 cursor-pointer ${
             currentIndex === CORE_TEAM_MEMBERS.length - 1
-              ? 'border-slate-300/50 dark:border-zinc-800/50 bg-slate-200/30 dark:bg-zinc-900/30 text-slate-400 dark:text-zinc-600 cursor-not-allowed'
-              : 'border-slate-300 dark:border-zinc-700/80 bg-white/90 dark:bg-zinc-900/90 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:border-[#00629B] hover:shadow-[0_0_20px_rgba(0,98,155,0.4)] active:scale-95'
+              ? 'border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 text-slate-400 dark:text-zinc-600 cursor-not-allowed'
+              : 'border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-500 active:scale-95'
           }`}
           aria-label="Next member"
         >
-          <ChevronRight size={22} />
+          <ChevronRight size={20} />
         </button>
 
         {/* 3D Drum Container */}
@@ -329,9 +827,12 @@ export default function TeamPage() {
 
             if (Math.abs(offset) > 4) return null;
 
+            const theme = getDepartmentTheme(member.role);
+            const isCore = isCoreMember(member.role);
+
             const angleStep = isMobile ? 22 : 18;
-            const spacingStep = isMobile ? 180 : 255;
-            const depthStep = isMobile ? 65 : 85;
+            const spacingStep = isMobile ? 180 : 240;
+            const depthStep = isMobile ? 65 : 80;
             const scaleStep = isMobile ? 0.08 : 0.06;
 
             const rotateY = -offset * angleStep;
@@ -345,93 +846,79 @@ export default function TeamPage() {
               <div
                 key={member.id}
                 onClick={() => handleCardClick(member, index)}
-                className={`absolute cursor-pointer transition-all duration-300 ease-out will-change-transform ${
+                className={`absolute cursor-pointer transition-all duration-[0.4s] ease-out will-change-transform ${
                   isCenter ? 'z-30' : 'z-10'
                 }`}
                 style={{
                   transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                   transformOrigin: 'center center',
                   opacity: opacity,
+                  transitionDuration: '0.4s',
                 }}
               >
-                {/* The Profile Card */}
+                {/* Simple Flat Profile Card */}
                 <div
-                  className={`relative w-[310px] sm:w-[380px] h-[195px] sm:h-[230px] rounded-xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-lg ${
+                  className={`group relative w-[260px] sm:w-[290px] h-[350px] sm:h-[380px] rounded-lg transition-all duration-[0.4s] flex flex-col overflow-hidden ${
                     isCenter
-                      ? 'bg-white dark:bg-[#0a0d16] border-2 border-[#00629B] shadow-[0_0_35px_rgba(0,98,155,0.25)] ring-1 ring-[#00629B]/30'
-                      : 'bg-slate-100/90 dark:bg-[#080a11]/90 border border-slate-300 dark:border-zinc-800/90 hover:border-slate-400 dark:hover:border-zinc-700'
+                      ? `bg-white dark:bg-zinc-900 border-2 ${theme.activeBorder}`
+                      : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 hover:border-slate-400 dark:hover:border-zinc-700'
                   }`}
+                  style={{
+                    maxHeight: 'min(380px, 60vh)',
+                  }}
                 >
-                  <div className="absolute right-[-10px] bottom-[-10px] text-slate-300/40 dark:text-zinc-800/15 pointer-events-none">
-                    <ShieldCheck size={120} />
+                  {/* Photo Section */}
+                  <div className="relative w-full h-[210px] sm:h-[235px] overflow-hidden bg-slate-100 dark:bg-zinc-800 shrink-0">
+                    <img
+                      src={getMemberImage(member.image)}
+                      alt={member.name}
+                      loading="eager"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+                      }}
+                      className="w-full h-full object-cover object-top sm:object-center"
+                    />
                   </div>
 
-                  <div className="relative z-10 flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3.5">
-                      <div className="relative">
-                        <img
-                          src={member.image}
-                          alt={member.name}
-                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg object-cover border transition-colors ${
-                            isCenter
-                              ? 'border-[#00629B] shadow-sm shadow-[#00629B]/50'
-                              : 'border-slate-300 dark:border-zinc-700'
-                          }`}
-                          loading="lazy"
-                        />
-                        {isCenter && (
-                          <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#00629B] border-2 border-white dark:border-[#0a0d16] flex items-center justify-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#0096D6]" />
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <h3
-                          className={`font-bold tracking-tight text-base sm:text-lg transition-colors leading-tight ${
-                            isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-zinc-200'
-                          }`}
-                        >
-                          {member.name}
-                        </h3>
-                        <p className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 mt-0.5 truncate max-w-[170px]">
-                          {member.dept}
-                        </p>
-                        <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400">
-                          {member.year}
-                        </span>
-                      </div>
-                    </div>
-
-                    <span
-                      className={`text-[9px] font-mono tracking-wider uppercase px-2 py-0.5 rounded border whitespace-nowrap font-semibold ${
-                        isCenter
-                          ? 'border-[#00629B]/70 bg-[#00629B]/15 text-[#00629B] dark:text-[#5db4e8]'
-                          : 'border-slate-300 dark:border-zinc-800 bg-slate-200/60 dark:bg-zinc-900/60 text-slate-600 dark:text-zinc-400'
-                      }`}
-                    >
-                      {member.division}
-                    </span>
-                  </div>
-
-                  <div className="relative z-10 pt-3 border-t border-slate-200 dark:border-zinc-800/80 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <Award
-                        size={14}
-                        className={isCenter ? 'text-[#00629B] dark:text-[#5db4e8]' : 'text-slate-400 dark:text-zinc-500'}
-                      />
-                      <span
-                        className={`text-xs font-semibold tracking-wide ${
-                          isCenter ? 'text-slate-900 dark:text-zinc-100' : 'text-slate-600 dark:text-zinc-400'
+                  {/* Plain Text Labels & Info */}
+                  <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1">
+                    <div className="flex flex-col items-center text-center w-full">
+                      {/* Name */}
+                      <h3
+                        className={`leading-tight mb-1 truncate w-full text-center ${
+                          isCore
+                            ? 'text-lg sm:text-[1.2rem] font-extrabold text-slate-900 dark:text-white'
+                            : `text-base sm:text-[1.05rem] font-bold ${
+                                isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-zinc-200'
+                              }`
                         }`}
                       >
-                        {member.role}
-                      </span>
+                        {member.name.replace(/\n/g, ' ').trim()}
+                      </h3>
+
+                      {/* Designation */}
+                      <p
+                        className={`text-[1.1rem] font-bold ${theme.roleText} mb-0.5 truncate w-full text-center`}
+                      >
+                        {member.role.trim()}
+                      </p>
+
+                      {/* Department / Year */}
+                      <p className="text-[0.95rem] text-slate-500 dark:text-zinc-400 truncate w-full text-center">
+                        {formatDeptYear(member.dept, member.year)}
+                      </p>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[10px] font-mono text-slate-500 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-zinc-200">
-                      <span>Details</span>
-                      <ArrowRight size={11} />
+                    {/* Footer Row */}
+                    <div className="pt-2 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between mt-1.5 w-full">
+                      <span className="text-xs text-slate-500 dark:text-zinc-400 truncate max-w-[130px]">
+                        {member.division}
+                      </span>
+                      <div className="flex items-center gap-1 text-xs text-[#00629B] dark:text-[#38bdf8] font-semibold group-hover:underline">
+                        <span>View Details</span>
+                        <ArrowRight size={12} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -441,34 +928,13 @@ export default function TeamPage() {
         </div>
       </div>
 
-      {/* Position Indicator Below Barrel */}
-      <div className="mt-8 flex flex-col items-center gap-3">
-        <div className="flex items-center gap-3 font-mono text-xs">
-          <span className="text-slate-500 dark:text-zinc-400">INDEX</span>
-          <span className="text-slate-900 dark:text-white font-bold tracking-wider px-2.5 py-0.5 rounded bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 shadow-sm">
-            {String(currentIndex + 1).padStart(2, '0')} / {String(CORE_TEAM_MEMBERS.length).padStart(2, '0')}
-          </span>
-          <span className="text-slate-400 dark:text-zinc-400 hidden sm:inline">·</span>
-          <span className="text-[#00629B] dark:text-[#5db4e8] font-semibold hidden sm:inline">
-            {activeMember?.role}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-1.5 max-w-[85vw] overflow-x-auto py-1 px-2 no-scrollbar">
-          {CORE_TEAM_MEMBERS.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => goToIndex(i)}
-              aria-label={`Jump to ${CORE_TEAM_MEMBERS[i].name}`}
-              className={`h-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-                i === currentIndex
-                  ? 'w-6 bg-[#00629B] dark:bg-[#5db4e8]'
-                  : 'w-1.5 bg-slate-300 dark:bg-zinc-800 hover:bg-slate-400 dark:hover:bg-zinc-600'
-              }`}
-            />
-          ))}
-        </div>
+      {/* Plain Text Position Label */}
+      <div className="mt-3 flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-zinc-400">
+        <span>{currentIndex + 1} of {CORE_TEAM_MEMBERS.length}</span>
+        <span>·</span>
+        <span className={`font-bold ${getDepartmentTheme(activeMember?.role).roleText}`}>
+          {activeMember?.role?.trim()}
+        </span>
       </div>
 
       {/* Modal Profile Zoom */}
@@ -476,49 +942,50 @@ export default function TeamPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-slate-900/60 dark:bg-black/85 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 animate-in fade-in duration-200 cursor-pointer"
           onClick={() => setSelectedMember(null)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-xl rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-300 dark:border-zinc-700/80 p-6 sm:p-8 shadow-2xl overflow-hidden"
+            className="cursor-default relative w-full max-w-xl rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-72 h-72 bg-[#00629B]/15 rounded-full blur-3xl pointer-events-none" />
-
             <button
               type="button"
-              onClick={() => setSelectedMember(null)}
-              className="absolute top-5 right-5 p-2 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/80 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-zinc-600 transition-colors cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedMember(null);
+              }}
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 p-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors cursor-pointer"
               aria-label="Close profile modal"
             >
-              <X size={18} />
+              <X size={18} className="pointer-events-none" />
             </button>
 
             <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start">
               <div className="relative shrink-0">
                 <img
-                  src={selectedMember.image}
+                  src={getMemberImage(selectedMember.image)}
                   alt={selectedMember.name}
-                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover border-2 border-[#00629B] shadow-lg shadow-[#00629B]/30"
+                  className={`w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover border-2 ${selectedTheme?.activeBorder || 'border-[#00629B]'}`}
                 />
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 whitespace-nowrap font-bold">
-                  {selectedMember.memberId}
+                <span className="block mt-1.5 text-center text-xs text-slate-500 dark:text-zinc-400 font-medium">
+                  ID: {selectedMember.memberId}
                 </span>
               </div>
 
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest text-[#00629B] dark:text-[#5db4e8] uppercase mb-1 font-bold">
-                  <span>{selectedMember.division}</span>
-                </div>
+              <div className="flex-1 pr-10 sm:pr-12">
+                <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold mb-1">
+                  {selectedMember.division}
+                </p>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
                   {selectedMember.name}
                 </h2>
-                <div className="text-sm font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5 mt-0.5">
-                  <Award size={15} className="text-[#00629B] dark:text-[#5db4e8]" />
+                <div className={`text-sm font-semibold flex items-center gap-1.5 mt-0.5 ${selectedTheme?.roleText || 'text-[#00629B] dark:text-[#5db4e8]'}`}>
+                  <Award size={15} />
                   <span>{selectedMember.role}</span>
                 </div>
 
-                <div className="mt-2 text-xs font-mono text-slate-600 dark:text-zinc-400 space-y-0.5">
+                <div className="mt-2 text-xs text-slate-600 dark:text-zinc-400 space-y-0.5">
                   <p className="flex items-center gap-1.5">
                     <Building2 size={12} className="text-slate-400 dark:text-zinc-500" />
                     <span>{selectedMember.dept}</span>
@@ -531,58 +998,59 @@ export default function TeamPage() {
               </div>
             </div>
 
-            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800/80">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2 font-bold">
-                Executive Overview & Focus
+            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800">
+              <h4 className="text-xs uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2 font-semibold">
+                Executive Overview &amp; Focus
               </h4>
               <p className="text-xs sm:text-sm text-slate-700 dark:text-zinc-300 leading-relaxed font-normal">
                 {selectedMember.bio}
               </p>
             </div>
 
-            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800/80">
-              <h4 className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2 font-bold">
-                
-              </h4>
-              <p className="text-xs sm:text-sm text-slate-700 dark:text-zinc-300 leading-relaxed font-normal">
-                {selectedMember.quote}
-              </p>
-            </div>
-            
-
-            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-2.5">
-                <a
-                  href={selectedMember.socials.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin size={15} />
-                </a>
-                <a
-                  href={selectedMember.socials.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors"
-                  aria-label="GitHub"
-                >
-                  <Github size={15} />
-                </a>
-                
-                <a 
-                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(selectedMember.socials.email)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:bg-[#00629B] hover:border-transparent flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:text-white transition-colors" 
-                aria-label="Email"
-              >
-                <Mail size={15} />
-              </a>
+            {selectedMember.quote && selectedMember.quote.trim() !== '' && selectedMember.quote.trim().toLowerCase() !== 'nothing' && (
+              <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800">
+                <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-400 leading-relaxed font-normal">
+                  {selectedMember.quote}
+                </p>
               </div>
+            )}
 
-              
+            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                {getSocialUrl('linkedin', selectedMember.socials?.linkedin) && (
+                  <a
+                    href={getSocialUrl('linkedin', selectedMember.socials?.linkedin)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#0A66C2] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="LinkedIn profile"
+                  >
+                    <FaLinkedin size={26} />
+                  </a>
+                )}
+                {getSocialUrl('github', selectedMember.socials?.github) && (
+                  <a
+                    href={getSocialUrl('github', selectedMember.socials?.github)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#181717] dark:text-white transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="GitHub profile"
+                  >
+                    <FaGithub size={26} />
+                  </a>
+                )}
+                {getSocialUrl('email', selectedMember.socials?.email) && (
+                  <a
+                    href={getSocialUrl('email', selectedMember.socials?.email)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#EA4335] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
+                    aria-label="Gmail"
+                  >
+                    <SiGmail size={25} />
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
