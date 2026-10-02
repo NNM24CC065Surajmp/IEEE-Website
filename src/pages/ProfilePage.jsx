@@ -24,6 +24,7 @@ export default function ProfilePage({ authUser }) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   // ================= REGISTERED EVENTS (still placeholder for now) =================
   const [events] = useState([
@@ -51,11 +52,24 @@ export default function ProfilePage({ authUser }) {
       return;
     }
     setLoading(true);
-    getUserProfile(authUser.uid).then((data) => {
-      if (!active) return;
-      setProfile(data);
-      setLoading(false);
-    });
+    setLoadError('');
+    getUserProfile(authUser.uid)
+      .then((data) => {
+        if (!active) return;
+        setProfile(data);
+      })
+      .catch((err) => {
+        if (!active) return;
+        console.error('Failed to load profile:', err);
+        setLoadError(
+          err?.code === 'permission-denied'
+            ? "We don't have permission to read your profile. Firestore security rules may not be set up yet."
+            : 'Something went wrong loading your profile.'
+        );
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
     return () => {
       active = false;
     };
@@ -107,6 +121,19 @@ export default function ProfilePage({ authUser }) {
     return (
       <div className="pt-28 sm:pt-36 pb-20 flex justify-center">
         <Loader2 className="animate-spin text-[#00629B]" size={28} />
+      </div>
+    );
+  }
+
+  // ================= LOAD ERROR =================
+  if (loadError) {
+    return (
+      <div className="pt-28 sm:pt-36 pb-20 max-w-xl mx-auto px-5 text-center">
+        <p className="text-red-500 dark:text-red-400">{loadError}</p>
+        <p className="mt-2 text-sm text-slate-500 dark:text-zinc-500">
+          Check the browser console for the full error, and confirm Firestore Database is enabled
+          for this project with rules allowing a user to read/write their own <code>users/&#123;uid&#125;</code> document.
+        </p>
       </div>
     );
   }

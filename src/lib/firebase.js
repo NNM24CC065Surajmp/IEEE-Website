@@ -56,9 +56,17 @@ export async function loginWithEmail(email, password) {
   return cred.user;
 }
 
-/** Sign in with Google popup */
+/**
+ * Sign in with Google popup.
+ * `hd: 'nmamit.in'` hints Google to only list nmamit.in accounts in the
+ * picker — a UX nicety, NOT real enforcement (a user could still type a
+ * different account). The actual domain check happens after sign-in,
+ * in AuthModal's handleGoogle, which signs the user back out if the
+ * returned email isn't @nmamit.in.
+ */
 export async function loginWithGoogle() {
   const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ hd: 'nmamit.in' });
   const cred = await signInWithPopup(auth, provider);
   return cred.user;
 }

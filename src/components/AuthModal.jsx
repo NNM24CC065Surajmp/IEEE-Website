@@ -5,9 +5,13 @@ import {
   registerWithEmail,
   loginWithGoogle,
   resetPassword,
+  logoutUser,
   createUserProfile,
   getUserProfile,
 } from '../lib/firebase.js';
+import { parseNmamitIdentity } from '../lib/nmamitId.js';
+
+const ALLOWED_GOOGLE_DOMAIN = 'nmamit.in';
 
 export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
   const [mode, setMode] = useState('login'); // 'login' | 'register' | 'reset'
@@ -92,16 +96,29 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
     setLoading(true);
     try {
       const user = await loginWithGoogle();
-      // First time this Google account signs in, seed a minimal profile
-      // so the Profile page has something to show — the rest can be
-      // filled in later from the Edit Profile screen.
+
+      // ─── Enforce the college domain ───────────────────────────
+      // The `hd` param on the provider only hints the account picker;
+      // this is the actual check. Anyone outside @nmamit.in is signed
+      // back out immediately and never gets a session.
+      const userEmail = (user.email || '').toLowerCase();
+      if (!userEmail.endsWith(`@${ALLOWED_GOOGLE_DOMAIN}`)) {
+        await logoutUser();
+        setError(`Only NMAMIT college accounts (@${ALLOWED_GOOGLE_DOMAIN}) can sign in with Google.`);
+        return;
+      }
+
+      // First time this account signs in, seed the profile — parsing
+      // USN / branch / year / name out of the Google display name,
+      // which NMAMIT formats as "<USN> <FULL NAME>".
       const existing = await getUserProfile(user.uid);
       if (!existing) {
+        const identity = parseNmamitIdentity(user.displayName || '');
         await createUserProfile(user.uid, {
-          name: user.displayName || '',
-          branch: '',
-          year: '',
-          usn: '',
+          name: identity?.name || user.displayName || '',
+          branch: identity?.branchName || '',
+          year: identity?.yearLabel || '',
+          usn: identity?.usn || '',
           collegeEmail: user.email || '',
           bio: '',
           membershipId: '',
@@ -177,7 +194,7 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="NAME"
+                      placeholder="Anagha Shetty"
                       className={inputFieldClass}
                     />
                   </div>
@@ -225,7 +242,7 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                       required
                       value={usn}
                       onChange={(e) => setUsn(e.target.value)}
-                      placeholder="USN"
+                      placeholder="NN25CSE021"
                       className={`${inputFieldClass} uppercase`}
                     />
                   </div>
@@ -314,11 +331,9 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
               <Chrome size={16} />
               Continue with Google
             </button>
-            {mode === 'register' && (
-              <p className={`text-[11px] mt-2 text-center ${isLight ? 'text-slate-400' : 'text-zinc-600'}`}>
-                Google sign-up skips the fields above — add them later from Edit Profile.
-              </p>
-            )}
+            <p className={`text-[11px] mt-2 text-center ${isLight ? 'text-slate-400' : 'text-zinc-600'}`}>
+              NMAMIT college accounts only (@{ALLOWED_GOOGLE_DOMAIN}) — name, USN, branch and year are pulled in automatically.
+            </p>
           </>
         )}
 
