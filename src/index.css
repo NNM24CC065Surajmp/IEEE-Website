@@ -32,7 +32,7 @@
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family:
-      'Inter',
+      -apple-system,
       system-ui,
       -apple-system,
       BlinkMacSystemFont,

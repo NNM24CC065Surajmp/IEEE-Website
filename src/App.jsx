@@ -61,42 +61,6 @@ function AppContent({ theme, toggleTheme }) {
       </a>
 
 
-      {/* Background Architectural Grid */}
-      <div
-        className="fixed inset-0 pointer-events-none transition-opacity duration-300 z-0"
-        style={{
-          opacity: theme === 'light' ? 0.06 : 0.035,
-
-          backgroundImage:
-            theme === 'light'
-              ? `
-                linear-gradient(
-                  to right,
-                  rgba(0,98,155,0.4) 1px,
-                  transparent 1px
-                ),
-                linear-gradient(
-                  to bottom,
-                  rgba(0,98,155,0.4) 1px,
-                  transparent 1px
-                )
-              `
-              : `
-                linear-gradient(
-                  to right,
-                  rgba(255,255,255,0.6) 1px,
-                  transparent 1px
-                ),
-                linear-gradient(
-                  to bottom,
-                  rgba(255,255,255,0.6) 1px,
-                  transparent 1px
-                )
-              `,
-
-          backgroundSize: '36px 36px',
-        }}
-      />
 
 
       {/* Radial Blue Glow */}

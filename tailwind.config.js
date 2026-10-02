@@ -19,10 +19,10 @@ export default {
         }
       },
       fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Inter', 'Roboto', 'sans-serif'],
+        body: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Inter', 'Roboto', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Inter', 'Roboto', 'sans-serif'],
       },
       keyframes: {
         'fade-up': {
