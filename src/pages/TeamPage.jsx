@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { SiGmail } from 'react-icons/si';
+import TeamMemberModal from '../components/TeamMemberModal';
 
 
 // Vite eager asset glob resolver for team profile pictures
@@ -864,11 +865,11 @@ export default function TeamPage() {
                       : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 hover:border-slate-400 dark:hover:border-zinc-700'
                   }`}
                   style={{
-                    maxHeight: 'min(380px, 60vh)',
+                    maxHeight: '80vh',
                   }}
                 >
                   {/* Photo Section */}
-                  <div className="relative w-full h-[210px] sm:h-[235px] overflow-hidden bg-slate-100 dark:bg-zinc-800 shrink-0">
+                  <div className="relative w-full h-[190px] sm:h-[215px] overflow-hidden bg-slate-100 dark:bg-zinc-800 shrink-0">
                     <img
                       src={getMemberImage(member.image)}
                       alt={member.name}
@@ -886,36 +887,37 @@ export default function TeamPage() {
                     <div className="flex flex-col items-center text-center w-full">
                       {/* Name */}
                       <h3
-                        className={`leading-tight mb-1 truncate w-full text-center ${
+                        className={`leading-tight mb-1 w-full text-center whitespace-normal ${
                           isCore
                             ? 'text-lg sm:text-[1.2rem] font-extrabold text-slate-900 dark:text-white'
                             : `text-base sm:text-[1.05rem] font-bold ${
                                 isCenter ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-zinc-200'
                               }`
                         }`}
+                        style={{ textWrap: 'balance' }}
                       >
                         {member.name.replace(/\n/g, ' ').trim()}
                       </h3>
 
                       {/* Designation */}
                       <p
-                        className={`text-[1.1rem] font-bold ${theme.roleText} mb-0.5 truncate w-full text-center`}
+                        className={`text-[1.05rem] sm:text-[1.1rem] font-bold ${theme.roleText} mb-0.5 truncate w-full text-center`}
                       >
                         {member.role.trim()}
                       </p>
 
                       {/* Department / Year */}
-                      <p className="text-[0.95rem] text-slate-500 dark:text-zinc-400 truncate w-full text-center">
+                      <p className="text-[0.85rem] sm:text-[0.95rem] text-slate-500 dark:text-zinc-400 truncate w-full text-center">
                         {formatDeptYear(member.dept, member.year)}
                       </p>
                     </div>
 
                     {/* Footer Row */}
-                    <div className="pt-2 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between mt-1.5 w-full">
-                      <span className="text-xs text-slate-500 dark:text-zinc-400 truncate max-w-[130px]">
+                    <div className="pt-2 border-t border-slate-200 dark:border-zinc-800 flex flex-col items-center justify-center gap-1.5 mt-auto w-full">
+                      <span className="text-[0.75rem] sm:text-xs text-slate-500 dark:text-zinc-400 w-full text-center truncate">
                         {member.division}
                       </span>
-                      <div className="flex items-center gap-1 text-xs text-[#00629B] dark:text-[#38bdf8] font-semibold group-hover:underline">
+                      <div className="flex items-center gap-1 text-[0.8rem] sm:text-xs text-[#00629B] dark:text-[#38bdf8] font-semibold group-hover:underline">
                         <span>View Details</span>
                         <ArrowRight size={12} />
                       </div>
@@ -939,121 +941,16 @@ export default function TeamPage() {
 
       {/* Modal Profile Zoom */}
       {selectedMember && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 animate-in fade-in duration-200 cursor-pointer"
-          onClick={() => setSelectedMember(null)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="cursor-default relative w-full max-w-xl rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 overflow-hidden"
-          >
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedMember(null);
-              }}
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 p-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors cursor-pointer"
-              aria-label="Close profile modal"
-            >
-              <X size={18} className="pointer-events-none" />
-            </button>
-
-            <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start">
-              <div className="relative shrink-0">
-                <img
-                  src={getMemberImage(selectedMember.image)}
-                  alt={selectedMember.name}
-                  className={`w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover border-2 ${selectedTheme?.activeBorder || 'border-[#00629B]'}`}
-                />
-                <span className="block mt-1.5 text-center text-xs text-slate-500 dark:text-zinc-400 font-medium">
-                  ID: {selectedMember.memberId}
-                </span>
-              </div>
-
-              <div className="flex-1 pr-10 sm:pr-12">
-                <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold mb-1">
-                  {selectedMember.division}
-                </p>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
-                  {selectedMember.name}
-                </h2>
-                <div className={`text-sm font-semibold flex items-center gap-1.5 mt-0.5 ${selectedTheme?.roleText || 'text-[#00629B] dark:text-[#5db4e8]'}`}>
-                  <Award size={15} />
-                  <span>{selectedMember.role}</span>
-                </div>
-
-                <div className="mt-2 text-xs text-slate-600 dark:text-zinc-400 space-y-0.5">
-                  <p className="flex items-center gap-1.5">
-                    <Building2 size={12} className="text-slate-400 dark:text-zinc-500" />
-                    <span>{selectedMember.dept}</span>
-                  </p>
-                  <p className="flex items-center gap-1.5">
-                    <BookOpen size={12} className="text-slate-400 dark:text-zinc-500" />
-                    <span>{selectedMember.year}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800">
-              <h4 className="text-xs uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2 font-semibold">
-                Executive Overview &amp; Focus
-              </h4>
-              <p className="text-xs sm:text-sm text-slate-700 dark:text-zinc-300 leading-relaxed font-normal">
-                {selectedMember.bio}
-              </p>
-            </div>
-
-            {selectedMember.quote && selectedMember.quote.trim() !== '' && selectedMember.quote.trim().toLowerCase() !== 'nothing' && (
-              <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800">
-                <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-400 leading-relaxed font-normal">
-                  {selectedMember.quote}
-                </p>
-              </div>
-            )}
-
-            <div className="relative z-10 mt-6 pt-5 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                {getSocialUrl('linkedin', selectedMember.socials?.linkedin) && (
-                  <a
-                    href={getSocialUrl('linkedin', selectedMember.socials?.linkedin)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#0A66C2] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
-                    aria-label="LinkedIn profile"
-                  >
-                    <FaLinkedin size={26} />
-                  </a>
-                )}
-                {getSocialUrl('github', selectedMember.socials?.github) && (
-                  <a
-                    href={getSocialUrl('github', selectedMember.socials?.github)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#181717] dark:text-white transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
-                    aria-label="GitHub profile"
-                  >
-                    <FaGithub size={26} />
-                  </a>
-                )}
-                {getSocialUrl('email', selectedMember.socials?.email) && (
-                  <a
-                    href={getSocialUrl('email', selectedMember.socials?.email)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#EA4335] transition-transform duration-200 hover:scale-110 hover:opacity-85 inline-flex items-center justify-center"
-                    aria-label="Gmail"
-                  >
-                    <SiGmail size={25} />
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <TeamMemberModal
+          member={selectedMember}
+          theme={selectedTheme}
+          imageUrl={getMemberImage(selectedMember.image)}
+          formattedDeptYear={formatDeptYear(selectedMember.dept, selectedMember.year)}
+          linkedinUrl={getSocialUrl('linkedin', selectedMember.socials?.linkedin)}
+          githubUrl={getSocialUrl('github', selectedMember.socials?.github)}
+          emailUrl={getSocialUrl('email', selectedMember.socials?.email)}
+          onClose={() => setSelectedMember(null)}
+        />
       )}
     </div>
   );

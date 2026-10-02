@@ -218,4 +218,19 @@
     #05070a calc(100% - var(--bg-shift) * 100%),
     #0A1224
   );
+}@keyframes backdropFade {
+  0% { opacity: 0; backdrop-filter: blur(0px); }
+  100% { opacity: 1; backdrop-filter: blur(8px); }
+}
+@keyframes modalEntry3D {
+  0% { opacity: 0; transform: scale(0.8) translateY(60px) rotateX(-15deg); filter: blur(15px); }
+  100% { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); filter: blur(0); }
+}
+@keyframes imageReveal {
+  0% { opacity: 0; transform: scale(1.1) translateX(-20px); filter: blur(10px); }
+  100% { opacity: 1; transform: scale(1) translateX(0); filter: blur(0); }
+}
+@keyframes textCascade {
+  0% { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
 }

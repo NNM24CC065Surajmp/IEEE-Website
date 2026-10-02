@@ -7,6 +7,7 @@ import {
   useLocation,
 } from 'react-router-dom';
 
+import ShaderAurora from './components/ShaderAurora.jsx';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
@@ -47,12 +48,9 @@ function AppContent({ theme, toggleTheme }) {
         antialiased
         transition-colors
         duration-300
-        ${
-          theme === 'light'
-            ? 'bg-slate-50 text-slate-900'
-            : 'bg-[#05060A] text-zinc-100'
-        }`}
+        text-slate-900 dark:text-zinc-100`}
     >
+      <ShaderAurora isDarkMode={theme === 'dark'} />
 
       {/* Skip to content */}
       <a

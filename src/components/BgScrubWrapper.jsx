@@ -28,10 +28,7 @@ export default function BgScrubWrapper({ children }) {
   return (
     <div 
       ref={wrapperRef} 
-      className="w-full min-h-screen transition-none relative z-10 "
-      style={{
-        backgroundColor: 'var(--scroll-bg, transparent)'
-      }}
+      className="w-full min-h-screen transition-none relative z-10"
     >
       {children}
     </div>
