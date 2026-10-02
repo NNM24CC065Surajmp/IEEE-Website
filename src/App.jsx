@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
+import AuthModal from './components/AuthModal.jsx';
 import HomePage from './pages/HomePage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import EventsPage from './pages/EventsPage.jsx';
 import TeamPage from './pages/TeamPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import { subscribeToAuthChanges, logoutUser } from './lib/firebase.js';
 
 export default function App() {
   // Read initial page from URL hash if available (e.g. #about, #events, #team)
   const getInitialPage = () => {
     const hash = window.location.hash.replace('#', '').toLowerCase();
-    if (['home', 'about', 'events', 'team','profile'].includes(hash)) {
+    if (['home', 'about', 'events', 'team', 'profile'].includes(hash)) {
       return hash;
     }
     return 'home';
@@ -27,6 +29,35 @@ export default function App() {
     }
     return 'dark';
   });
+
+  // ─── Auth state ──────────────────────────────────────────────────
+  const [authUser, setAuthUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  // Only auto-prompt the login modal once, the first time we learn
+  // there's no signed-in user — not on every re-render.
+  const hasAutoPrompted = useRef(false);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToAuthChanges((user) => {
+      setAuthUser(user);
+      setAuthChecked(true);
+
+      if (user) {
+        // Signed in — make sure the modal isn't left open.
+        setAuthModalOpen(false);
+      } else if (!hasAutoPrompted.current) {
+        setAuthModalOpen(true);
+        hasAutoPrompted.current = true;
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleLogout = async () => {
+    await logoutUser();
+    hasAutoPrompted.current = false; // allow the prompt again on next logged-out state
+  };
 
   useEffect(() => {
     const root = document.documentElement;
@@ -72,12 +103,27 @@ export default function App() {
       case 'team':
         return <TeamPage onNavigate={navigateTo} />;
       case 'profile':
-        return <ProfilePage onNavigate={navigateTo} />;
+        return <ProfilePage onNavigate={navigateTo} authUser={authUser} />;
       case 'home':
       default:
         return <HomePage onNavigate={navigateTo} />;
     }
   };
+
+  // While we haven't heard back from Firebase yet, show a minimal splash
+  // instead of flashing the homepage before we know the auth state.
+  if (!authChecked) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${theme === 'light' ? 'bg-slate-50' : 'bg-[#05070a]'}`}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-[#00629B] border-t-transparent animate-spin" />
+          <p className={`text-[10px] font-mono uppercase tracking-wider ${theme === 'light' ? 'text-slate-400' : 'text-zinc-600'}`}>
+            IEEE NMAMIT
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative min-h-screen font-sans selection:bg-[#00629B] selection:text-white overflow-hidden flex flex-col justify-between antialiased transition-colors duration-300 ${
@@ -103,7 +149,15 @@ export default function App() {
       }`} />
 
       {/* Unified Sticky Navbar */}
-      <Navbar activePage={currentPage} onNavigate={navigateTo} theme={theme} onToggleTheme={toggleTheme} />
+      <Navbar
+        activePage={currentPage}
+        onNavigate={navigateTo}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        authUser={authUser}
+        onOpenAuth={() => setAuthModalOpen(true)}
+        onLogout={handleLogout}
+      />
 
       {/* Dynamic Page Content with Smooth Transition */}
       <main key={currentPage} className="animate-page-fade relative z-10 flex-1">
@@ -112,6 +166,13 @@ export default function App() {
 
       {/* Unified Footer */}
       <Footer onNavigate={navigateTo} />
+
+      {/* Auth Modal — auto-opens once if no one is signed in, reopens via the Navbar's Sign In button */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        theme={theme}
+      />
     </div>
   );
 }
