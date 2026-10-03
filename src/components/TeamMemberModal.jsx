@@ -37,7 +37,7 @@ export default function TeamMemberModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 cursor-pointer backdrop-blur-md"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 cursor-pointer backdrop-blur-md"
       style={{ 
         perspective: '1500px',
         animation: 'backdropFade 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards' 
@@ -47,7 +47,7 @@ export default function TeamMemberModal({
       {/* Modal Card */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="cursor-default relative w-full max-w-3xl bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5),_0_0_30px_rgba(0,0,0,0.2)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh]"
+        data-lenis-prevent="true" className="cursor-default relative w-full max-w-3xl bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5),_0_0_30px_rgba(0,0,0,0.2)] overflow-y-auto overflow-x-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh]"
         style={{ 
           animation: 'modalEntry3D 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards',
           transformStyle: 'preserve-3d'
@@ -77,7 +77,7 @@ export default function TeamMemberModal({
         </div>
 
         {/* RIGHT COLUMN: Content */}
-        <div className="w-full md:w-[58%] p-5 md:p-7 flex flex-col relative z-20 overflow-y-auto">
+        <div className="w-full md:w-[58%] p-5 md:p-7 flex flex-col relative z-20">
           
           {/* Header section */}
           <div className="mb-4" style={{ animation: 'textCascade 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.2s', opacity: 0 }}>
@@ -142,4 +142,5 @@ export default function TeamMemberModal({
     </div>
   );
 }
+
 
