@@ -34,7 +34,7 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
         scrolled
           ? isLight
             ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200/80 py-3 shadow-lg shadow-slate-200/50'
-            : 'bg-[#05070a]/90 backdrop-blur-xl border-b border-zinc-800/80 py-3 shadow-2xl shadow-black/50'
+            : 'bg-[#0B1F3A]/90 backdrop-blur-xl border-b border-white/10 py-3 shadow-2xl shadow-black/50'
           : 'bg-transparent py-5'
       }`}
     >
@@ -48,7 +48,7 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
           <div className={`relative w-9 h-9 rounded-lg border flex items-center justify-center font-mono font-bold text-xs transition-all duration-300 overflow-hidden ${
             isLight
               ? 'border-slate-300 bg-white text-[#00629B] group-hover:border-[#00629B] group-hover:shadow-[0_0_15px_rgba(0,98,155,0.2)]'
-              : 'border-zinc-700/80 bg-zinc-900/90 text-[#0096D6] group-hover:border-[#0096D6] group-hover:shadow-[0_0_15px_rgba(0,150,214,0.4)]'
+              : 'border-white/15 bg-[#0B1F3A]/70 text-[#0096D6] group-hover:border-[#0096D6] group-hover:shadow-[0_0_15px_rgba(0,150,214,0.4)]'
           }`}>
             <span className="relative z-10">IE</span>
             <div className="absolute inset-0 bg-gradient-to-tr from-[#00629B]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -73,7 +73,7 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
           <nav className={`flex items-center gap-1.5 p-1 rounded-full border backdrop-blur-md shadow-inner transition-colors duration-300 ${
             isLight
               ? 'border-slate-200 bg-slate-100/90'
-              : 'border-zinc-800/80 bg-zinc-900/70'
+              : 'border-white/15 bg-[#0B1F3A]/70'
           }`}>
             {navItems.map((item) => {
               const isActive = activePage === item.id;
@@ -89,7 +89,7 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
                         : 'text-white font-bold bg-[#00629B]/80 border border-[#0096D6]/60 shadow-[0_0_15px_rgba(0,150,214,0.35)]'
                       : isLight
                         ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                        : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                        : 'text-zinc-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   {isActive && (
@@ -109,7 +109,7 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
             className={`p-2 rounded-full border transition-all duration-300 flex items-center justify-center cursor-pointer focus:outline-none ${
               isLight
                 ? 'border-slate-300 bg-slate-100 text-amber-500 hover:bg-amber-50 hover:border-amber-400 hover:shadow-md'
-                : 'border-zinc-800 bg-zinc-900 text-sky-400 hover:bg-zinc-800 hover:border-sky-500 hover:shadow-[0_0_15px_rgba(56,189,248,0.3)]'
+                : 'border-white/15 bg-[#0B1F3A]/70 text-sky-400 hover:bg-[#0B1F3A] hover:border-sky-500 hover:shadow-[0_0_15px_rgba(56,189,248,0.3)]'
             }`}
           >
             {isLight ? <Sun size={17} /> : <Moon size={17} />}

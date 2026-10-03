@@ -8,10 +8,14 @@ import TeamPage from './pages/TeamPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 
 export default function App() {
-  // Read initial page from URL hash if available (e.g. #about, #events, #team)
+  // Read initial page from URL pathname or hash (e.g. /events, #events, #about)
   const getInitialPage = () => {
+    const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    if (['home', 'about', 'events', 'team', 'profile'].includes(path)) {
+      return path;
+    }
     const hash = window.location.hash.replace('#', '').toLowerCase();
-    if (['home', 'about', 'events', 'team','profile'].includes(hash)) {
+    if (['home', 'about', 'events', 'team', 'profile'].includes(hash)) {
       return hash;
     }
     return 'home';
@@ -44,16 +48,25 @@ export default function App() {
     setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
 
-  // Sync state with browser hash changes (back / forward navigation)
+  // Sync state with browser hash / popstate changes (back / forward navigation)
   useEffect(() => {
-    const handleHashChange = () => {
+    const handleUrlChange = () => {
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+      if (['home', 'about', 'events', 'team', 'profile'].includes(path)) {
+        setCurrentPage(path);
+        return;
+      }
       const hash = window.location.hash.replace('#', '').toLowerCase();
       if (['home', 'about', 'events', 'team', 'profile'].includes(hash)) {
         setCurrentPage(hash);
       }
     };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    window.addEventListener('popstate', handleUrlChange);
+    return () => {
+      window.removeEventListener('hashchange', handleUrlChange);
+      window.removeEventListener('popstate', handleUrlChange);
+    };
   }, []);
 
   // Navigate handler that updates URL hash and scrolls smoothly to top

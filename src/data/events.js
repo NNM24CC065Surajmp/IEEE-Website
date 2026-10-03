@@ -1,165 +1,303 @@
-// Event Data for IEEE Student Branch NMAMIT
-// All events contain placeholder values marked with TODO comments for real details
+// src/data/events.js
+// Built from the posters in 1.pdf. Posters go in public/events/ (served at /events/<file>).
+// Dates are ISO strings in IST. A null date means the poster did not show one.
+// Lines marked CHECK need a quick confirmation from the branch.
 
-export const EVENTS_DATA = [
+export const events = [
   {
-    // TODO: fill real details
-    id: 'ieee-day-2024',
-    title: 'IEEE Day 2024',
-    category: 'Workshop',
-    date: '2024-10-01T09:30:00Z',
-    venue: 'Sambhram Auditorium, NMAMIT',
-    time: '09:30 AM – 04:30 PM IST',
+    id: "activity-inauguration-2026-27",
+    title: "Activity Inauguration 2026-27",
+    category: "Inauguration",
+    batch: "2026-27",
+    startDate: "2026-10-07T14:30:00+05:30",
+    endDate: "2026-10-07T16:30:00+05:30", // CHECK: end time not on poster
+    venue: "Shambhavi Hall, APJ 1st Floor, NMAMIT",
+    format: "Offline",
+    organizer: "IEEE SB NMAMIT",
     description:
-      'Annual global IEEE Day celebrations honoring technical innovation and collaboration. Featured keynote addresses from distinguished IEEE Bangalore Section delegates, hardware exhibitions, and campus technical quizzes.',
-    poster: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=80',
-    ],
-    registrationLink: '',
-    isFlagship: false,
+      "Inauguration of the IEEE SB NMAMIT activities for 2026-27. New Beginnings, Bigger Dreams: a new chapter begins with ideas, innovation and you. Contact: Ajmal (Chair), Ninaad (Vice Chair).",
+    poster: "/events/activity-inauguration-2026-27.webp",
+    registrationLink:
+      "https://docs.google.com/forms/d/e/1FAIpQLSfhwN4JXkiFEWTYNEe1KmZ5JS7mEvhvs8mvtqDVMoJDOruIzw/viewform",
   },
   {
-    // TODO: fill real details
-    id: 'tech-triad',
-    title: 'Tech Triad',
-    category: 'Competition',
-    date: '2025-03-15T10:00:00Z',
-    venue: 'MCA Tech Lab 2 & 3, NMAMIT',
-    time: '10:00 AM – 05:00 PM IST',
+    id: "online-technical-quiz-2026",
+    title: "Online Technical Quiz - IEEE Day",
+    category: "Competition",
+    batch: "2026-27",
+    startDate: "2026-10-04T18:00:00+05:30",
+    endDate: "2026-10-04T20:00:00+05:30",
+    venue: "Online",
+    format: "Online, 2 rounds",
+    organizer: "Student Activity Committee, IEEE Mangalore Subsection",
     description:
-      'A multi-round technical showdown spanning algorithmic coding, system debugging, and rapid web prototyping designed to challenge multi-disciplinary engineering skill sets under intense time limits.',
-    poster: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1200&q=80',
-    ],
-    registrationLink: '',
-    isFlagship: false,
+      "Online technical quiz on account of IEEE Day. Round 1: Basic. Round 2: Intermediate. Open to IEEE members of all branches. Last day to register: 1 October 2026.",
+    poster: "/events/online-technical-quiz-2026.webp",
+    registrationLink: "https://forms.gle/ob3vtz9tyncsk9Kx5",
+    registrationDeadline: "2026-10-01T23:59:00+05:30",
   },
   {
-    // TODO: fill real details
-    id: 'spark-hunt',
-    title: 'Spark Hunt',
-    category: 'Competition',
-    date: '2025-09-20T13:30:00Z',
-    venue: 'Campus-wide & New Academic Block, NMAMIT',
-    time: '01:30 PM – 05:30 PM IST',
+    id: "project-to-paper-2026",
+    title: "Project to Paper 2026",
+    category: "Competition",
+    batch: "2026-27",
+    startDate: null,
+    endDate: "2026-10-04T23:59:00+05:30", // submission deadline
+    venue: "Online submission",
+    format: "Individual / team (no limit on authors)",
+    organizer: "IEEE SB NMAMIT",
     description:
-      'An exhilarating technical treasure hunt and puzzle-solving quest integrating cryptic radio signals, QR circuit clues, and hardware debugging stations placed across the campus grounds.',
-    poster: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80',
-    ],
-    registrationLink: '',
-    isFlagship: false,
+      "Technical writing competition open to all UG and PG students. Papers must be in IEEE format and based on a project done this academic year; already published papers are accepted. No registration fee, digital certificates for all participants. Submission deadline: 4 October 2026, 11:59 PM. Contact: Prof. Vasudeva, IEEE SB Counselor.",
+    poster: "/events/project-to-paper-2026.webp",
+    registrationLink: "https://forms.gle/cFkbYwNCwYafy3GCA",
+    registrationDeadline: "2026-10-04T23:59:00+05:30",
+    registrationLabel: "Submit Paper",
   },
   {
-    // TODO: fill real details
-    id: 'circuitron',
-    title: 'Circuitron',
-    category: 'Flagship',
-    date: '2026-02-20T09:00:00Z',
-    venue: 'Hardware & IoT Center of Excellence, NMAMIT',
-    time: '09:00 AM – 06:00 PM IST',
+    id: "b-htc-2024",
+    title: "IEEE B-HTC 2024 Inauguration",
+    category: "Conference",
+    batch: "2023-24",
+    startDate: "2024-03-21T15:00:00+05:30",
+    endDate: "2024-03-21T17:00:00+05:30", // CHECK: end time not on poster
+    venue: "Sowparnika Seminar Hall, NMAMIT, Nitte",
+    format: "Offline",
+    organizer: "IEEE Bangalore Section, IEEE Mangalore Subsection, NMAMIT",
     description:
-      'Our annual premier electronics and embedded systems flagship challenge. Student engineers designed, simulated, and fabricated custom PCB circuits and sensor telemetry prototypes under rigorous evaluation.',
-    poster: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
-    ],
-    registrationLink: '',
-    isFlagship: true,
+      "Inauguration of the 2024 IEEE Bangalore Humanitarian Technology Conference. Theme: SDG14 - Life Below Water. Chief Guest: Dr. Chengappa M R (HP Enterprises, Vice Chair Industry Engagement and SIGHT Chair, IEEE Bangalore Section). President: Dr. Niranjan N Chiplunkar, Principal, NMAMIT.",
+    poster: "/events/b-htc-2024.webp",
+    registrationLink: null,
   },
   {
-    // TODO: fill real details
-    id: 'grss-event',
-    title: 'GRSS Event: Earth Observation & Geospatial Analytics',
-    category: 'Workshop',
-    date: '2026-10-18T10:00:00Z',
-    venue: 'MCA Seminar Hall, Ground Floor, NMAMIT',
-    time: '10:00 AM – 04:30 PM IST',
+    id: "ieee-membership-webinar-2024",
+    title: "Webinar on Benefits of IEEE Membership",
+    category: "Webinar",
+    batch: "2024-25",
+    startDate: "2024-08-22T19:30:00+05:30",
+    endDate: "2024-08-22T20:30:00+05:30", // CHECK: end time not on poster
+    venue: "Google Meet",
+    format: "Online",
+    organizer: "IEEE SB NMAMIT",
     description:
-      'Specialized IEEE Geoscience and Remote Sensing Society hands-on workshop covering synthetic aperture radar (SAR), satellite spectral data processing, and open GIS mapping pipelines using Python.',
-    poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?auto=format&fit=crop&w=1200&q=80',
-    ],
-    registrationLink: 'https://forms.gle/ieee-nmamit-grss-2026',
-    isFlagship: false,
+      "Online webinar on the benefits of IEEE membership. Speaker: Suprith Patil, MDC Lead, IEEE Bangalore Section.",
+    poster: "/events/ieee-membership-webinar-2024.webp",
+    registrationLink: null,
   },
   {
-    // TODO: fill real details
-    id: 'primed',
-    title: 'Primed: Industry Induction & Tech Toolkit',
-    category: 'Workshop',
-    date: '2026-11-12T14:00:00Z',
-    venue: 'Sambhram Auditorium, NMAMIT',
-    time: '02:00 PM – 05:30 PM IST',
+    id: "ieee-day-2024",
+    title: "IEEE Day 2024",
+    category: "Celebration",
+    batch: "2024-25",
+    startDate: "2024-10-03T14:00:00+05:30",
+    endDate: "2024-10-03T17:00:00+05:30", // CHECK: end time not on poster
+    venue: "Karyagar Sabhangan (Mechanical Workshop), NMAMIT",
+    format: "Offline",
+    organizer: "IEEE SB NMAMIT",
     description:
-      'A practical bootcamp introducing student engineers to production Git & GitHub workflows, Linux terminal fundamentals, containerization concepts, and IEEE technical paper writing methodologies.',
-    poster: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
-    ],
-    registrationLink: 'https://forms.gle/ieee-nmamit-primed-2026',
-    isFlagship: false,
+      "Celebration of IEEE Day's 15th anniversary: 'Let's celebrate innovation, technology, and the spirit of collaboration'. Highlights: a quiz, Ideate (develop limitless ideas), cash prizes and a membership drive. Open to all.",
+    poster: "/events/ieee-day-2024.webp",
+    registrationLink: null,
   },
   {
-    // TODO: fill real details
-    id: 'aptitude-test',
-    title: 'Aptitude Test & Technical Assessment Series',
-    category: 'Competition',
-    date: '2026-12-05T09:30:00Z',
-    venue: 'MCA Tech Labs 1 to 4, NMAMIT',
-    time: '09:30 AM – 12:30 PM IST',
+    id: "project-to-paper-2024",
+    title: "Project to Paper",
+    category: "Competition",
+    batch: "2024-25",
+    startDate: null,
+    endDate: "2024-11-23T23:59:00+05:30", // submission deadline
+    venue: "Online submission",
+    format: "Individual / team (no limit on authors)",
+    organizer: "IEEE SB NMAMIT",
     description:
-      'Comprehensive competitive assessment testing logical reasoning, quantitative aptitude, algorithmic problem solving, and core CS fundamentals aligned with national engineering benchmarks.',
-    poster: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&q=80',
-    ],
-    registrationLink: 'https://forms.gle/ieee-nmamit-aptitude-2026',
-    isFlagship: false,
+      "Technical writing competition for all UG and PG students. Papers must be in IEEE format and based on a project done this academic year; already published papers are accepted. No registration fee. Total prize money Rs. 12,000 with separate prizes for departments. Digital certificates for all participants. Submission deadline: 23 November 2024.",
+    poster: "/events/project-to-paper-2024.webp",
+    registrationLink: null,
   },
   {
-    // TODO: fill real details
-    id: 'techtide',
-    title: 'TechTide 2027: 36h National Flagship Hackathon',
-    category: 'Hackathon',
-    date: '2027-03-20T09:00:00Z',
-    venue: 'Centre for High Performance Computing & Main Quad, NMAMIT',
-    time: 'Starts 09:00 AM IST (36 Hours Non-Stop)',
+    id: "mss-agm-2025",
+    title: "Annual General Meeting of IEEE Mangalore Subsection",
+    category: "Meeting",
+    batch: "2024-25",
+    startDate: "2025-01-11T14:00:00+05:30",
+    endDate: "2025-01-11T16:00:00+05:30",
+    venue: "Sambhram Auditorium, NMAMIT, Nitte",
+    format: "Offline",
+    organizer: "IEEE Mangalore Subsection",
     description:
-      'Our pinnacle annual national hackathon assembling 70+ top collegiate squads to engineer breakthrough software and hardware prototypes in AI, Edge Systems, Web3, and Sustainable Engineering.',
-    poster: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
-    ],
-    registrationLink: 'https://techtide.ieeenmamit.org/register',
-    isFlagship: true,
+      "AGM of the IEEE Mangalore Subsection with activity and financial reports, IEEE MSS awards, IEEE SB evaluation results and the 2025 slate announcement, followed by high tea.",
+    poster: "/events/mss-agm-2025.webp",
+    registrationLink: null,
+  },
+  {
+    id: "aide-2025",
+    title: "AIDE 2025 - International Conference on AI and Data Engineering",
+    category: "Conference",
+    batch: "2024-25",
+    startDate: "2025-02-06T09:00:00+05:30", // CHECK: time not on poster
+    endDate: "2025-02-07T17:00:00+05:30",
+    venue: "NMAMIT, Nitte",
+    format: "Offline",
+    organizer: "NMAMIT, technically co-sponsored by IEEE Bangalore Section and IEEE Mangalore Subsection",
+    description:
+      "2025 International Conference on Artificial Intelligence and Data Engineering (AIDE), 6-7 February 2025. The image is the proceedings cover.",
+    poster: "/events/aide-2025.webp",
+    registrationLink: null,
+  },
+  {
+    id: "tech-triad-2025",
+    title: "The Tech Triad",
+    category: "Competition",
+    batch: "2024-25",
+    startDate: "2025-03-22T09:00:00+05:30",
+    endDate: "2025-03-22T13:00:00+05:30",
+    venue: "SMV Block ADL 01, 03, NMAMIT, Nitte",
+    format: "Offline",
+    organizer: "IEEE Mangalore Subsection, HackerEarth Hub NMAMIT",
+    description:
+      "Offline tech competition with a prize pool of Rs. 15,000. Open to all.",
+    poster: "/events/tech-triad-2025.webp",
+    registrationLink: null,
+  },
+  {
+    id: "spark-hunt-2025",
+    title: "Spark Hunt",
+    category: "Competition",
+    batch: "2024-25",
+    startDate: "2025-04-11T13:45:00+05:30", // CHECK: year not on poster (11 April was a Friday in 2025)
+    endDate: "2025-04-11T16:00:00+05:30", // CHECK: end time not on poster
+    venue: "ADL04, NMAMIT",
+    format: "Offline",
+    organizer: "IEEE SB NMAMIT, Institution's Innovation Council",
+    description:
+      "Web Hunt Level 1 and Level 2, held as part of World Creativity and Innovation Day (21 April) celebrations. Prize pool Rs. 5,000. Entry free; exclusive to IEEE members and first-year students.",
+    poster: "/events/spark-hunt-2025.webp",
+    registrationLink: null,
+  },
+  {
+    id: "primed-aptitude-test-2025",
+    title: "PRIMED Round 1: Aptitude Test",
+    category: "Competition",
+    batch: "2024-25",
+    startDate: "2025-05-02T19:30:00+05:30",
+    endDate: "2025-05-02T21:00:00+05:30", // CHECK: end time not on poster
+    venue: "Online",
+    format: "Individual",
+    organizer: "IEEE Mangalore Subsection SAC and Industry Relations Committee, HackerEarth Hub NMAMIT",
+    description:
+      "First round of PRIMED, the placement hackathon. Online aptitude test for 3rd year students of MSS region colleges. Shortlisted participants move to the next round. Registration closed 30 April 2025.",
+    poster: "/events/primed-aptitude-test-2025.webp",
+    registrationLink: null,
+  },
+  {
+    id: "primed-placement-hackathon-2025",
+    title: "PRIMED - The Placement Hackathon",
+    category: "Hackathon",
+    batch: "2024-25",
+    startDate: "2025-05-02T19:30:00+05:30",
+    endDate: "2025-05-17T17:00:00+05:30",
+    venue: "Online rounds; interviews at AJIET, Mangalore",
+    format: "Individual",
+    organizer: "IEEE Mangalore Subsection SAC and Industry Relations Committee",
+    description:
+      "Four rounds: Aptitude (2 May, online), Technical (9 May, online), Technical Interview and HR Interview (17 May, offline at AJIET, Mangalore). For 3rd year students of the Mangalore Subsection region. Entry fee: Rs. 50 for IEEE members, Rs. 100 for non-members. Winners get a chance at an industrial internship.",
+    poster: "/events/primed-placement-hackathon-2025.webp",
+    registrationLink: null,
+  },
+  {
+    id: "grss-inaugural-2025",
+    title: "IEEE GRSS Student Branch Chapter Inauguration and Technical Talk",
+    category: "Talk",
+    batch: "2025-26",
+    startDate: "2025-08-12T10:00:00+05:30",
+    endDate: "2025-08-12T12:00:00+05:30", // CHECK: end time not on poster
+    venue: "RS & GIS Lab, SMV Block, NMAMIT",
+    format: "Offline",
+    organizer: "Department of Civil Engineering, IEEE GRSS Student Branch Chapter",
+    description:
+      "Inaugural function of the IEEE GRSS Student Branch Chapter with a technical talk by Dr. Chandan M C, Assistant Professor, Department of Water Resources and Ocean Engineering, NITK Surathkal.",
+    poster: "/events/grss-inaugural-2025.webp",
+    registrationLink: null,
+  },
+  {
+    id: "treasure-hunt-2025",
+    title: "Treasure Hunt",
+    category: "Competition",
+    batch: "2025-26", // CHECK: year not on poster; assumed 2025 (GRSS logo, 8 August 2025 was a Friday)
+    startDate: "2025-08-08T14:00:00+05:30",
+    endDate: "2025-08-08T15:45:00+05:30",
+    venue: "ISL02 and ISL03, NMAMIT",
+    format: "Offline",
+    organizer: "IEEE SB NMAMIT, IEEE GRSS",
+    description:
+      "Treasure hunt with a prize pool of Rs. 6,000 plus gifts. Free entry for 1st year students and IEEE members; Rs. 100 for non-members.",
+    poster: "/events/treasure-hunt-2025.webp",
+    registrationLink: null,
   },
 ];
 
-export default EVENTS_DATA;
+// ---------------------------------------------------------------------------
+// Helpers (the Events page should use these instead of re-implementing logic)
+// ---------------------------------------------------------------------------
+const toDate = (v) => (v ? new Date(v) : null);
+
+// "live" | "upcoming" | "ended" | "open" (deadline-only events, still accepting entries)
+export const getStatus = (event, now = new Date()) => {
+  const start = toDate(event.startDate);
+  const end = toDate(event.endDate) || start;
+  if (!start && !end) return "ended";
+  if (!start) return now <= end ? "open" : "ended";
+  if (now < start) return "upcoming";
+  if (end && now > end) return "ended";
+  return "live";
+};
+
+// Register / Submit button is shown only when this is true.
+export const isRegistrationOpen = (event, now = new Date()) => {
+  if (!event.registrationLink) return false;
+  if (getStatus(event, now) === "ended") return false;
+  const deadline = toDate(event.registrationDeadline);
+  return !deadline || now <= deadline;
+};
+
+const sortKey = (e) =>
+  (toDate(e.startDate) || toDate(e.endDate) || new Date(0)).getTime();
+
+// Newest first
+export const sortedEvents = [...events].sort((a, b) => sortKey(b) - sortKey(a));
+
+// Event shown in the hero.
+// 1) nearest live/upcoming event, preferring ones whose registration is open
+// 2) otherwise a deadline-style "open" event
+// 3) otherwise the latest past event (mode "latest", no countdown)
+export const getSpotlight = (now = new Date()) => {
+  const by = (list) =>
+    [...list].sort((a, b) => {
+      const ra = isRegistrationOpen(a, now) ? 0 : 1;
+      const rb = isRegistrationOpen(b, now) ? 0 : 1;
+      return ra - rb || sortKey(a) - sortKey(b);
+    })[0];
+
+  const current = events.filter((e) => ["live", "upcoming"].includes(getStatus(e, now)));
+  if (current.length) {
+    const event = by(current);
+    return { event, mode: getStatus(event, now) };
+  }
+  const open = events.filter((e) => getStatus(e, now) === "open");
+  if (open.length) return { event: by(open), mode: "open" };
+  const past = sortedEvents.filter((e) => getStatus(e, now) === "ended");
+  return { event: past[0] || null, mode: "latest" };
+};
+
+// Default content of the permanent right-hand side panel:
+// the most recent past event that is not already the hero event.
+export const getDefaultPanelEvent = (now = new Date()) => {
+  const { event: hero } = getSpotlight(now);
+  return (
+    sortedEvents.find((e) => getStatus(e, now) === "ended" && e.id !== hero?.id) ||
+    sortedEvents[0] ||
+    null
+  );
+};
+
+export const batches = [...new Set(events.map((e) => e.batch).filter(Boolean))].sort().reverse();
+export const categories = [...new Set(events.map((e) => e.category))].sort();
