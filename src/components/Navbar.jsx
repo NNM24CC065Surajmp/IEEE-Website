@@ -62,25 +62,30 @@ export default function Navbar({
     { scope: navRef }
   );
 
-  // Scroll detection with hysteresis and auto-collapse
+    // Scroll detection with hysteresis and auto-collapse (RAF batched)
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setScrolled(currentScrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          setScrolled(currentScrollY > 20);
 
-      // Debounced/Hysteresis thresholds for collapse
-      if (currentScrollY > 80) {
-        setIsCollapsed(true);
-      } else if (currentScrollY < 40) {
-        setIsCollapsed(false);
-        setIsManuallyExpanded(false); // Reset when returning to top
-      }
+          if (currentScrollY > 80) {
+            setIsCollapsed(true);
+          } else if (currentScrollY < 40) {
+            setIsCollapsed(false);
+            setIsManuallyExpanded(false); 
+          }
 
-      // Auto-collapse if scrolled more than 100px away from the expanded point
-      if (isManuallyExpandedRef.current) {
-        if (Math.abs(currentScrollY - expandedScrollYRef.current) > 100) {
-          setIsManuallyExpanded(false);
-        }
+          if (isManuallyExpandedRef.current) {
+            if (Math.abs(currentScrollY - expandedScrollYRef.current) > 100) {
+              setIsManuallyExpanded(false);
+            }
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
@@ -89,63 +94,102 @@ export default function Navbar({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Center alignment and fade animations for collapse
-  useGSAP(() => {
-    const rightEl = rightElementsRef.current;
-    const rightWrapperEl = rightElementsWrapperRef.current;
+      // Coordinated GSAP Timeline for Collapse/Expand
+  const tl = useRef(null);
 
-    if (!rightEl || !rightWrapperEl) return;
+  useGSAP(() => {
+    const header = navRef.current;
+    const pill = innerBarRef.current;
+    const rightWrapperEl = rightElementsWrapperRef.current;
+    const rightEl = rightElementsRef.current;
+
+    if (!header || !pill || !rightWrapperEl || !rightEl) return;
 
     if (isMobile) {
-      // Clear animations if resized back to mobile
-      gsap.set(rightWrapperEl, { clearProps: 'all' });
-      gsap.set(rightEl, { clearProps: 'all' });
+      gsap.set([header, pill, rightWrapperEl, rightEl], { clearProps: 'all' });
       return;
     }
 
     if (prefersReducedMotion()) {
       if (showCollapsedState) {
+        gsap.set(header, { paddingTop: '0.75rem', paddingBottom: '0.75rem' }); // py-3 equivalent
         gsap.set(rightWrapperEl, { display: 'none', width: 0 });
         gsap.set(rightEl, { autoAlpha: 0 });
       } else {
-        gsap.set(rightWrapperEl, { display: 'flex', width: '' });
+        gsap.set(header, { paddingTop: '1.25rem', paddingBottom: '1.25rem' }); // py-5 equivalent
+        gsap.set(rightWrapperEl, { display: 'flex', width: 'auto' });
         gsap.set(rightEl, { autoAlpha: 1 });
       }
-    } else {
-      if (showCollapsedState) {
-        gsap.to(rightEl, {
-          opacity: 0,
-          duration: 0.25,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-        
-        gsap.to(rightWrapperEl, {
-          width: 0,
-          duration: 0.6,
-          ease: 'power3.inOut',
-          overwrite: 'auto',
-          onComplete: () => gsap.set(rightWrapperEl, { display: 'none' })
-        });
-      } else {
-        gsap.set(rightWrapperEl, { display: 'flex' });
-        
-        gsap.to(rightWrapperEl, {
-          width: 'auto',
-          duration: 0.6,
-          ease: 'power3.inOut',
-          overwrite: 'auto'
-        });
-        
-        gsap.to(rightEl, {
-          opacity: 1,
-          duration: 0.4,
-          delay: 0.2,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-      }
+      return;
     }
+
+    // Kill existing timeline to prevent conflicts on rapid scroll
+    if (tl.current) {
+      tl.current.kill();
+    }
+    
+    tl.current = gsap.timeline();
+
+    // 1. Measure exact pixel width to avoid 'auto' resolution jank
+    // Briefly force flex/auto to measure true intrinsic width safely
+    gsap.set(rightWrapperEl, { display: 'flex', width: 'auto' });
+    const targetWidth = rightWrapperEl.scrollWidth;
+
+    if (showCollapsedState) {
+      // Reset to exact start positions before animating
+      gsap.set(rightWrapperEl, { width: targetWidth });
+      gsap.set(rightEl, { opacity: 1 });
+      
+      tl.current
+        // A. Fade out nav items quickly
+        .to(rightEl, {
+          opacity: 0,
+          duration: 0.2,
+          ease: 'power2.out',
+        })
+        // B. Shrink width and padding simultaneously with fade (starts same time, takes longer)
+        .to(rightWrapperEl, {
+          width: 0,
+          duration: 0.45,
+          ease: 'power3.inOut',
+        }, '<')
+        .to(header, {
+          paddingTop: '0.75rem',
+          paddingBottom: '0.75rem',
+          duration: 0.45,
+          ease: 'power3.inOut',
+        }, '<')
+        // C. Apply display none only after width shrink completes
+        .set(rightWrapperEl, { display: 'none' });
+
+    } else {
+      // Reset to exact start positions before animating
+      gsap.set(rightWrapperEl, { width: 0, display: 'flex' });
+      gsap.set(rightEl, { opacity: 0 });
+      
+      tl.current
+        // A. Grow width and padding immediately
+        .to(rightWrapperEl, {
+          width: targetWidth,
+          duration: 0.45,
+          ease: 'power3.inOut',
+        })
+        .to(header, {
+          paddingTop: '1.25rem',
+          paddingBottom: '1.25rem',
+          duration: 0.45,
+          ease: 'power3.inOut',
+        }, '<')
+        // B. Fade in opacity starting partway through width growth
+        .to(rightEl, {
+          opacity: 1,
+          duration: 0.3,
+          ease: 'power2.out',
+        }, '-=0.25')
+        // C. Cleanup width to auto so it reflows naturally on window resize
+        .set(rightWrapperEl, { width: 'auto' });
+    }
+
   }, [showCollapsedState, isMobile]);
 
   // Navigation items
@@ -227,11 +271,9 @@ export default function Navbar({
   }, [hoveredLink, activePage, showCollapsedState]);
 
   return (
-    <header
+        <header
       ref={navRef}
-      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-out motion-reduce:transition-none flex justify-center px-4 ${
-        scrolled ? 'py-3' : 'py-5'
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 w-full motion-reduce:transition-none flex justify-center px-4 py-5"
     >
       {/* Premium unified navbar */}
       <div
@@ -243,11 +285,11 @@ export default function Navbar({
         } ${showCollapsedState ? 'bg-opacity-100 backdrop-blur-3xl' : ''}`}
       >
         {/* Logo Container */}
-        <div className="flex items-center shrink-0 z-10 px-2 transition-all duration-500 ease-in-out">
+        <div ref={logoWrapperRef} className="flex items-center shrink-0 z-10 px-2">
           <button
             type="button"
             onClick={handleLogoClick}
-            className="relative bg-white rounded-full flex items-center justify-center transition-all duration-500 ease-in-out shadow-[0_2px_10px_rgba(0,0,0,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden w-[130px] h-[40px] cursor-pointer"
+            className="relative bg-white rounded-full flex items-center justify-center transition-colors duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden w-[130px] h-[40px] cursor-pointer"
             aria-label={showCollapsedState ? "Expand navigation" : "IEEE NMAMIT home"}
           >
             {/* Full Lockup */}
@@ -632,5 +674,9 @@ export default function Navbar({
     </header>
   );
 }
+
+
+
+
 
 

@@ -12,6 +12,7 @@ import Preloader from './components/Preloader';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
+import { initSmoothScroll, destroySmoothScroll } from './lib/smoothScroll.js';
 
 import HomePage from './pages/HomePage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
@@ -153,6 +154,10 @@ function AppContent({ theme, toggleTheme }) {
 
 
 export default function App() {
+  useEffect(() => {
+    initSmoothScroll();
+    return () => destroySmoothScroll();
+  }, []);
 
   // Theme state
   const [theme, setTheme] = useState(() => {
