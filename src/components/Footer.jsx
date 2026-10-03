@@ -42,21 +42,15 @@ export default function Footer({ onNavigate }) {
   };
 
   return (
-    <footer className="bg-slate-100 dark:bg-ieee-surface py-14 border-t border-slate-200 dark:border-ieee-border relative z-10 transition-colors duration-300">
+    <footer className="bg-slate-100 dark:bg-zinc-950 py-14 border-t border-slate-200 dark:border-white/5 relative z-10 transition-colors duration-300">
       <div className="section-container">
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-12">
 
           {/* Column 1: Brand & Description */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-7 h-7 rounded border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center text-ieee-blue dark:text-ieee-teal font-mono font-bold text-xs">
-                IE
-              </div>
-
-              <span className="font-heading font-bold text-base text-slate-900 dark:text-white tracking-tight">
-                {site.name || 'IEEE Student Branch NMAMIT'}
-              </span>
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="bg-white rounded-full flex items-center justify-center w-[130px] h-[40px] shadow-sm"><img src="/images/ieee-nmamit-logo-lockup.png" alt="IEEE NMAMIT" className="h-[24px] w-auto object-contain" /></div>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 max-w-sm leading-relaxed mb-5 font-normal">
@@ -94,11 +88,11 @@ export default function Footer({ onNavigate }) {
 
           {/* Column 2: Navigation Links */}
           <div>
-            <h4 className="text-xs font-mono uppercase tracking-wider text-slate-900 dark:text-zinc-300 font-bold mb-4">
+            <h4 className="text-sm font-semibold tracking-wide text-slate-900 dark:text-zinc-300 font-bold mb-4">
               Navigation
             </h4>
 
-            <ul className="space-y-2.5 text-xs font-mono text-slate-600 dark:text-zinc-400">
+            <ul className="space-y-2.5 text-sm text-slate-500 dark:text-zinc-400">
 
               <li>
                 <Link
@@ -165,11 +159,11 @@ export default function Footer({ onNavigate }) {
 
           {/* Column 3: Contact Details */}
           <div>
-            <h4 className="text-xs font-mono uppercase tracking-wider text-slate-900 dark:text-zinc-300 font-bold mb-4">
+            <h4 className="text-sm font-semibold tracking-wide text-slate-900 dark:text-zinc-300 font-bold mb-4">
               Contact Us
             </h4>
 
-            <div className="space-y-2.5 text-xs font-mono text-slate-600 dark:text-zinc-400 leading-relaxed">
+            <div className="space-y-2.5 text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
 
               {site.contact?.address && (
                 <div className="flex items-start gap-2">
@@ -233,7 +227,7 @@ export default function Footer({ onNavigate }) {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-200 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-slate-500 dark:text-zinc-500">
+        <div className="pt-8 border-t border-slate-200 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500 dark:text-zinc-500">
           <p>
             © {currentYear}{' '}
             {site.name || 'IEEE NMAMIT Student Branch'}. All rights reserved.
@@ -246,3 +240,7 @@ export default function Footer({ onNavigate }) {
     </footer>
   );
 }
+
+
+
+
