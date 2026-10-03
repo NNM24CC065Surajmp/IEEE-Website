@@ -144,7 +144,7 @@ const fragment = `
       color = mix(color, uColor3, clamp(r.x * 1.5, 0.0, 1.0));
       
       // Increased intensity back to 0.18 for better visibility
-      float lightIntensity = 0.18; 
+      float lightIntensity = 0.45; 
       vec3 pageBg = vec3(0.976, 0.984, 0.992); // Matches tailwind slate-50
       vec3 finalColor = mix(pageBg, color, lightIntensity);
       
@@ -272,3 +272,4 @@ export default function ShaderAurora({ isDarkMode }) {
     />
   );
 }
+
