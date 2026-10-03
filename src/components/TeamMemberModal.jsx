@@ -69,7 +69,7 @@ export default function TeamMemberModal({
           <img
             src={imageUrl}
             alt={member.name}
-            className="absolute inset-0 w-full h-full object-cover object-top"
+            className="absolute inset-0 w-full h-full object-cover object-center"
             style={{ animation: 'imageReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.1s', opacity: 0 }}
           />
           {/* Gradient Overlay for bottom depth */}
@@ -77,7 +77,7 @@ export default function TeamMemberModal({
         </div>
 
         {/* RIGHT COLUMN: Content */}
-        <div className="w-full md:w-[58%] p-5 md:p-7 flex flex-col relative z-20">
+        <div className="w-full md:w-[58%] p-5 md:p-7 flex flex-col relative z-20 overflow-y-auto">
           
           {/* Header section */}
           <div className="mb-4" style={{ animation: 'textCascade 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.2s', opacity: 0 }}>
@@ -142,3 +142,4 @@ export default function TeamMemberModal({
     </div>
   );
 }
+

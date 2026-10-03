@@ -767,7 +767,7 @@ export default function TeamPage() {
   const selectedTheme = selectedMember ? getDepartmentTheme(selectedMember.role) : null;
 
   return (
-    <div className="pt-20 sm:pt-24 pb-16 select-none">
+    <div className="pt-20 sm:pt-24 pb-16 select-none overflow-x-hidden">
       {/* Page Header */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 pb-3 sm:pb-4 text-center">
         <p className="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-zinc-400 mb-2">
@@ -878,7 +878,7 @@ export default function TeamPage() {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
                       }}
-                      className="w-full h-full object-cover object-top sm:object-center"
+                      className="w-full h-full object-cover object-center"
                     />
                   </div>
 
@@ -955,3 +955,4 @@ export default function TeamPage() {
     </div>
   );
 }
+
