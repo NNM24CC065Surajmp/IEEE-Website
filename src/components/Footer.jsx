@@ -1,15 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { gsap } from '../lib/gsap';
-import { prefersReducedMotion } from '../lib/motion';
 import {
   Github,
   Linkedin,
   Instagram,
   Twitter,
   Mail,
-  Phone,
-  MapPin,
+  ArrowUpRight,
 } from 'lucide-react';
 import { site } from '../data/site';
 
@@ -23,224 +20,103 @@ const SOCIAL_ICON_MAP = {
 export default function Footer({ onNavigate }) {
   const currentYear = new Date().getFullYear();
 
-  const handleSocialHover = (e, isHover) => {
-    if (window.matchMedia('(hover: none)').matches) return;
-
-    if (!prefersReducedMotion()) {
-      gsap.to(e.currentTarget, {
-        scale: isHover ? 1.15 : 1,
-        duration: 0.3,
-        ease: 'back.out(2)',
-      });
-    }
-  };
-
-  const handleNav = (target) => {
-    if (onNavigate) {
-      onNavigate(target);
-    }
+  const handleNav = (id) => {
+    onNavigate(id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <footer className="bg-slate-100 dark:bg-zinc-950 py-14 border-t border-slate-200 dark:border-white/5 relative z-10 transition-colors duration-300">
-      <div className="section-container">
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-12">
-
-          {/* Column 1: Brand & Description */}
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 mb-6">
-              <div className="bg-white rounded-full flex items-center justify-center w-[130px] h-[40px] shadow-sm"><img src="/images/ieee-nmamit-logo-lockup.png" alt="IEEE NMAMIT" className="h-[24px] w-auto object-contain" /></div>
-            </div>
-
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 max-w-sm leading-relaxed mb-5 font-normal">
-              {site.tagline ||
-                'Advancing Technology for Humanity. Empowering student engineers, coders, and researchers at NMAM Institute of Technology, Nitte.'}
+    <footer className="relative pt-24 pb-8 overflow-hidden bg-white dark:bg-zinc-950">
+      {/* Decorative gradient overlay */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-zinc-800 to-transparent" />
+      
+      <div className="section-container relative z-10">
+        
+        {/* Main Footer Content */}
+        <div className="bg-slate-50 dark:bg-zinc-900/40 rounded-[2rem] border border-slate-200/60 dark:border-white/5 p-8 sm:p-12 md:p-16 mb-8 flex flex-col lg:flex-row gap-12 lg:gap-24">
+          
+          {/* Brand Column */}
+          <div className="flex-1 max-w-sm">
+            <Link 
+              to="/" 
+              onClick={() => handleNav('home')}
+              className="inline-block mb-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue rounded-full"
+            >
+              <div className="bg-white dark:bg-white rounded-full px-4 py-2 shadow-sm border border-slate-100 dark:border-transparent inline-flex items-center">
+                <img 
+                  src="/images/ieee-nmamit-logo-lockup.png" 
+                  alt="IEEE NMAMIT" 
+                  className="h-[20px] sm:h-[24px] object-contain" 
+                />
+              </div>
+            </Link>
+            <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed mb-8 font-medium">
+              Empowering students to innovate, build, and lead. We bridge the gap between academic theory and real-world engineering excellence.
             </p>
-
-            {/* Social Links */}
-            <div className="flex items-center gap-2.5">
-              {site.socials?.map((social) => {
-                const IconComp =
-                  SOCIAL_ICON_MAP[social.icon] || Github;
-
+            <div className="flex flex-wrap items-center gap-3">
+              {site.socials.map((social) => {
+                const Icon = SOCIAL_ICON_MAP[social.name] || Github;
                 return (
                   <a
-                    key={social.label}
-                    href={social.href}
+                    key={social.name}
+                    href={social.url}
                     target="_blank"
-                    rel="noreferrer"
-                    className="w-8 h-8 rounded-lg border border-slate-300 dark:border-zinc-800 hover:border-ieee-blue dark:hover:border-ieee-teal bg-white dark:bg-zinc-900/60 flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue"
-                    aria-label={social.label}
-                    onMouseEnter={(e) =>
-                      handleSocialHover(e, true)
-                    }
-                    onMouseLeave={(e) =>
-                      handleSocialHover(e, false)
-                    }
+                    rel="noopener noreferrer"
+                    aria-label={`Follow on ${social.name}`}
+                    className="w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-500 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal hover:border-ieee-blue/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue group"
                   >
-                    <IconComp size={15} />
+                    <Icon size={16} className="group-hover:scale-110 transition-transform" />
                   </a>
                 );
               })}
             </div>
           </div>
 
-          {/* Column 2: Navigation Links */}
-          <div>
-            <h4 className="text-sm font-semibold tracking-wide text-slate-900 dark:text-zinc-300 font-bold mb-4">
-              Navigation
-            </h4>
-
-            <ul className="space-y-2.5 text-sm text-slate-500 dark:text-zinc-400">
-
-              <li>
-                <Link
-                  to="/"
-                  onClick={() => handleNav('home')}
-                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
-                >
-                  Home
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/about"
-                  onClick={() => handleNav('about')}
-                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
-                >
-                  About Chapter
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/events"
-                  onClick={() => handleNav('events')}
-                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
-                >
-                  Events & Labs
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/team"
-                  onClick={() => handleNav('team')}
-                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
-                >
-                  Core Team
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/join"
-                  onClick={() => handleNav('join')}
-                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
-                >
-                  Join Us
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/profile"
-                  onClick={() => handleNav('profile')}
-                  className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ieee-blue rounded"
-                >
-                  Profile
-                </Link>
-              </li>
-
-            </ul>
-          </div>
-
-          {/* Column 3: Contact Details */}
-          <div>
-            <h4 className="text-sm font-semibold tracking-wide text-slate-900 dark:text-zinc-300 font-bold mb-4">
-              Contact Us
-            </h4>
-
-            <div className="space-y-2.5 text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
-
-              {site.contact?.address && (
-                <div className="flex items-start gap-2">
-                  <MapPin
-                    size={14}
-                    className="text-slate-400 dark:text-zinc-500 shrink-0 mt-0.5"
-                  />
-
-                  <span>{site.contact.address}</span>
-                </div>
-              )}
-
-              {site.contact?.email && (
-                <div className="flex items-center gap-2">
-                  <Mail
-                    size={14}
-                    className="text-ieee-blue dark:text-ieee-teal shrink-0"
-                  />
-
-                  <a
-                    href={`mailto:${site.contact.email}`}
-                    className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors"
-                  >
-                    {site.contact.email}
+          {/* Links Columns */}
+          <div className="flex-[2] grid grid-cols-2 sm:grid-cols-3 gap-8">
+            <div>
+              <h4 className="text-xs font-mono uppercase tracking-[0.2em] font-bold text-slate-900 dark:text-white mb-6">Explore</h4>
+              <ul className="space-y-4">
+                <li><Link to="/" onClick={() => handleNav('home')} className="text-sm text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors">Home</Link></li>
+                <li><Link to="/about" onClick={() => handleNav('about')} className="text-sm text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors">About Us</Link></li>
+                <li><Link to="/events" onClick={() => handleNav('events')} className="text-sm text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors">Events</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-mono uppercase tracking-[0.2em] font-bold text-slate-900 dark:text-white mb-6">Connect</h4>
+              <ul className="space-y-4">
+                <li><Link to="/team" onClick={() => handleNav('team')} className="text-sm text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors">Core Team</Link></li>
+                <li><Link to="/join" onClick={() => handleNav('join')} className="text-sm text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors">Join Chapter</Link></li>
+                <li>
+                  <a href="mailto:ieee@nmamit.in" className="text-sm text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors inline-flex items-center gap-1 group">
+                    Contact <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </a>
-                </div>
-              )}
-
-              {site.contact?.phone && (
-                <div className="flex items-center gap-2">
-                  <Phone
-                    size={14}
-                    className="text-ieee-blue dark:text-ieee-teal shrink-0"
-                  />
-
-                  <a
-                    href={`tel:${site.contact.phone}`}
-                    className="hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors"
-                  >
-                    {site.contact.phone}
-                  </a>
-                </div>
-              )}
-
-              {/* Fallback contact information */}
-              {!site.contact?.address &&
-                !site.contact?.email &&
-                !site.contact?.phone && (
-                  <>
-                    <p>NMAM Institute of Technology</p>
-                    <p>Nitte, Karkala Taluk, Udupi - 574110</p>
-
-                    <p className="text-[#00629B] dark:text-[#0096D6] font-semibold pt-1">
-                      ieee@nmamit.in
-                    </p>
-                  </>
-                )}
-
+                </li>
+              </ul>
+            </div>
+            <div className="col-span-2 sm:col-span-1">
+              <h4 className="text-xs font-mono uppercase tracking-[0.2em] font-bold text-slate-900 dark:text-white mb-6">Location</h4>
+              <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
+                NMAM Institute of Technology<br/>
+                Nitte, Karkala Taluk<br/>
+                Udupi District, Karnataka<br/>
+                India - 574110
+              </p>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-200 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500 dark:text-zinc-500">
-          <p>
-            Â© {currentYear}{' '}
-            {site.name || 'IEEE NMAMIT Student Branch'}. All rights reserved.
-          </p>
-
-          <p>Advancing Technology for Humanity.</p>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 text-xs font-medium text-slate-500 dark:text-zinc-500">
+          <p>© {currentYear} IEEE NMAMIT Student Branch. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <span className="hover:text-slate-800 dark:hover:text-zinc-300 transition-colors cursor-pointer">Privacy Policy</span>
+            <span className="hover:text-slate-800 dark:hover:text-zinc-300 transition-colors cursor-pointer">Terms of Service</span>
+          </div>
         </div>
 
       </div>
     </footer>
   );
 }
-
-
-
 
