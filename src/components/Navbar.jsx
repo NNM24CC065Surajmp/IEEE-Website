@@ -289,11 +289,15 @@ export default function Navbar({
           <button
             type="button"
             onClick={handleLogoClick}
-            className="relative bg-white rounded-full flex items-center justify-center transition-colors duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden px-3 h-[40px] gap-2 cursor-pointer"
+            className="relative bg-white rounded-full flex items-center justify-center transition-colors duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden w-[130px] h-[40px] cursor-pointer"
             aria-label={showCollapsedState ? "Expand navigation" : "IEEE NMAMIT home"}
           >
             {/* Full Lockup */}
-            <img src="/images/ieee-nmamit-mark-only.png" alt="IEEE Logo" className="pointer-events-none object-contain h-[20px] w-auto" /> <span className="text-slate-900 font-heading font-bold text-[11px] tracking-wide shrink-0">IEEE NMAMIT</span>
+            <img 
+              src="/images/ieee-nmamit-logo-lockup.png" 
+              alt="IEEE NMAMIT logo lockup" 
+              className="pointer-events-none object-contain h-[24px] w-auto"
+            />
           </button>
         </div>
 
