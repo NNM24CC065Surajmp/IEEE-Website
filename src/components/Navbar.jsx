@@ -287,14 +287,25 @@ export default function Navbar({
         {/* Logo Container */}
         <div ref={logoWrapperRef} className="flex items-center shrink-0 z-10 px-2">
           <button
-            type="button"
-            onClick={handleLogoClick}
-            className="relative bg-white rounded-full flex items-center justify-center transition-colors duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden px-3 h-[40px] gap-2 cursor-pointer"
-            aria-label={showCollapsedState ? "Expand navigation" : "IEEE NMAMIT home"}
-          >
-            {/* Full Lockup */}
-            <img src="/images/ieee-nmamit-mark-only.png" alt="IEEE Logo" className="pointer-events-none object-contain h-[20px] w-auto" /> <span className="text-slate-900 font-heading font-bold text-[11px] tracking-wide shrink-0">IEEE NMAMIT</span>
-          </button>
+              type="button"
+              onClick={handleLogoClick}
+              className="relative rounded-full flex items-center transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden h-[40px] gap-2.5 cursor-pointer group"
+              aria-label={showCollapsedState ? "Expand navigation" : "IEEE NMAMIT home"}
+            >
+              <div className={`relative w-8 h-8 rounded-full border flex items-center justify-center font-mono font-bold text-[11px] transition-all duration-300 overflow-hidden ${
+                isLight
+                  ? "border-slate-300 bg-white text-[#00629B] group-hover:border-[#00629B] group-hover:shadow-[0_0_15px_rgba(0,98,155,0.2)]"
+                  : "border-zinc-700/80 bg-zinc-900/90 text-[#0096D6] group-hover:border-[#0096D6] group-hover:shadow-[0_0_15px_rgba(0,150,214,0.4)]"
+              }`}>
+                <span className="relative z-10">IE</span>
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#00629B]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+              <span className={`text-[12px] font-heading font-bold tracking-wide shrink-0 transition-colors ${
+                isLight ? "text-slate-900 group-hover:text-[#00629B]" : "text-zinc-100 group-hover:text-white"
+              }`}>
+                IEEE NMAMIT
+              </span>
+            </button>
         </div>
 
         {/* Right side wrapper animates width to smoothly collapse the parent w-fit container */}
@@ -670,6 +681,7 @@ export default function Navbar({
     </header>
   );
 }
+
 
 
 
