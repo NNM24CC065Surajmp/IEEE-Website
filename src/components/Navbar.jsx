@@ -289,19 +289,14 @@ export default function Navbar({
           <button
               type="button"
               onClick={handleLogoClick}
-              className={`relative rounded-full flex items-center transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden h-[40px] gap-2.5 cursor-pointer group px-3 ${
-                isLight 
-                  ? "bg-white hover:bg-slate-50 border border-slate-200/50 shadow-sm" 
-                  : "bg-zinc-900/90 hover:bg-zinc-800 border border-white/5 shadow-sm"
-              }`}
+              className="relative bg-white rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-105 shadow-[0_2px_10px_rgba(0,0,0,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden w-[140px] h-[40px] cursor-pointer shrink-0"
               aria-label={showCollapsedState ? "Expand navigation" : "IEEE NMAMIT home"}
             >
-              <img src="/images/ieee-nmamit-mark-only.png" alt="IEEE Logo" className="pointer-events-none object-contain h-[20px] w-[20px] shrink-0" />
-              <span className={`text-[12px] font-heading font-bold tracking-wide shrink-0 transition-colors ${
-                isLight ? "text-slate-900 group-hover:text-[#00629B]" : "text-zinc-100 group-hover:text-white"
-              }`}>
-                IEEE NMAMIT
-              </span>
+              <img 
+                src="/images/ieee-nmamit-logo-lockup.png" 
+                alt="IEEE NMAMIT Student Branch Logo" 
+                className="pointer-events-none w-full h-full object-contain p-1.5"
+              />
             </button>
         </div>
 
