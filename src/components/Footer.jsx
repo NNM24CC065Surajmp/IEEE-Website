@@ -62,7 +62,7 @@ export default function Footer({ onNavigate }) {
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={Follow on }
+                    aria-label={`Follow on ${social.name}`}
                     className="w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-500 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal hover:border-ieee-blue/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue group"
                   >
                     <Icon size={16} className="group-hover:scale-110 transition-transform" />
@@ -119,3 +119,4 @@ export default function Footer({ onNavigate }) {
     </footer>
   );
 }
+
