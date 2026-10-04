@@ -3,18 +3,21 @@ import { Link } from 'react-router-dom';
 import { gsap } from '../lib/gsap';
 import { prefersReducedMotion } from '../lib/motion';
 import {
+  Github,
   Linkedin,
   Instagram,
+  Twitter,
   Mail,
   Phone,
   MapPin,
 } from 'lucide-react';
 import { site } from '../data/site';
-import { socials } from '../data/socials';
 
 const SOCIAL_ICON_MAP = {
   Instagram,
   Linkedin,
+  Github,
+  Twitter,
 };
 
 export default function Footer({ onNavigate }) {
@@ -57,21 +60,18 @@ export default function Footer({ onNavigate }) {
 
             {/* Social Links */}
             <div className="flex items-center gap-2.5">
-              {socials.map((social) => {
+              {site.socials?.map((social) => {
                 const IconComp =
-                  typeof social.icon === 'function' || typeof social.icon === 'object'
-                    ? social.icon
-                    : SOCIAL_ICON_MAP[social.icon] || (social.name === 'LinkedIn' ? Linkedin : Instagram);
+                  SOCIAL_ICON_MAP[social.icon] || Github;
 
                 return (
                   <a
-                    key={social.name}
-                    href={social.url}
+                    key={social.label}
+                    href={social.href}
                     target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-lg border border-slate-300 dark:border-zinc-800 hover:border-ieee-blue dark:hover:border-ieee-teal bg-white dark:bg-zinc-900/60 flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue cursor-pointer"
-                    aria-label={`IEEE NMAMIT on ${social.name}`}
-                    title={`IEEE NMAMIT on ${social.name}`}
+                    rel="noreferrer"
+                    className="w-8 h-8 rounded-lg border border-slate-300 dark:border-zinc-800 hover:border-ieee-blue dark:hover:border-ieee-teal bg-white dark:bg-zinc-900/60 flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue"
+                    aria-label={social.label}
                     onMouseEnter={(e) =>
                       handleSocialHover(e, true)
                     }
