@@ -289,7 +289,7 @@ export default function Navbar({
           <button
               type="button"
               onClick={handleLogoClick}
-              className="relative rounded-full flex items-center transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden h-[40px] gap-2.5 cursor-pointer group"
+              className="relative rounded-full flex items-center transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden h-[40px] gap-2.5 cursor-pointer group px-2"
               aria-label={showCollapsedState ? "Expand navigation" : "IEEE NMAMIT home"}
             >
               <div className={`relative w-8 h-8 rounded-full border flex items-center justify-center font-mono font-bold text-[11px] transition-all duration-300 overflow-hidden ${
@@ -681,8 +681,6 @@ export default function Navbar({
     </header>
   );
 }
-
-
 
 
 
