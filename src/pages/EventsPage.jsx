@@ -371,7 +371,7 @@ export default function EventsPage({ onNavigate }) {
 
   // Combined Filters
   const matchesFilters = (event) => {
-    const catMatch = matchesCategory(event, selectedCategory);
+    const catMatch = selectedCategory === 'All' || event.category === selectedCategory || (selectedCategory === 'Flagship' && event.isFlagship);
     const yearMatch = selectedYear === 'All' || event.year === selectedYear;
     return catMatch && yearMatch;
   };
