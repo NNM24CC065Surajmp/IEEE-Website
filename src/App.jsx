@@ -7,10 +7,12 @@ import {
   useLocation,
 } from 'react-router-dom';
 
+import ShaderAurora from './components/ShaderAurora.jsx';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
+import { initSmoothScroll, destroySmoothScroll } from './lib/smoothScroll.js';
 
 import HomePage from './pages/HomePage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
@@ -47,12 +49,9 @@ function AppContent({ theme, toggleTheme }) {
         antialiased
         transition-colors
         duration-300
-        ${
-          theme === 'light'
-            ? 'bg-slate-50 text-slate-900'
-            : 'bg-[#05060A] text-zinc-100'
-        }`}
+        text-slate-900 dark:text-zinc-100`}
     >
+      <ShaderAurora isDarkMode={theme === 'dark'} />
 
       {/* Skip to content */}
       <a
@@ -63,42 +62,6 @@ function AppContent({ theme, toggleTheme }) {
       </a>
 
 
-      {/* Background Architectural Grid */}
-      <div
-        className="fixed inset-0 pointer-events-none transition-opacity duration-300 z-0"
-        style={{
-          opacity: theme === 'light' ? 0.06 : 0.035,
-
-          backgroundImage:
-            theme === 'light'
-              ? `
-                linear-gradient(
-                  to right,
-                  rgba(0,98,155,0.4) 1px,
-                  transparent 1px
-                ),
-                linear-gradient(
-                  to bottom,
-                  rgba(0,98,155,0.4) 1px,
-                  transparent 1px
-                )
-              `
-              : `
-                linear-gradient(
-                  to right,
-                  rgba(255,255,255,0.6) 1px,
-                  transparent 1px
-                ),
-                linear-gradient(
-                  to bottom,
-                  rgba(255,255,255,0.6) 1px,
-                  transparent 1px
-                )
-              `,
-
-          backgroundSize: '36px 36px',
-        }}
-      />
 
 
       {/* Radial Blue Glow */}
@@ -191,6 +154,10 @@ function AppContent({ theme, toggleTheme }) {
 
 
 export default function App() {
+  useEffect(() => {
+    initSmoothScroll();
+    return () => destroySmoothScroll();
+  }, []);
 
   // Theme state
   const [theme, setTheme] = useState(() => {

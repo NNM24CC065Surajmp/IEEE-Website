@@ -30,7 +30,7 @@ export default function VelocityMarquee({
         }
         
         // Map raw velocity (px/sec) to an added speed multiplier
-        const addedSpeed = gsap.utils.clamp(0, 1.5, Math.abs(v) / 1000);
+        const addedSpeed = gsap.utils.clamp(0, 1.5, Math.abs(v) / 300);
         targetSpeed = baseSpeed + addedSpeed;
       }
     });
@@ -109,3 +109,4 @@ export default function VelocityMarquee({
     </section>
   );
 }
+

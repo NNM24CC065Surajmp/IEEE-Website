@@ -28,8 +28,9 @@ export const site = {
     },
   ],
   contact: {
-    email: 'placeholder@nmamit.in', // TODO: replace with official email
-    phone: '+91 00000 00000', // TODO: replace with official contact phone
+    email: 'ieee.nmamit@nitte.edu.in', // TODO: replace with official email
+    phone: '+91 82582 81263', // TODO: replace with official contact phone
     address: 'NMAM Institute of Technology, Nitte, Karkala Taluk, Karnataka - 574110', // TODO: replace with office address
   },
 };
+

@@ -3,7 +3,7 @@ import { gsap, useGSAP } from '../lib/gsap';
 import { prefersReducedMotion } from '../lib/motion';
 
 const statsData = [
-  { id: 1, target: 36, label: 'Hour Hackathons', suffix: 'h' },
+  { id: 1, target: 0, label: 'Hackathons', suffix: '' },
   { id: 2, target: 60, label: 'Elite Teams', suffix: '+' },
   { id: 3, target: 15, label: 'Events Hosted', suffix: '+' }
 ];

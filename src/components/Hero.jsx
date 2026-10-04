@@ -52,13 +52,10 @@ export default function Hero() {
       <HeroParticles />
 
       <div className="section-container w-full relative z-10">
-        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div className="flex flex-col lg:grid lg:grid-cols-10 gap-12 lg:gap-4 justify-between max-w-6xl mx-auto items-center">
           
-          <div className="lg:col-span-7 flex flex-col items-center text-center lg:items-start lg:text-left w-full">
-            <div className="hero-anim invisible inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-ieee-teal/30 bg-ieee-teal/10 text-ieee-teal text-xs font-semibold uppercase tracking-wider mb-8">
-              <span className="w-2 h-2 rounded-full bg-ieee-teal" />
-              Student Branch
-            </div>
+          <div className="lg:col-span-5 flex flex-col items-center text-center lg:items-start lg:text-left w-full">
+            
             
             <h1 className="hero-anim invisible font-heading font-bold flex flex-col mb-6 w-full">
               <span className="text-4xl sm:text-5xl lg:text-7xl text-slate-900 dark:text-slate-100 mb-2 leading-tight">
@@ -110,3 +107,4 @@ export default function Hero() {
     </section>
   );
 }
+
