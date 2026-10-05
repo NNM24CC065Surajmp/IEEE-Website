@@ -53,7 +53,6 @@ const AFFILIATIONS = [
     id: 'nmamit',
     name: 'IEEE NMAMIT Student Branch',
     logo: '/logos/nmamit-ieee-student-branch.png',
-    logoDark: '/logos/nmamit-ieee-student-branch-dark.png',
     url: null,
     intro:
       'IEEE NMAMIT Student Branch (STB34551) empowers students through practical engineering, workshops, hackathons, and technical innovation.',
