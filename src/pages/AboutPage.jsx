@@ -163,7 +163,7 @@ export default function AboutPage({ onNavigate }) {
             <span>IEEE STUDENT BRANCH · STB 34551</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-6 cursor-default select-text">
+          <h1 className="hero-interactive-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-6 cursor-default select-text">
             <span>Rooted at NMAMIT Nitte.</span>{' '}
             <span className="block sm:inline">
               Connected to the world&apos;s premier technical society.
