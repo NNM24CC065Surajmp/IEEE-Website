@@ -34,7 +34,7 @@ export default function FilterTabs({ options, selected, onChange, ariaLabel }) {
       aria-label={ariaLabel || "Filter tabs"}
     >
       <div 
-        className="absolute h-[34px] sm:h-[38px] rounded-full pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] dark:bg-white/10 dark:border-white/10 dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] dark:backdrop-blur-md bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-200/50"
+        className="absolute h-8 bg-white dark:bg-zinc-800 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.06)] dark:shadow-black/50 border border-slate-200 dark:border-white/5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
         style={{
           left: indicatorStyle.left,
           width: indicatorStyle.width,
