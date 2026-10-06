@@ -34,7 +34,7 @@ export default function FilterTabs({ options, selected, onChange, ariaLabel }) {
       aria-label={ariaLabel || "Filter tabs"}
     >
       <div 
-        className="absolute h-8 bg-white dark:bg-zinc-800 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.06)] dark:shadow-black/50 border border-slate-200 dark:border-white/5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+        className="absolute h-8 bg-slate-900 dark:bg-zinc-800 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.06)] dark:shadow-black/50 border border-slate-800 dark:border-white/5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
         style={{
           left: indicatorStyle.left,
           width: indicatorStyle.width,
@@ -55,7 +55,7 @@ export default function FilterTabs({ options, selected, onChange, ariaLabel }) {
             onClick={() => onChange(opt)}
             className={`relative z-10 px-4 sm:px-5 py-1.5 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-widest font-bold transition-colors duration-300 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue ${
               selected === opt 
-                ? 'text-ieee-blue dark:text-white' 
+                ? 'text-white dark:text-white' 
                 : 'text-slate-500 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-zinc-300'
             }`}
           >
