@@ -444,10 +444,6 @@ export default function EventsPage({ onNavigate }) {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-ieee-blue/10 via-transparent to-ieee-teal/10 blur-[100px] pointer-events-none -z-10 rounded-full" />
           
           <div className="flex-1 w-full text-center lg:text-left flex flex-col items-center lg:items-start">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ieee-blue/10 dark:bg-ieee-blue/20 border border-ieee-blue/20 dark:border-ieee-blue/30 mb-6">
-               <span className="w-2 h-2 rounded-full bg-ieee-blue dark:bg-ieee-teal animate-pulse" />
-               <span className="text-xs font-mono font-bold tracking-widest text-ieee-blue dark:text-ieee-teal uppercase">Live Event Calendar</span>
-            </div>
             
             <h1 className="font-heading font-black text-6xl sm:text-7xl lg:text-8xl text-slate-900 dark:text-slate-100 leading-[0.95] mb-6 uppercase tracking-tighter">
               WHERE<br/>STUDENTS<br/>
