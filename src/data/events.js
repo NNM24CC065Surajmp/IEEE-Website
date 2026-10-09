@@ -146,7 +146,128 @@ export const EVENTS_DATA = [
     image: '/events/ieee-day-quiz-2026.jpg',
     registrationLink: '',
     isFlagship: false
+  },
+  {
+    id: "wie-summit-2024",
+    title: "IEEE WIE International Leadership Summit",
+    category: "Summit",
+    date: "2024-10-03T09:00:00Z",
+    venue: "College of Engineering, Guindy, Anna University, Chennai",
+    time: "Oct 3-5, 2024",
+    description: "IEEE Women in Engineering Madras Section Affinity Group presents IEEE WIE International Leadership Summit. Tracks: Start-up Spirit, TechForGood, EmpowerED, LeadHERship.",
+    image: "/events/pdf2-page2.jpg",
+    registrationLink: "",
+    isFlagship: true
+  },
+  {
+    id: "wie-scholarship-2024",
+    title: "WIE Scholarship 2024-25",
+    category: "Scholarship",
+    date: "2025-01-31T23:59:00Z",
+    venue: "Online",
+    time: "Apply by January 31st, 2025",
+    description: "Funded by CSR initiatives of Quest Global. Rs. 50,000 to pay the college fee. For female students pursuing engineering.",
+    image: "/events/pdf2-page5.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "agm-2025",
+    title: "Annual General Meeting of IEEE Mangalore Subsection",
+    category: "Meeting",
+    date: "2025-01-11T14:00:00Z",
+    venue: "Sambhram Auditorium, NMAMIT",
+    time: "02:00 PM",
+    description: "AGM of IEEE Mangalore Subsection. Agenda includes Welcome by Chair, Approval of AGM 2024 MOM, Activity and Financial reports, and Awards.",
+    image: "/events/pdf2-page6.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "ob-conclave-2024",
+    title: "Office Bearer's Conclave",
+    category: "Conclave",
+    date: "2024-07-05T09:00:00Z",
+    venue: "Nitte Meenakshi Institute of Technology Yelahanka, Bangalore",
+    time: "09:00 AM to 04:30 PM",
+    description: "Student Activities Committee IEEE Bangalore Section presents Office Bearer's Conclave.",
+    image: "/events/pdf2-page7.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "bc-meet-2",
+    title: "BC MEET-2: Talk on Conference Approval",
+    category: "Meeting",
+    date: "2024-08-01T10:00:00Z",
+    venue: "Online / TBA",
+    time: "TBA",
+    description: "Talk on conference approval by IEEE Bangalore Section. Welcome address by Dr. Parameshachari B D, Chair's Address by Dr. Srinivas T.",
+    image: "/events/pdf2-page8.jpg",
+    registrationLink: "https://forms.gle/ufCrenfCPfJaZMUz6",
+    isFlagship: false
+  },
+  {
+    id: "membership-drive-50",
+    title: "Join IEEE at 50% Price",
+    category: "Membership",
+    date: "2024-12-31T23:59:00Z",
+    venue: "Online",
+    time: "Valid till December 2024",
+    description: "Gain expertise and open career doors. Build and expand your network. Free certification programs. UG students: $7. PG/PhD: $13.5.",
+    image: "/events/pdf2-page9.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "aide-2025",
+    title: "2025 International Conference on Artificial Intelligence and Data Engineering (AIDE)",
+    category: "Conference",
+    date: "2025-02-06T09:00:00Z",
+    venue: "Nitte, Karnataka",
+    time: "February 06 - 07, 2025",
+    description: "Technically Cosponsored by IEEE Bangalore Section and IEEE Mangalore Subsection.",
+    image: "/events/pdf2-page10.jpg",
+    registrationLink: "",
+    isFlagship: true
+  },
+  {
+    id: "tech-triad-real",
+    title: "THE TECH TRIAD",
+    category: "Competition",
+    date: "2025-03-22T09:00:00Z",
+    venue: "SMV BLOCK ADL 01, 03, NMAMIT",
+    time: "09:00 AM - 01:00 PM",
+    description: "Offline Event. Prize Pool 15K. Open to all.",
+    image: "/events/pdf2-page17.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "project-to-paper-2026",
+    title: "Project to Paper 2026",
+    category: "Competition",
+    date: "2026-10-04T23:59:00Z",
+    venue: "NMAMIT",
+    time: "Submit before October 4 2026 (11:59PM)",
+    description: "A competition organized by the IEEE Student Branch to evaluate the technical writing skills of the students. Submit research papers based on the academic year project.",
+    image: "/events/pdf1-page1.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "ieee-benefits-webinar",
+    title: "Webinar on benefits of IEEE membership",
+    category: "Webinar",
+    date: "2024-08-22T19:30:00Z",
+    venue: "Online / Google Meet",
+    time: "7:30 PM",
+    description: "Speaker: Suprith Patil, MDC Lead IEEE Bangalore Section. Google Meet ID: mmj-ctgu-hbi",
+    image: "/events/pdf2-page4.jpg",
+    registrationLink: "https://meet.google.com/mmj-ctgu-hbi",
+    isFlagship: false
   }
+
 ];
 
 export default EVENTS_DATA;
