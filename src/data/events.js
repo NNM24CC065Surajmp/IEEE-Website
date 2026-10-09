@@ -65,7 +65,7 @@ export const EVENTS_DATA = [
     id: "spark-hunt-real",
     title: "Spark Hunt",
     category: "Competition",
-    date: "2027-04-11T13:45:00Z",
+    date: "2025-04-11T13:45:00Z",
     venue: "ADL04",
     time: "01:45 PM",
     description: "AS PART OF THE WORLD CREATIVITY & INNOVATION DAY CELEBRATIONS NMAMIT IEEE STUDENT BRANCH & INSTITUTIONS INNOVATION COUNCIL PRESENTS Spark Hunt. Web Hunt Level 1 & Level 2. Prize pool 5K.",
@@ -101,13 +101,38 @@ export const EVENTS_DATA = [
     id: "activity-inauguration-26-27",
     title: "Activity Inauguration 2026-27",
     category: "Inauguration",
-    date: "2026-11-07T14:30:00Z",
+    date: "2026-10-07T14:30:00Z",
     venue: "SHAMBHAVI HALL, APJ 1ST FLOOR",
     time: "02:30 PM",
     description: "IEEE NMAMIT Student Branch presents Activity Inauguration 2026-27. New Beginnings | Bigger Dreams. A new chapter begins with ideas, innovation and you.",
     image: "/events/activity-inauguration.jpg",
     registrationLink: "",
     isFlagship: false
+  }
+  ,
+  {
+    id: 'grss-event-upcoming',
+    title: 'GRSS Event: Earth Observation & Geospatial Analytics',
+    category: 'Workshop',
+    date: '2026-10-18T10:00:00Z',
+    venue: 'MCA Seminar Hall, Ground Floor, NMAMIT',
+    time: '10:00 AM - 04:30 PM IST',
+    description: 'Specialized IEEE Geoscience and Remote Sensing Society hands-on workshop covering synthetic aperture radar (SAR), satellite spectral data processing, and open GIS mapping pipelines using Python.',
+    image: null,
+    registrationLink: 'https://forms.gle/ieee-nmamit-grss-2026',
+    isFlagship: false
+  },
+  {
+    id: 'techtide-2027',
+    title: 'TechTide 2027: 36h National Flagship Hackathon',
+    category: 'Hackathon',
+    date: '2027-03-20T09:00:00Z',
+    venue: 'Centre for High Performance Computing & Main Quad, NMAMIT',
+    time: 'Starts 09:00 AM IST (36 Hours Non-Stop)',
+    description: 'Our pinnacle annual national hackathon assembling 70+ top collegiate squads to engineer breakthrough software and hardware prototypes in AI, Edge Systems, Web3, and Sustainable Engineering.',
+    image: null,
+    registrationLink: 'https://techtide.ieeenmamit.org/register',
+    isFlagship: true
   }
 ];
 
