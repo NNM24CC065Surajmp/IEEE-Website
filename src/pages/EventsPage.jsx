@@ -100,14 +100,18 @@ const AbstractFallback = ({ category, variant = 'standard' }) => {
   );
 };
 
+import EventModal from '../components/EventModal';
+
 // Rebuilt EventCardVariant (Upcoming)
-const EventCardVariant = ({ event, featured = false }) => {
+const EventCardVariant = ({ event, featured = false, onClick }) => {
   const dateInfo = formatEventDate(event.date);
   const imageUrl = event.image || event.poster || event.posterImage;
   const isReduced = prefersReducedMotion();
 
   return (
-    <div className={`group relative bg-white dark:bg-zinc-900 rounded-[1.5rem] border border-slate-200 dark:border-white/5 overflow-hidden flex flex-col h-full ${isReduced ? '' : 'transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] hover:border-slate-300 dark:hover:border-white/10'}`}>
+    <div 
+      onClick={() => onClick && onClick(event)}
+      className={`group relative bg-white dark:bg-zinc-900 rounded-[1.5rem] border border-slate-200 dark:border-white/5 overflow-hidden flex flex-col h-full cursor-pointer ${isReduced ? '' : 'transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] hover:border-slate-300 dark:hover:border-white/10'}`}>
       
       <div className={`relative w-full overflow-hidden shrink-0 ${featured ? 'aspect-[21/9] sm:aspect-[2.5/1]' : 'aspect-video'}`}>
         {imageUrl && imageUrl !== 'null' ? (
@@ -148,7 +152,7 @@ const EventCardVariant = ({ event, featured = false }) => {
              <span>{event.time || 'TBA'}</span>
           </div>
           <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ieee-blue dark:hover:bg-ieee-teal transition-colors group/btn">
-              <span>Register</span>
+              <span>View</span>
               <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </button>
         </div>
@@ -158,13 +162,13 @@ const EventCardVariant = ({ event, featured = false }) => {
 };
 
 // Rebuilt PastArchiveCard
-const PastArchiveCard = ({ event }) => {
+const PastArchiveCard = ({ event, onClick }) => {
   const dateInfo = formatEventDate(event.date);
   const imageUrl = event.image || event.poster || event.posterImage;
   const isReduced = prefersReducedMotion();
 
   return (
-    <div className={`group relative bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-white/5 overflow-hidden flex flex-col h-full ${isReduced ? '' : 'transition-all duration-300 hover:border-slate-300 dark:hover:border-white/20'}`}>
+    <div onClick={() => onClick && onClick(event)} className={`cursor-pointer group relative bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-white/5 overflow-hidden flex flex-col h-full ${isReduced ? '' : 'transition-all duration-300 hover:border-slate-300 dark:hover:border-white/20'}`}>
       <div className="relative w-full aspect-video overflow-hidden shrink-0">
         {imageUrl && imageUrl !== 'null' ? (
           <>
@@ -362,6 +366,7 @@ const CountdownCard = ({ event }) => {
 // --------------------------------------------------------------------------
 
 export default function EventsPage({ onNavigate }) {
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedYear, setSelectedYear] = useState('All');
   const listWrapperRef = useRef(null);
@@ -521,13 +526,13 @@ export default function EventsPage({ onNavigate }) {
 
               <div className="flex flex-col gap-8">
                 <div className="event-card-anim">
-                  <EventCardVariant event={upcomingEvents[0]} featured={true} />
+                  <EventCardVariant event={upcomingEvents[0]} featured={true} onClick={setSelectedEvent} />
                 </div>
                 {upcomingEvents.length > 1 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-4">
                     {upcomingEvents.slice(1).map((event) => (
                       <div key={event.id} className="event-card-anim">
-                        <EventCardVariant event={event} featured={false} />
+                        <EventCardVariant event={event} featured={false} onClick={setSelectedEvent} />
                       </div>
                     ))}
                   </div>
@@ -575,7 +580,7 @@ export default function EventsPage({ onNavigate }) {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
                 {pastEvents.map((event) => (
                   <div key={event.id} className="event-card-anim">
-                    <PastArchiveCard event={event} />
+                    <PastArchiveCard event={event} onClick={setSelectedEvent} />
                   </div>
                 ))}
               </div>
@@ -601,6 +606,10 @@ export default function EventsPage({ onNavigate }) {
 
         </div>
       </div>
+      {selectedEvent && (
+        <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
+  
     </div>
   );
 }
