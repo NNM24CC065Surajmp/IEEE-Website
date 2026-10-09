@@ -4,20 +4,6 @@
 export const EVENTS_DATA = [
   {
     // TODO: fill real details
-    id: 'ieee-day-2024',
-    title: 'IEEE Day 2024',
-    category: 'Workshop',
-    date: '2024-10-01T09:30:00Z',
-    venue: 'Sambhram Auditorium, NMAMIT',
-    time: '09:30 AM – 04:30 PM IST',
-    description:
-      'Annual global IEEE Day celebrations honoring technical innovation and collaboration. Featured keynote addresses from distinguished IEEE Bangalore Section delegates, hardware exhibitions, and campus technical quizzes.',
-image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1000',
-registrationLink: '',
-    isFlagship: false,
-  },
-  {
-    // TODO: fill real details
     id: 'tech-triad',
     title: 'Tech Triad',
     category: 'Competition',
@@ -27,20 +13,6 @@ registrationLink: '',
     description:
       'A multi-round technical showdown spanning algorithmic coding, system debugging, and rapid web prototyping designed to challenge multi-disciplinary engineering skill sets under intense time limits.',
 image: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=1000',
-registrationLink: '',
-    isFlagship: false,
-  },
-  {
-    // TODO: fill real details
-    id: 'spark-hunt',
-    title: 'Spark Hunt',
-    category: 'Competition',
-    date: '2025-09-20T13:30:00Z',
-    venue: 'Campus-wide & New Academic Block, NMAMIT',
-    time: '01:30 PM – 05:30 PM IST',
-    description:
-      'An exhilarating technical treasure hunt and puzzle-solving quest integrating cryptic radio signals, QR circuit clues, and hardware debugging stations placed across the campus grounds.',
-image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1000',
 registrationLink: '',
     isFlagship: false,
   },
@@ -70,34 +42,6 @@ registrationLink: '',
       'Specialized IEEE Geoscience and Remote Sensing Society hands-on workshop covering synthetic aperture radar (SAR), satellite spectral data processing, and open GIS mapping pipelines using Python.',
 image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000',
 registrationLink: 'https://forms.gle/ieee-nmamit-grss-2026',
-    isFlagship: false,
-  },
-  {
-    // TODO: fill real details
-    id: 'primed',
-    title: 'Primed: Industry Induction & Tech Toolkit',
-    category: 'Workshop',
-    date: '2026-11-12T14:00:00Z',
-    venue: 'Sambhram Auditorium, NMAMIT',
-    time: '02:00 PM – 05:30 PM IST',
-    description:
-      'A practical bootcamp introducing student engineers to production Git & GitHub workflows, Linux terminal fundamentals, containerization concepts, and IEEE technical paper writing methodologies.',
-image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=1000',
-registrationLink: 'https://forms.gle/ieee-nmamit-primed-2026',
-    isFlagship: false,
-  },
-  {
-    // TODO: fill real details
-    id: 'aptitude-test',
-    title: 'Aptitude Test & Technical Assessment Series',
-    category: 'Competition',
-    date: '2026-12-05T09:30:00Z',
-    venue: 'MCA Tech Labs 1 to 4, NMAMIT',
-    time: '09:30 AM – 12:30 PM IST',
-    description:
-      'Comprehensive competitive assessment testing logical reasoning, quantitative aptitude, algorithmic problem solving, and core CS fundamentals aligned with national engineering benchmarks.',
-image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=1000',
-registrationLink: 'https://forms.gle/ieee-nmamit-aptitude-2026',
     isFlagship: false,
   },
   {
@@ -174,6 +118,68 @@ registrationLink: 'https://techtide.ieeenmamit.org/register',
     registrationLink: 'Google Meet ID: mmj-ctgu-hbi',
     isFlagship: false,
   }
+,
+  {
+    id: 'ieee-day-2024-real',
+    title: 'IEEE DAY 2024 Celebration',
+    category: 'Celebration',
+    date: '2024-10-03T14:00:00Z',
+    venue: 'Karyagar Sabhangan (Mechanical Workshop)',
+    time: '02:00 PM',
+    description: 'Lets celebrate innovation, technology, and the spirit of collaboration. Event Highlights: Quizz, Ideate - Develop limitless ideas, Exciting Cash prizes, Membership drive.',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1000',
+    registrationLink: '',
+    isFlagship: false,
+  },
+  {
+    id: 'spark-hunt-real',
+    title: 'Spark Hunt',
+    category: 'Competition',
+    date: '2025-04-11T13:45:00Z',
+    venue: 'ADL04',
+    time: '01:45 PM',
+    description: 'AS PART OF THE WORLD CREATIVITY & INNOVATION DAY CELEBRATIONS NMAMIT IEEE STUDENT BRANCH & INSTITUTIONS INNOVATION COUNCIL PRESENTS Spark Hunt. Web Hunt Level 1 & Level 2. Prize pool 5K.',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1000',
+    registrationLink: '',
+    isFlagship: false,
+  },
+  {
+    id: 'primed-placement-hackathon',
+    title: 'PRIMED: The Placement Hackathon',
+    category: 'Hackathon',
+    date: '2025-05-02T09:00:00Z',
+    venue: 'Online & AJIET, Mangalore',
+    time: 'Round 1: 02/05/2025',
+    description: 'IEEE Mangalore Sub-Section SAC Presents PRIMED "The Placement Hackathon". Round 1: Aptitude (02/05/2025), Round 2: Technical (09/05/2025), Round 3 & 4: Interviews (17/05/2025). Winners stand a chance to secure an industrial internship!',
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=1000',
+    registrationLink: '',
+    isFlagship: false,
+  },
+  {
+    id: 'treasure-hunt-grss',
+    title: 'Treasure Hunt by IEEE GRSS',
+    category: 'Competition',
+    date: '2024-08-08T14:00:00Z',
+    venue: 'ISL02 & ISL03',
+    time: '02:00 PM - 03:45 PM',
+    description: 'IEEE GRSS presents Treasure Hunt. ₹ 6000 Prize Pool + Gifts! Free entry for 1st year students & IEEE members. Non-IEEE members registration fee ₹ 100 only.',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000',
+    registrationLink: '',
+    isFlagship: false,
+  },
+  {
+    id: 'activity-inauguration-26-27',
+    title: 'Activity Inauguration 2026-27',
+    category: 'Inauguration',
+    date: '2026-10-07T14:30:00Z',
+    venue: 'SHAMBHAVI HALL, APJ 1ST FLOOR',
+    time: '02:30 PM',
+    description: 'IEEE NMAMIT Student Branch presents Activity Inauguration 2026-27. New Beginnings | Bigger Dreams. A new chapter begins with ideas, innovation and you.',
+    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1000',
+    registrationLink: '',
+    isFlagship: false,
+  }
+
 ];
 
 export default EVENTS_DATA;
