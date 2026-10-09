@@ -134,6 +134,19 @@ export const EVENTS_DATA = [
     registrationLink: 'https://techtide.ieeenmamit.org/register',
     isFlagship: true
   }
+  ,
+  {
+    id: 'ieee-day-quiz-2026',
+    title: 'Online Technical Quiz on account of IEEE Day',
+    category: 'Competition',
+    date: '2026-10-04T18:00:00Z',
+    venue: 'Online Mode',
+    time: '6:00 to 8:00 PM',
+    description: 'Student Activity Committee (SAC) of IEEE Mangalore Subsection is Organizing ONLINE TECHNICAL QUIZ on account of IEEE Day.\nRound 1 - Basic\nRound 2 - Intermediate\nOpen to IEEE Members - All branches.\nLast day to register: October 1, 2026.',
+    image: '/events/ieee-day-quiz-2026.jpg',
+    registrationLink: '',
+    isFlagship: false
+  }
 ];
 
 export default EVENTS_DATA;
