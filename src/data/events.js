@@ -11,7 +11,7 @@ export const EVENTS_DATA = [
     description: "Inauguration of 2024 IEEE Bangalore Humanitarian Technology Conference. Theme: SDG14 - Life Below Water. Chief Guest: Dr. Chengappa M R. President: Dr. Niranjan N Chiplunkar.",
     image: "/events/b-htc-2024.jpg",
     registrationLink: "",
-    isFlagship: false
+    isFlagship: true
   },
   {
     id: "project-to-paper",
@@ -65,7 +65,7 @@ export const EVENTS_DATA = [
     id: "spark-hunt-real",
     title: "Spark Hunt",
     category: "Competition",
-    date: "2025-04-11T13:45:00Z",
+    date: "2027-04-11T13:45:00Z",
     venue: "ADL04",
     time: "01:45 PM",
     description: "AS PART OF THE WORLD CREATIVITY & INNOVATION DAY CELEBRATIONS NMAMIT IEEE STUDENT BRANCH & INSTITUTIONS INNOVATION COUNCIL PRESENTS Spark Hunt. Web Hunt Level 1 & Level 2. Prize pool 5K.",
@@ -83,7 +83,7 @@ export const EVENTS_DATA = [
     description: "IEEE Mangalore Sub-Section SAC Presents PRIMED \"The Placement Hackathon\". Round 1: Aptitude (02/05/2025), Round 2: Technical (09/05/2025), Round 3 & 4: Interviews (17/05/2025). Winners stand a chance to secure an industrial internship!",
     image: "/events/primed-hackathon.jpg",
     registrationLink: "",
-    isFlagship: false
+    isFlagship: true
   },
   {
     id: "treasure-hunt-grss",
@@ -101,7 +101,7 @@ export const EVENTS_DATA = [
     id: "activity-inauguration-26-27",
     title: "Activity Inauguration 2026-27",
     category: "Inauguration",
-    date: "2026-10-07T14:30:00Z",
+    date: "2026-11-07T14:30:00Z",
     venue: "SHAMBHAVI HALL, APJ 1ST FLOOR",
     time: "02:30 PM",
     description: "IEEE NMAMIT Student Branch presents Activity Inauguration 2026-27. New Beginnings | Bigger Dreams. A new chapter begins with ideas, innovation and you.",
