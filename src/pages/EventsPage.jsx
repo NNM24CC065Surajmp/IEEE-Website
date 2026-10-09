@@ -152,7 +152,7 @@ const EventCardVariant = ({ event, featured = false, onClick }) => {
              <span>{event.time || 'TBA'}</span>
           </div>
           <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ieee-blue dark:hover:bg-ieee-teal transition-colors group/btn">
-              <span>View</span>
+              <span>Register</span>
               <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </button>
         </div>

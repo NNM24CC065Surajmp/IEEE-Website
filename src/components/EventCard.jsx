@@ -101,7 +101,7 @@ export default function EventCard({ event, index = 0 }) {
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsModalOpen(true); }}
           className="inline-flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider font-semibold text-ieee-blue dark:text-ieee-teal hover:text-[#0077b6] dark:hover:text-cyan-300 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue dark:focus-visible:ring-ieee-teal rounded transition-colors"
         >
-          <span>View Details</span>
+          {new Date(event.date) >= new Date() ? <span>Register</span> : <span>View Details</span>}
           <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none" />
         </button>
       </div>
