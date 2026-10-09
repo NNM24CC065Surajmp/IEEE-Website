@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { gsap, useGSAP } from '../lib/gsap';
 import { prefersReducedMotion } from '../lib/motion';
-import { events } from '../data/events';
+import { EVENTS_DATA as events } from '../data/events';
 
 export default function EventsMarquee() {
   const containerRef = useRef(null);
