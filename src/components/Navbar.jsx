@@ -279,8 +279,8 @@ export default function Navbar({
       <div
         ref={innerBarRef}
         className={`nav-anim-item relative flex items-center w-fit max-w-full p-1.5 rounded-full border backdrop-blur-xl transition-colors duration-500 shadow-2xl overflow-hidden ${isLight
-            ? 'bg-slate-100/90 border-slate-200/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)]'
-            : 'bg-zinc-950/80 border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.5)]'
+          ? 'bg-slate-100/90 border-slate-200/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)]'
+          : 'bg-zinc-950/80 border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.5)]'
           } ${showCollapsedState ? 'bg-opacity-100 backdrop-blur-3xl' : ''}`}
       >
         {/* Logo Container */}
@@ -314,8 +314,8 @@ export default function Navbar({
               <div
                 ref={indicatorRef}
                 className={`absolute top-0 bottom-0 left-0 rounded-full pointer-events-none z-0 transition-opacity duration-300 ${isLight
-                    ? 'bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-white'
-                    : 'bg-white/10 border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-md'
+                  ? 'bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-white'
+                  : 'bg-white/10 border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-md'
                   }`}
                 style={{ opacity: 0 }}
               />
@@ -334,12 +334,12 @@ export default function Navbar({
                     onMouseEnter={() => setHoveredLink(item.id)}
                     onClick={() => handleLinkClick(item.id)}
                     className={`relative z-10 px-5 py-2 rounded-full text-[13px] font-semibold tracking-wide transition-colors duration-300 flex items-center gap-1.5 cursor-pointer focus:outline-none ${hasIndicator
-                        ? isLight
-                          ? 'text-ieee-blue'
-                          : 'text-white'
-                        : isLight
-                          ? 'text-slate-600 hover:text-slate-900'
-                          : 'text-slate-400 hover:text-slate-200'
+                      ? isLight
+                        ? 'text-ieee-blue'
+                        : 'text-white'
+                      : isLight
+                        ? 'text-slate-600 hover:text-slate-900'
+                        : 'text-slate-400 hover:text-slate-200'
                       }`}
                   >
                     <span>{item.label}</span>
@@ -357,8 +357,8 @@ export default function Navbar({
                 aria-label="Toggle Theme"
                 tabIndex={showCollapsedState ? -1 : undefined}
                 className={`magic-theme-btn shrink-0 transition-all hover:scale-105 rounded-full ${isLight
-                    ? 'bg-white text-amber-500 border border-white shadow-sm'
-                    : 'is-dark bg-slate-800 text-sky-400 border border-slate-700 shadow-sm'
+                  ? 'bg-white text-amber-500 border border-white shadow-sm'
+                  : 'is-dark bg-slate-800 text-sky-400 border border-slate-700 shadow-sm'
                   }`}
                 style={{
                   '--moon-cutout-bg': isLight ? '#ffffff' : '#1e293b',
@@ -391,8 +391,8 @@ export default function Navbar({
                 onClick={onToggleTheme}
                 aria-label="Toggle Light and Dark Theme"
                 className={`p-2 rounded-lg border transition-colors ${isLight
-                    ? 'border-slate-300 bg-slate-100 text-amber-500'
-                    : 'border-zinc-800 bg-zinc-900/80 text-sky-400'
+                  ? 'border-slate-300 bg-slate-100 text-amber-500'
+                  : 'border-zinc-800 bg-zinc-900/80 text-sky-400'
                   }`}
               >
                 {isLight ? <Sun size={18} /> : <Moon size={18} />}
@@ -403,8 +403,8 @@ export default function Navbar({
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle Navigation"
                 className={`p-2 rounded-lg border transition-colors ${isLight
-                    ? 'border-slate-300 bg-slate-100 text-slate-700 hover:text-slate-900'
-                    : 'border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:text-white'
+                  ? 'border-slate-300 bg-slate-100 text-slate-700 hover:text-slate-900'
+                  : 'border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:text-white'
                   }`}
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -419,8 +419,8 @@ export default function Navbar({
       {mobileMenuOpen && (
         <div
           className={`md:hidden absolute top-full left-4 right-4 mt-2 rounded-2xl border backdrop-blur-2xl px-5 py-4 space-y-2 font-mono text-xs uppercase tracking-wider shadow-2xl ${isLight
-              ? 'border-slate-200 bg-white/95'
-              : 'border-slate-700/50 bg-zinc-950/95'
+            ? 'border-slate-200 bg-white/95'
+            : 'border-slate-700/50 bg-zinc-950/95'
             }`}
         >
           {navItems.map((item, idx) => {
@@ -430,7 +430,7 @@ export default function Navbar({
                 key={item.id}
                 type="button"
                 onClick={() => handleLinkClick(item.id)}
-                className={`w-full text-left py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-200 ${isActive
+                className={`mobile-menu-item w-full text-left py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-200 ${isActive
                     ? isLight
                       ? 'bg-ieee-blue/10 border border-ieee-blue/30 text-ieee-blue font-bold shadow-sm'
                       : 'bg-ieee-blue/30 border border-ieee-teal/50 text-white font-bold shadow-[0_0_12px_rgba(0,150,214,0.2)]'
@@ -450,15 +450,15 @@ export default function Navbar({
           })}
 
           {/* Mobile theme */}
-          <div className={`mt-4 pt-4 border-t flex items-center justify-between px-2 ${isLight ? 'border-slate-200' : 'border-slate-700/50'}`}>
+          <div className={`mobile-menu-item mt-4 pt-4 border-t flex items-center justify-between px-2 ${isLight ? 'border-slate-200' : 'border-slate-700/50'}`}>
             <span className={isLight ? 'text-slate-500' : 'text-slate-400'}>Theme</span>
             <button
               type="button"
               onClick={onToggleTheme}
               aria-label="Toggle Theme"
               className={`magic-theme-btn shrink-0 mx-1 rounded-full ${isLight
-                  ? 'bg-slate-100 text-amber-500 border border-slate-200'
-                  : 'is-dark bg-slate-800 text-sky-400 border border-slate-700'
+                ? 'bg-slate-100 text-amber-500 border border-slate-200'
+                : 'is-dark bg-slate-800 text-sky-400 border border-slate-700'
                 }`}
               style={{
                 '--moon-cutout-bg': isLight ? '#f1f5f9' : '#1e293b',
@@ -470,7 +470,7 @@ export default function Navbar({
           </div>
 
           {/* Mobile Join */}
-          <div className="pt-2 mt-2">
+          <div className="mobile-menu-item pt-2 mt-2">
             <button
               type="button"
               onClick={() => handleLinkClick('join')}
@@ -485,6 +485,23 @@ export default function Navbar({
       <style
         dangerouslySetInnerHTML={{
           __html: `
+            @keyframes staggerSlideIn {
+              from { opacity: 0; transform: translateY(-10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            .mobile-menu-item {
+              animation: staggerSlideIn 0.3s ease-out forwards;
+              opacity: 0;
+            }
+            .mobile-menu-item:nth-child(1) { animation-delay: 0.05s; }
+            .mobile-menu-item:nth-child(2) { animation-delay: 0.10s; }
+            .mobile-menu-item:nth-child(3) { animation-delay: 0.15s; }
+            .mobile-menu-item:nth-child(4) { animation-delay: 0.20s; }
+            .mobile-menu-item:nth-child(5) { animation-delay: 0.25s; }
+            .mobile-menu-item:nth-child(6) { animation-delay: 0.30s; }
+            .mobile-menu-item:nth-child(7) { animation-delay: 0.35s; }
+            .mobile-menu-item:nth-child(8) { animation-delay: 0.40s; }
+
             .magic-theme-btn {
               background-color: transparent;
               border-radius: 10px;

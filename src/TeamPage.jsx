@@ -809,7 +809,7 @@ export default function TeamPage() {
               // translateZ: cards recede as they curve away from the front plane
               // translateX: horizontal spread along the cylindrical face
               const angleStep = isMobile ? 22 : 18; // degrees per card
-              const spacingStep = isMobile ? 180 : 255; // pixels per card
+              const spacingStep = isMobile ? 240 : 255; // pixels per card
               const depthStep = isMobile ? 65 : 85; // pixels receding in depth
               const scaleStep = isMobile ? 0.08 : 0.06;
 
@@ -846,8 +846,9 @@ export default function TeamPage() {
                       <ShieldCheck size={120} />
                     </div>
 
-                    {/* Top Row: Avatar + Role Badge */}
-                    <div className="relative z-10 flex items-start justify-between gap-3">
+                    <div className={`relative z-10 w-full h-full flex flex-col justify-between transition-opacity duration-300 ${!isCenter ? 'max-md:opacity-0' : 'opacity-100'}`}>
+                      {/* Top Row: Avatar + Role Badge */}
+                      <div className="relative flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3.5">
                         {/* Avatar */}
                         <div className="relative">
