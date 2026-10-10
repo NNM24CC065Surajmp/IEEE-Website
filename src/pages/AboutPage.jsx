@@ -71,7 +71,7 @@ const CHAPTERS = [
       'Advancing innovation and practical solutions in electric power and energy systems.',
     links: [
       {
-        label: 'PES Website',
+        label: 'PES website',
         url: 'https://ieee-pes.org/',
       },
     ],
@@ -87,7 +87,7 @@ const CHAPTERS = [
       'Exploring sensing, imaging, and technologies for understanding Earth and its environment.',
     links: [
       {
-        label: 'GRSS Website',
+        label: 'GRSS website',
         url: 'https://www.grss-ieee.org/',
       },
     ],
@@ -104,11 +104,11 @@ const CHAPTERS = [
       'Advancing antennas, propagation, microwave engineering, and related technologies.',
     links: [
       {
-        label: 'AP-S Website',
+        label: 'AP-S website',
         url: 'https://ieeeaps.org/',
       },
       {
-        label: 'MTT-S Website',
+        label: 'MTT-S website',
         url: 'https://mtt.org/',
       },
     ],
@@ -157,58 +157,58 @@ export default function AboutPage({ onNavigate }) {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-ieee-teal/10 dark:bg-ieee-teal/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-300 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm text-slate-700 dark:text-zinc-300 font-mono text-[11px] uppercase tracking-wider mb-6 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-300 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm text-slate-700 dark:text-zinc-300 text-xs font-medium tracking-wide mb-6 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>IEEE STUDENT BRANCH · STB 34551</span>
+            <span>IEEE Student Branch · STB 34551</span>
           </div>
 
-          <h1 className="hero-interactive-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-6 cursor-default select-text">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.15] mb-6 cursor-default select-text">
             <span>Rooted at NMAMIT Nitte.</span>{' '}
             <span className="block sm:inline">
               Connected to the world&apos;s premier technical society.
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-zinc-300 leading-relaxed mb-8 max-w-2xl font-normal">
+          <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 leading-relaxed mb-8 max-w-2xl font-normal text-left">
             Empowering global innovators from our NMAMIT campus &mdash; bridging local engineering rigor with IEEE&apos;s worldwide technical excellence.
           </p>
 
-          {/* Sleek Metric & Badge Strip (replaces outdated hierarchy list) */}
+          {/* Metric & Badge Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 block mb-1">
+              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
                 Charter ID
               </span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono">
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                 STB 34551
               </div>
             </div>
 
             <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 block mb-1">
+              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
                 Established
               </span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono">
-                2009 · 15+ Yrs
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                2009 (15+ years)
               </div>
             </div>
 
             <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 block mb-1">
+              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
                 Jurisdiction
               </span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono">
+              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                 Region 10 (APAC)
               </div>
             </div>
 
             <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-500 block mb-1">
+              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
                 Status
               </span>
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono mt-1">
+              <div className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                Active Branch
+                Active branch
               </div>
             </div>
           </div>
@@ -216,20 +216,20 @@ export default function AboutPage({ onNavigate }) {
       </section>
 
       {/* =========================================================
-          2. IEEE NMAMIT GLOBAL VIEW — NITK STYLE
+          2. IEEE NMAMIT GLOBAL VIEW
       ========================================================= */}
 
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20 border-b border-slate-200 dark:border-zinc-800/80">
 
-        {/* Centered Heading */}
+        {/* Centered Heading with Left-Aligned Reading Paragraph */}
 
-        <div className="text-center max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto">
 
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            IEEE NMAMIT Global View
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white text-center leading-tight">
+            IEEE NMAMIT global view
           </h2>
 
-          <p className="mt-6 max-w-3xl mx-auto text-sm sm:text-base text-slate-600 dark:text-zinc-400 leading-relaxed">
+          <p className="mt-6 max-w-2xl mx-auto text-left text-sm sm:text-base text-slate-600 dark:text-zinc-400 leading-relaxed font-normal">
             The IEEE NMAMIT Student Branch is part of the IEEE Bangalore
             Section. The IEEE Bangalore Section is governed by the IEEE
             India Council, which falls under Region 10 of the IEEE Global
@@ -308,15 +308,15 @@ export default function AboutPage({ onNavigate }) {
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20 border-b border-slate-200 dark:border-zinc-800/80">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <div className="lg:col-span-5">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full border border-ieee-blue/20 bg-ieee-blue/5 text-ieee-blue dark:text-ieee-teal font-mono text-[10px] uppercase tracking-widest mb-3 font-semibold">
-              [ 01 ] INSTITUTION & MISSION
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full border border-ieee-blue/20 bg-ieee-blue/5 text-ieee-blue dark:text-ieee-teal text-xs font-medium mb-3">
+              Institution and mission
             </div>
 
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight mb-4">
               Building on 35+ years of engineering rigor at Nitte.
             </h2>
 
-            <p className="text-xs sm:text-sm font-mono text-slate-600 dark:text-zinc-400 leading-relaxed mb-6">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-zinc-400 leading-relaxed mb-6 font-normal text-left">
               NMAM Institute of Technology was founded in 1986 in Nitte, Udupi
               District, Karnataka. Today it is a premier autonomous institute
               under Nitte (Deemed to be University).
@@ -325,16 +325,16 @@ export default function AboutPage({ onNavigate }) {
             {/* 35+ Years Legacy Highlight Card */}
             <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-gradient-to-br from-slate-50 to-white dark:from-zinc-900/60 dark:to-zinc-900/20 shadow-sm flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-ieee-blue/10 dark:bg-ieee-blue/20 flex items-center justify-center text-ieee-blue dark:text-ieee-teal shrink-0">
-                <span className="text-xl font-bold font-mono">35+</span>
+                <span className="text-xl font-bold">35+</span>
               </div>
               <div>
-                <div className="text-xs font-bold text-slate-900 dark:text-white">Years of Engineering Excellence</div>
-                <div className="text-[11px] text-slate-500 dark:text-zinc-400 font-mono">Pioneering technical education since 1986</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white">Years of engineering excellence</div>
+                <div className="text-xs text-slate-500 dark:text-zinc-400 font-medium">Pioneering technical education since 1986</div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-7 space-y-5 text-sm sm:text-base text-slate-700 dark:text-zinc-300 leading-relaxed">
+          <div className="lg:col-span-7 space-y-5 text-sm sm:text-base text-slate-600 dark:text-zinc-400 leading-relaxed font-normal text-left">
             <p>
               The primary purpose of IEEE Student Branch NMAMIT is to eliminate
               the gap between textbook syllabi and industry engineering
@@ -342,14 +342,14 @@ export default function AboutPage({ onNavigate }) {
               activities where students can turn ideas into practical systems.
             </p>
 
-            <p className="text-slate-600 dark:text-zinc-400 text-sm">
+            <p>
               Through the IEEE network, our student members gain access to a
               global technical community, professional resources, conferences,
               research opportunities, and mentorship from engineers and
               researchers across different fields.
             </p>
 
-            <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono text-slate-700 dark:text-zinc-300">
+            <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700 dark:text-zinc-300">
               <div className="group flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/40 hover:border-ieee-blue/40 hover:shadow-md transition-all">
                 <CheckCircle2
                   size={16}
@@ -395,12 +395,12 @@ export default function AboutPage({ onNavigate }) {
           <div className="w-px h-8 bg-slate-300 dark:bg-zinc-700 mx-auto mb-4" />
           <div className="flex items-center justify-center gap-4 sm:gap-6">
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-r from-transparent to-ieee-blue" />
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
               Societies
             </h2>
             <div className="h-[2px] w-12 sm:w-24 bg-gradient-to-l from-transparent to-ieee-blue" />
           </div>
-          <p className="mt-4 text-sm sm:text-base text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-4 text-sm sm:text-base text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed font-normal text-left">
             Specialized technical chapters empowering students through domain expertise, workshops, projects, and global IEEE conferences.
           </p>
         </div>
@@ -425,7 +425,7 @@ export default function AboutPage({ onNavigate }) {
                 {society.name}
               </h3>
 
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed mb-6 flex-1">
+              <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed mb-6 flex-1 font-normal text-left">
                 {society.description}
               </p>
 
@@ -435,10 +435,10 @@ export default function AboutPage({ onNavigate }) {
                   href={society.links[0].url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-auto inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-semibold text-ieee-blue dark:text-ieee-teal hover:underline pt-4 border-t border-slate-100 dark:border-zinc-800/70 w-full justify-center transition-colors"
+                  className="mt-auto inline-flex items-center gap-2 text-sm font-medium text-ieee-blue dark:text-ieee-teal hover:underline pt-4 border-t border-slate-100 dark:border-zinc-800/70 w-full justify-center transition-colors"
                 >
                   <span>{society.links[0].label}</span>
-                  <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </a>
               )}
             </div>
@@ -456,15 +456,15 @@ export default function AboutPage({ onNavigate }) {
 
           <div>
 
-            <div className="text-xs font-mono uppercase tracking-widest text-ieee-blue dark:text-[#5db4e8] mb-2 font-bold">
-              STUDENT LEADERSHIP
+            <div className="text-xs font-medium text-ieee-blue dark:text-ieee-teal mb-2">
+              Student leadership
             </div>
 
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 leading-snug">
               Driven by student engineers.
             </h3>
 
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 max-w-lg">
+            <p className="text-sm text-slate-600 dark:text-zinc-400 max-w-lg leading-relaxed font-normal text-left">
               Explore our core executive committee, chapter leads, and faculty
               advisors.
             </p>
@@ -485,19 +485,16 @@ export default function AboutPage({ onNavigate }) {
               bg-ieee-blue
               hover:bg-[#0077b6]
               text-white
-              text-xs
-              font-mono
-              uppercase
-              tracking-wider
-              font-semibold
+              text-sm
+              font-medium
               transition-colors
               shadow-lg
               shadow-ieee-blue/25
               cursor-pointer
             "
           >
-            <span>Meet The Team</span>
-            <ArrowRight size={14} />
+            <span>Meet the team</span>
+            <ArrowRight size={15} />
           </button>
 
         </div>
@@ -567,14 +564,14 @@ export default function AboutPage({ onNavigate }) {
 
               <h3
                 id="affiliation-modal-title"
-                className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight"
+                className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug"
               >
                 {selectedAffiliation.name}
               </h3>
 
               {/* Brief introduction in one line */}
 
-              <p className="mt-3 text-sm text-slate-600 dark:text-zinc-300 leading-relaxed max-w-sm mx-auto">
+              <p className="mt-3 text-sm text-slate-600 dark:text-zinc-300 leading-relaxed max-w-sm mx-auto font-normal text-left">
                 {selectedAffiliation.intro}
               </p>
 
@@ -597,9 +594,9 @@ export default function AboutPage({ onNavigate }) {
                     href={selectedAffiliation.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-ieee-blue hover:bg-[#005180] text-white text-sm font-semibold transition-colors shadow-md shadow-ieee-blue/20 cursor-pointer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-ieee-blue hover:bg-[#005180] text-white text-sm font-medium transition-colors shadow-md shadow-ieee-blue/20 cursor-pointer"
                   >
-                    <span>Visit Site</span>
+                    <span>Visit site</span>
                     <ExternalLink size={15} />
                   </a>
                 )}
