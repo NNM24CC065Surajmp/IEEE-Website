@@ -7,6 +7,7 @@ import {
   X,
   ExternalLink,
 } from 'lucide-react';
+import StatsPanel from '../components/StatsPanel.jsx';
 
 const AFFILIATIONS = [
   {
@@ -148,6 +149,25 @@ export default function AboutPage({ onNavigate }) {
   return (
     <div className="pt-28 sm:pt-36">
 
+      {/* Punched ticket charter tag styles */}
+      <style>{`
+        .charter-tag {
+          --tag-bg: #00629B;
+          background:
+            radial-gradient(circle 4px at 0 50%, transparent 4px, var(--tag-bg) 4.5px) left / 51% 100% no-repeat,
+            radial-gradient(circle 4px at 100% 50%, transparent 4px, var(--tag-bg) 4.5px) right / 51% 100% no-repeat;
+          -webkit-mask:
+            radial-gradient(circle 4px at 0 50%, transparent 4px, #000 4.5px) left / 51% 100% no-repeat,
+            radial-gradient(circle 4px at 100% 50%, transparent 4px, #000 4.5px) right / 51% 100% no-repeat;
+          mask:
+            radial-gradient(circle 4px at 0 50%, transparent 4px, #000 4.5px) left / 51% 100% no-repeat,
+            radial-gradient(circle 4px at 100% 50%, transparent 4px, #000 4.5px) right / 51% 100% no-repeat;
+        }
+        .dark .charter-tag {
+          --tag-bg: #4DA3D9;
+        }
+      `}</style>
+
       {/* =========================================================
           1. HERO
       ========================================================= */}
@@ -156,59 +176,103 @@ export default function AboutPage({ onNavigate }) {
         <div className="absolute top-10 -left-20 w-80 h-80 bg-ieee-blue/10 dark:bg-ieee-blue/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-ieee-teal/10 dark:bg-ieee-teal/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-300 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm text-slate-700 dark:text-zinc-300 text-xs font-medium tracking-wide mb-6 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>IEEE Student Branch · STB 34551</span>
+        {/* Hero Top Grid: Heading column + fixed 420px StatsPanel */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] items-center gap-10 lg:gap-12">
+          <div className="w-full">
+            {/* Small label above the heading */}
+            <div className="flex flex-wrap items-center gap-[12px] mb-6">
+              {/* Short horizontal rule: 36px wide, 3px thick, IEEE blue (hides below 480px) */}
+              <span
+                className="hidden min-[480px]:block w-[36px] h-[3px] rounded-full bg-[#00629B] dark:bg-[#4DA3D9] shrink-0"
+                aria-hidden="true"
+              />
+
+              {/* Text label: body font, semibold, 15px, sentence case, normal text color */}
+              <span className="font-body font-semibold text-[15px] tracking-[0.01em] text-slate-900 dark:text-white shrink-0">
+                IEEE Student Branch
+              </span>
+
+              {/* Thin vertical hairline divider: 18px tall */}
+              <span
+                className="hidden min-[360px]:block w-px h-[18px] bg-slate-300 dark:bg-zinc-700 shrink-0"
+                aria-hidden="true"
+              />
+
+              {/* Small rectangular charter tag with punched ticket semicircular notches */}
+              <span
+                className="charter-tag inline-flex items-center justify-center font-body font-semibold text-[13px] text-white tracking-normal rounded-[4px] px-[10px] py-[4px] shrink-0 select-text"
+              >
+                STB 34551
+              </span>
+            </div>
+
+            <h1
+              style={{ textWrap: 'balance' }}
+              className="text-3xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.15] cursor-default select-text"
+            >
+              <span>Rooted at NMAMIT Nitte.</span>{' '}
+              <span className="block sm:inline">
+                Connected to the world&apos;s premier technical society.
+              </span>
+            </h1>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.15] mb-6 cursor-default select-text">
-            <span>Rooted at NMAMIT Nitte.</span>{' '}
-            <span className="block sm:inline">
-              Connected to the world&apos;s premier technical society.
-            </span>
-          </h1>
+          {/* StatsPanel: exactly 420px on large screens */}
+          <div className="w-full flex justify-center lg:justify-end">
+            <StatsPanel />
+          </div>
+        </div>
 
-          <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 leading-relaxed mb-8 max-w-2xl font-normal text-left">
-            Empowering global innovators from our NMAMIT campus &mdash; bridging local engineering rigor with IEEE&apos;s worldwide technical excellence.
-          </p>
-
-          {/* Metric & Badge Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors">
+        {/* Four Info Cards: Centered full-width row below hero grid, max-w-[960px] */}
+        <div className="relative z-10 w-full max-w-[960px] mx-auto mt-12 sm:mt-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors h-full flex flex-col justify-between">
               <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
                 Charter ID
               </span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                STB 34551
+              <div>
+                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                  STB 34551
+                </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors">
+            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors h-full flex flex-col justify-between">
               <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
                 Established
               </span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                2009 (15+ years)
+              <div>
+                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                  2009
+                </div>
+                <div className="text-xs text-slate-500 dark:text-zinc-400 font-normal mt-0.5">
+                  15+ years
+                </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors">
+            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors h-full flex flex-col justify-between">
               <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
                 Jurisdiction
               </span>
-              <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                Region 10 (APAC)
+              <div>
+                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                  Region 10
+                </div>
+                <div className="text-xs text-slate-500 dark:text-zinc-400 font-normal mt-0.5">
+                  APAC
+                </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors">
+            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors h-full flex flex-col justify-between">
               <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
                 Status
               </span>
-              <div className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                Active branch
+              <div>
+                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                  Active
+                </div>
               </div>
             </div>
           </div>
