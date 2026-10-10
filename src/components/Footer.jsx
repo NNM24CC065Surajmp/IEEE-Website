@@ -70,7 +70,7 @@ export default function Footer({ onNavigate }) {
                     href={social.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-8 h-8 rounded-lg border border-slate-300 dark:border-zinc-800 hover:border-ieee-blue dark:hover:border-ieee-teal bg-white dark:bg-zinc-900/60 flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue"
+                    className="w-8 h-8 rounded-full active:scale-95 border border-slate-300 dark:border-zinc-800 hover:border-ieee-blue dark:hover:border-ieee-teal bg-white dark:bg-zinc-900/60 flex items-center justify-center text-slate-600 dark:text-zinc-400 hover:text-ieee-blue dark:hover:text-ieee-teal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue"
                     aria-label={social.label}
                     onMouseEnter={(e) =>
                       handleSocialHover(e, true)

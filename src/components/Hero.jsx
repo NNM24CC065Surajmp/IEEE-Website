@@ -96,7 +96,7 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="hero-visual-container lg:col-span-5 w-full">
+          <div className="hero-visual-container lg:col-span-5 w-full max-md:hidden">
             <HeroVisual />
           </div>
         </div>

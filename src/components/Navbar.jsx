@@ -436,7 +436,7 @@ export default function Navbar({
                 key={item.id}
                 type="button"
                 onClick={() => handleLinkClick(item.id)}
-                className={`w-full text-left py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-200 ${
+                className={`mobile-menu-item w-full text-left py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-200 ${
                   isActive
                     ? isLight
                       ? 'bg-ieee-blue/10 border border-ieee-blue/30 text-ieee-blue font-bold shadow-sm'
@@ -457,7 +457,7 @@ export default function Navbar({
           })}
 
           {/* Mobile theme */}
-          <div className={`mt-4 pt-4 border-t flex items-center justify-between px-2 ${isLight ? 'border-slate-200' : 'border-slate-700/50'}`}>
+          <div className={`mobile-menu-item mt-4 pt-4 border-t flex items-center justify-between px-2 ${isLight ? 'border-slate-200' : 'border-slate-700/50'}`}>
             <span className={isLight ? 'text-slate-500' : 'text-slate-400'}>Theme</span>
             <button
               type="button"
@@ -478,7 +478,7 @@ export default function Navbar({
           </div>
 
           {/* Mobile Join */}
-          <div className="pt-2 mt-2">
+          <div className="mobile-menu-item pt-2 mt-2">
             <button
               type="button"
               onClick={() => handleLinkClick('join')}
@@ -493,6 +493,23 @@ export default function Navbar({
       <style
         dangerouslySetInnerHTML={{
           __html: `
+            @keyframes staggerSlideIn {
+              from { opacity: 0; transform: translateY(-10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            .mobile-menu-item {
+              animation: staggerSlideIn 0.3s ease-out forwards;
+              opacity: 0;
+            }
+            .mobile-menu-item:nth-child(1) { animation-delay: 0.05s; }
+            .mobile-menu-item:nth-child(2) { animation-delay: 0.10s; }
+            .mobile-menu-item:nth-child(3) { animation-delay: 0.15s; }
+            .mobile-menu-item:nth-child(4) { animation-delay: 0.20s; }
+            .mobile-menu-item:nth-child(5) { animation-delay: 0.25s; }
+            .mobile-menu-item:nth-child(6) { animation-delay: 0.30s; }
+            .mobile-menu-item:nth-child(7) { animation-delay: 0.35s; }
+            .mobile-menu-item:nth-child(8) { animation-delay: 0.40s; }
+
             .magic-theme-btn {
               background-color: transparent;
               border-radius: 10px;

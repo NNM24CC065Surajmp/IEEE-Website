@@ -471,7 +471,7 @@ export default function EventsPage({ onNavigate }) {
 
         {/* FLOATING COMMAND CENTER (Always Visible Filter via Portal to escape animation context) */}
         {typeof document !== 'undefined' && createPortal(
-          <div className={`fixed transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] z-[60] pointer-events-none ${showCollapsed ? 'bottom-6 right-6 sm:bottom-auto sm:top-[24px] sm:right-[40px] translate-x-0' : 'bottom-6 lg:bottom-10 left-1/2 -translate-x-1/2 w-[95%] sm:w-auto max-w-max'}`}>
+          <div className={`max-md:hidden fixed transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] z-[60] pointer-events-none ${showCollapsed ? 'bottom-6 right-6 sm:bottom-auto sm:top-[24px] sm:right-[40px] translate-x-0' : 'bottom-6 lg:bottom-10 left-1/2 -translate-x-1/2 w-[95%] sm:w-auto max-w-max'}`}>
             <div className="relative group pointer-events-auto">
               
               {/* Island Body */}
@@ -509,6 +509,16 @@ export default function EventsPage({ onNavigate }) {
 
         {/* LISTINGS WRAPPER */}
         <div ref={listWrapperRef} className="pb-32">
+          
+          {/* MOBILE STATIC FILTERS */}
+          <div className="hidden max-md:flex flex-col gap-4 px-6 mt-4 mb-8 w-full">
+            <div className="w-full overflow-x-auto no-scrollbar pb-2">
+              <FilterTabs options={categories} selected={selectedCategory} onChange={setSelectedCategory} />
+            </div>
+            <div className="w-full overflow-x-auto no-scrollbar pb-2">
+              <FilterTabs options={availableYears} selected={selectedYear} onChange={setSelectedYear} />
+            </div>
+          </div>
           
           {/* UPCOMING EVENTS */}
           {upcomingEvents.length > 0 && (
