@@ -5,7 +5,7 @@ import { prefersReducedMotion } from '../lib/motion';
 import { ArrowRight } from 'lucide-react';
 import Reveal from './Reveal';
 import EventCard from './EventCard';
-import { events } from '../data/events';
+import { EVENTS_DATA as events } from '../data/events';
 
 export default function FeaturedEvents() {
   const gridRef = useRef(null);
@@ -33,8 +33,12 @@ export default function FeaturedEvents() {
   }, { scope: gridRef });
 
   const featuredEvents = events
-    ? events.filter((event) => event.featured).slice(0, 3)
+    ? events.filter((event) => event.isFlagship || event.featured)
     : [];
+    
+  const displayEvents = featuredEvents.length > 0 
+    ? featuredEvents.slice(0, 3) 
+    : (events ? events.slice(0, 3) : []);
 
   return (
     <section className="section-container pt-16 md:pt-24 pb-8 md:pb-12">
@@ -50,7 +54,7 @@ export default function FeaturedEvents() {
         </div>
       </Reveal>
 
-      {featuredEvents.length === 0 ? (
+      {displayEvents.length === 0 ? (
         <Reveal>
           <div className="text-center py-12">
             <p className="text-slate-500 italic text-base">New events coming soon</p>
@@ -58,7 +62,7 @@ export default function FeaturedEvents() {
         </Reveal>
       ) : (
         <div ref={gridRef} className="events-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-          {featuredEvents.map((event, index) => (
+          {displayEvents.map((event, index) => (
             <div key={event.id} className="event-card-item h-full">
               <EventCard event={event} index={index} />
             </div>

@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import EventModal from './EventModal';
 import { Calendar, Cpu, Users, MapPin, ArrowRight } from 'lucide-react';
 import { gsap, useGSAP } from '../lib/gsap';
 import { prefersReducedMotion } from '../lib/motion';
@@ -21,6 +22,7 @@ function formatDate(dateString) {
 }
 
 export default function EventCard({ event, index = 0 }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const cardRef = useRef(null);
   const imgWrapperRef = useRef(null);
 
@@ -50,7 +52,7 @@ export default function EventCard({ event, index = 0 }) {
   const formattedDate = formatDate(event.date);
 
   return (
-    <article ref={cardRef} className="card h-full flex flex-col justify-between group transition-all duration-300 hover:border-ieee-blue dark:hover:border-ieee-teal/50 hover:shadow-xl hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none">
+    <article onClick={() => setIsModalOpen(true)} ref={cardRef} className="card h-full flex flex-col justify-between group transition-all duration-300 hover:border-ieee-blue dark:hover:border-ieee-teal/50 hover:shadow-xl hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none cursor-pointer">
       <div>
         <div ref={imgWrapperRef} className="relative aspect-[16/9] w-full overflow-hidden rounded-lg mb-5 bg-slate-900 event-image-wrapper">
           {event.image ? (
@@ -94,14 +96,20 @@ export default function EventCard({ event, index = 0 }) {
       </div>
 
       <div className="pt-4 border-t border-slate-200 dark:border-zinc-800/80 mt-auto">
-        <Link
-          to={event.link || '/events'}
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsModalOpen(true); }}
           className="inline-flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider font-semibold text-ieee-blue dark:text-ieee-teal hover:text-[#0077b6] dark:hover:text-cyan-300 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue dark:focus-visible:ring-ieee-teal rounded transition-colors"
         >
-          <span>Details</span>
+          {new Date(event.date) >= new Date() ? <span>Register</span> : <span>View Details</span>}
           <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none" />
-        </Link>
+        </button>
       </div>
+    
+      {isModalOpen && (
+        <EventModal event={event} onClose={() => setIsModalOpen(false)} />
+      )}
     </article>
+
   );
 }
