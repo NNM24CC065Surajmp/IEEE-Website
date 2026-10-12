@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 
-export default function Navbar({ activePage, onNavigate, theme, onToggleTheme }) {
+export default function Navbar({ activePage, onNavigate, theme, onToggleTheme, authUser, onOpenAuth, onLogout }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -114,6 +114,39 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
           >
             {isLight ? <Sun size={17} /> : <Moon size={17} />}
           </button>
+
+          {/* Auth Control */}
+          {authUser ? (
+            <div className="flex items-center gap-2">
+              <div
+                title={authUser.email}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border ${
+                  isLight ? 'bg-[#00629B]/10 text-[#00629B] border-[#00629B]/30' : 'bg-[#0096D6]/15 text-[#0096D6] border-[#0096D6]/30'
+                }`}
+              >
+                {(authUser.email || 'U').charAt(0).toUpperCase()}
+              </div>
+              <button
+                type="button"
+                onClick={onLogout}
+                className={`text-xs font-mono uppercase tracking-wider px-3 py-1.5 rounded-full border transition-colors cursor-pointer ${
+                  isLight
+                    ? 'border-slate-300 text-slate-600 hover:border-red-400 hover:text-red-500'
+                    : 'border-zinc-800 text-zinc-400 hover:border-red-500/60 hover:text-red-400'
+                }`}
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onOpenAuth}
+              className="text-xs font-mono uppercase tracking-wider px-4 py-1.5 rounded-full bg-[#00629B] hover:bg-[#00558a] text-white font-bold transition-colors cursor-pointer shadow-md shadow-[#00629B]/25"
+            >
+              Sign In
+            </button>
+          )}
         </div>
 
         {/* Mobile Action Controls */}
@@ -180,6 +213,35 @@ export default function Navbar({ activePage, onNavigate, theme, onToggleTheme })
               </button>
             );
           })}
+
+          {/* Mobile Auth Row */}
+          <div className={`pt-3 mt-3 border-t ${isLight ? 'border-slate-200' : 'border-zinc-800/80'}`}>
+            {authUser ? (
+              <button
+                type="button"
+                onClick={() => {
+                  onLogout?.();
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full text-left py-2.5 px-3 rounded-lg normal-case font-sans text-sm ${
+                  isLight ? 'text-red-500 hover:bg-red-50' : 'text-red-400 hover:bg-red-500/10'
+                }`}
+              >
+                Sign Out ({authUser.email})
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenAuth?.();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-center py-2.5 px-3 rounded-lg bg-[#00629B] text-white font-bold normal-case font-sans text-sm"
+              >
+                Sign In
+              </button>
+            )}
+          </div>
         </div>
       )}
     </header>
