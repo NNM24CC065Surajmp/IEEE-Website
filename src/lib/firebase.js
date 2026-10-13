@@ -114,9 +114,13 @@ export async function getUserProfile(uid) {
   return snap.exists() ? snap.data() : null;
 }
 
-/** Update fields on an existing user profile document. */
+/** Update fields on a user profile document (creates if not exists, merges if exists). */
 export async function updateUserProfile(uid, data) {
-  await updateDoc(doc(db, 'users', uid), { ...data, updatedAt: serverTimestamp() });
+  await setDoc(
+    doc(db, 'users', uid),
+    { ...data, updatedAt: serverTimestamp() },
+    { merge: true }
+  );
 }
 
 export { auth, db };
