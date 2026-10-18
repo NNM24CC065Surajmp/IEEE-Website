@@ -12,6 +12,13 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import {
+  getStorage,
+  ref, 
+  uploadBytes, 
+  getDownloadURL
+ } from 'firebase/storage';
+
+import {
   getFirestore,
   doc,
   getDoc,
@@ -37,6 +44,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Force session-level persistence so the user must log in again
 // every time they close the browser tab/window.
@@ -124,3 +132,17 @@ export async function updateUserProfile(uid, data) {
 }
 
 export { auth, db };
+export async function uploadProfilePicture(uid, file) {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Please select an image file.');
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Image must be 5 MB or smaller.');
+  }
+
+  const imageRef = ref(storage, `profilePictures/${uid}`);
+  await uploadBytes(imageRef, file);
+
+  return await getDownloadURL(imageRef);
+}
