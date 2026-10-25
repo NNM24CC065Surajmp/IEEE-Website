@@ -11,22 +11,40 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
+import {
+  getStorage,
+  ref, 
+  uploadBytes, 
+  getDownloadURL
+ } from 'firebase/storage';
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 
 // ─── Firebase Configuration ───────────────────────────────────────
 // Replace placeholder values with your actual Firebase project config
 // found in Firebase Console → Project Settings → Your apps → Config
 const firebaseConfig = {
-  apiKey: 'BPx0f7BZwFAyWRjE5LCDr65xTb0e_6VOx9yU6vywaWoATe6J4HUPbT5Ne7L_l-IDfL8EK481xLvGF3wyDIMa_uU',
-  authDomain: 'ieee-website-nmamit.firebaseapp.com',       // ← replace
-  projectId: 'ieee-website-nmamit',                        // ← replace
-  storageBucket: 'ieee-website-nmamit.firebasestorage.app', // ← replace
-  messagingSenderId: '000000000000',                        // ← replace
-  appId: '1:000000000000:web:0000000000000000000000',       // ← replace
+  apiKey: "AIzaSyBhy33lOYjC5iZbyg6aiMQHteG32CibsrQ",
+  authDomain: "ieee-b6bf8.firebaseapp.com",
+  projectId: "ieee-b6bf8",
+  storageBucket: "ieee-b6bf8.firebasestorage.app",
+  messagingSenderId: "1032672849162",
+  appId: "1:1032672849162:web:bf192203879e17ac449ef3",
+  measurementId: "G-4SB584FCG5"
 };
 
 // ─── Initialize Firebase ──────────────────────────────────────────
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Force session-level persistence so the user must log in again
 // every time they close the browser tab/window.
@@ -46,9 +64,17 @@ export async function loginWithEmail(email, password) {
   return cred.user;
 }
 
-/** Sign in with Google popup */
+/**
+ * Sign in with Google popup.
+ * `hd: 'nmamit.in'` hints Google to only list nmamit.in accounts in the
+ * picker — a UX nicety, NOT real enforcement (a user could still type a
+ * different account). The actual domain check happens after sign-in,
+ * in AuthModal's handleGoogle, which signs the user back out if the
+ * returned email isn't @nmamit.in.
+ */
 export async function loginWithGoogle() {
   const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ hd: 'nmamit.in' });
   const cred = await signInWithPopup(auth, provider);
   return cred.user;
 }
@@ -72,4 +98,51 @@ export function subscribeToAuthChanges(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-export { auth };
+// ─── User Profile Helpers (Firestore: users/{uid}) ────────────────
+// NOTE: Firestore Database must be enabled in the Firebase console for
+// this project, with security rules allowing a user to read/write only
+// their own document, e.g.:
+//
+//   match /users/{uid} {
+//     allow read, write: if request.auth != null && request.auth.uid == uid;
+//   }
+
+/** Create (or merge into) a user's profile document. */
+export async function createUserProfile(uid, data) {
+  await setDoc(
+    doc(db, 'users', uid),
+    { ...data, createdAt: serverTimestamp() },
+    { merge: true }
+  );
+}
+
+/** Fetch a user's profile document. Returns null if it doesn't exist yet. */
+export async function getUserProfile(uid) {
+  const snap = await getDoc(doc(db, 'users', uid));
+  return snap.exists() ? snap.data() : null;
+}
+
+/** Update fields on a user profile document (creates if not exists, merges if exists). */
+export async function updateUserProfile(uid, data) {
+  await setDoc(
+    doc(db, 'users', uid),
+    { ...data, updatedAt: serverTimestamp() },
+    { merge: true }
+  );
+}
+
+export { auth, db };
+export async function uploadProfilePicture(uid, file) {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Please select an image file.');
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Image must be 5 MB or smaller.');
+  }
+
+  const imageRef = ref(storage, `profilePictures/${uid}`);
+  await uploadBytes(imageRef, file);
+
+  return await getDownloadURL(imageRef);
+}
