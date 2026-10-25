@@ -284,11 +284,11 @@ export default function Navbar({
           } ${showCollapsedState ? 'bg-opacity-100 backdrop-blur-3xl' : ''}`}
       >
         {/* Logo Container */}
-        <div ref={logoWrapperRef} className="flex items-center shrink-0 z-10 px-2">
+        <div ref={logoWrapperRef} className="flex items-center shrink-0 z-10 px-2 [transform:translateZ(0)] isolate">
           <button
             type="button"
             onClick={handleLogoClick}
-            className="relative bg-white rounded-full flex items-center justify-center transition-colors duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden w-[130px] h-[40px] cursor-pointer"
+            className="relative bg-white rounded-full flex items-center justify-center transition-colors duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue overflow-hidden w-[130px] h-[40px] cursor-pointer [transform:translateZ(0)] [backface-visibility:hidden]"
             aria-label={showCollapsedState ? "Expand navigation" : "IEEE NMAMIT home"}
           >
             {/* Full Lockup */}

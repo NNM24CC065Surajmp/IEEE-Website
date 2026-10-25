@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   ShieldCheck,
@@ -6,13 +6,18 @@ import {
   CheckCircle2,
   X,
   ExternalLink,
+  Info,
 } from 'lucide-react';
+import { gsap, useGSAP } from '../lib/gsap';
+import { prefersReducedMotion } from '../lib/motion';
 import StatsPanel from '../components/StatsPanel.jsx';
 
 const AFFILIATIONS = [
   {
     id: 'ieee',
     name: 'IEEE',
+    tier: 'Level 01',
+    scope: 'Global Organization',
     logo: '/logos/ieee-blue.png',
     url: 'https://www.ieee.org/',
     intro:
@@ -21,6 +26,8 @@ const AFFILIATIONS = [
   {
     id: 'region10',
     name: 'IEEE Region 10',
+    tier: 'Level 02',
+    scope: 'Asia-Pacific Region',
     logo: '/logos/region10.png',
     url: 'https://www.ieeer10.org/',
     intro:
@@ -29,6 +36,8 @@ const AFFILIATIONS = [
   {
     id: 'india-council',
     name: 'IEEE India Council',
+    tier: 'Level 03',
+    scope: 'National Council',
     logo: '/logos/india-council.png',
     url: 'https://ieeeindiacouncil.org/',
     intro:
@@ -37,6 +46,8 @@ const AFFILIATIONS = [
   {
     id: 'bangalore',
     name: 'IEEE Bangalore Section',
+    tier: 'Level 04',
+    scope: 'Section Jurisdiction',
     logo: '/logos/bangalore.png',
     url: 'https://ieeebangalore.org/',
     intro:
@@ -45,6 +56,8 @@ const AFFILIATIONS = [
   {
     id: 'mangalore',
     name: 'IEEE Mangalore Subsection',
+    tier: 'Level 05',
+    scope: 'Local Subsection',
     logo: '/logos/mangalore.png',
     url: 'https://ieee-mangalore.org/',
     intro:
@@ -53,6 +66,8 @@ const AFFILIATIONS = [
   {
     id: 'nmamit',
     name: 'IEEE NMAMIT Student Branch',
+    tier: 'Level 06',
+    scope: 'Campus Student Branch',
     logo: '/logos/nmamit-ieee-student-branch.png',
     url: null,
     intro:
@@ -119,6 +134,12 @@ const CHAPTERS = [
 export default function AboutPage({ onNavigate }) {
   const [selectedAffiliation, setSelectedAffiliation] = useState(null);
 
+  const heroRef = useRef(null);
+  const charterRowRef = useRef(null);
+  const ladderRef = useRef(null);
+  const missionSectionRef = useRef(null);
+  const missionListRef = useRef(null);
+
   useEffect(() => {
     if (!selectedAffiliation) return;
 
@@ -146,6 +167,77 @@ export default function AboutPage({ onNavigate }) {
     };
   }, [selectedAffiliation]);
 
+  // GSAP ScrollTrigger animation pass (respects prefersReducedMotion)
+  useGSAP(() => {
+    if (prefersReducedMotion()) return;
+
+    // 1. Charter spec-sheet row items reveal
+    if (charterRowRef.current) {
+      gsap.from('.charter-spec-col', {
+        y: 18,
+        opacity: 0,
+        duration: 0.55,
+        stagger: 0.08,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: charterRowRef.current,
+          start: 'top 90%',
+          once: true,
+        },
+      });
+    }
+
+    // 2. Affiliation ladder circuit nodes sequential reveal
+    if (ladderRef.current) {
+      const steps = ladderRef.current.querySelectorAll('.ladder-step-node');
+      if (steps.length) {
+        gsap.from(steps, {
+          y: 28,
+          opacity: 0,
+          duration: 0.65,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: ladderRef.current,
+            start: 'top 82%',
+            once: true,
+          },
+        });
+      }
+    }
+
+    // 3. 35+ Years milestone callout reveal
+    if (missionSectionRef.current) {
+      gsap.from('.milestone-callout-anim', {
+        x: -24,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: missionSectionRef.current,
+          start: 'top 80%',
+          once: true,
+        },
+      });
+    }
+
+    // 4. Mission feature list staggered entrance
+    if (missionListRef.current) {
+      gsap.from('.mission-feature-item', {
+        y: 20,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.09,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: missionListRef.current,
+          start: 'top 85%',
+          once: true,
+        },
+      });
+    }
+  }, []);
+
   return (
     <div className="pt-28 sm:pt-36">
 
@@ -171,12 +263,12 @@ export default function AboutPage({ onNavigate }) {
       {/* =========================================================
           1. HERO
       ========================================================= */}
-      <section className="relative max-w-6xl mx-auto px-5 sm:px-8 pb-16 sm:pb-20 border-b border-slate-200 dark:border-zinc-800/80 overflow-hidden">
+      <section ref={heroRef} className="relative max-w-6xl mx-auto px-5 sm:px-8 pb-16 sm:pb-20 border-b border-slate-200 dark:border-zinc-800/80 overflow-hidden">
         {/* Soft Ambient Background Glow */}
         <div className="absolute top-10 -left-20 w-80 h-80 bg-ieee-blue/10 dark:bg-ieee-blue/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-ieee-teal/10 dark:bg-ieee-teal/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Hero Top Grid: Heading column + fixed 420px StatsPanel */}
+        {/* Hero Top Grid: Heading column + fixed 420px elevated StatsPanel */}
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] items-center gap-10 lg:gap-12">
           <div className="w-full">
             {/* Small label above the heading */}
@@ -217,32 +309,38 @@ export default function AboutPage({ onNavigate }) {
             </h1>
           </div>
 
-          {/* StatsPanel: exactly 420px on large screens */}
+          {/* StatsPanel: elevated layered-shadow/glass container with left-accent IEEE Blue borders */}
           <div className="w-full flex justify-center lg:justify-end">
             <StatsPanel />
           </div>
         </div>
 
-        {/* Four Info Cards: Centered full-width row below hero grid, max-w-[960px] */}
-        <div className="relative z-10 w-full max-w-[960px] mx-auto mt-12 sm:mt-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors h-full flex flex-col justify-between">
-              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
+        {/* 
+            CHARTER INFO ROW:
+            Differentiated as a clean, minimal technical spec-sheet / data-table strip with top hairline dividers,
+            breaking the repeated flat box pattern seen across the page.
+        */}
+        <div ref={charterRowRef} className="relative z-10 w-full max-w-[960px] mx-auto mt-12 sm:mt-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 py-5 px-4 sm:px-6 rounded-2xl border-y border-slate-200/90 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-zinc-950/30 backdrop-blur-sm">
+            {/* Charter ID */}
+            <div className="charter-spec-col flex flex-col border-t-2 border-[#00629B] dark:border-[#0096D6] pt-3">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold mb-1">
                 Charter ID
               </span>
               <div>
-                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono tracking-tight">
                   STB 34551
                 </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors h-full flex flex-col justify-between">
-              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
+            {/* Established */}
+            <div className="charter-spec-col flex flex-col border-t-2 border-slate-300 dark:border-zinc-700 pt-3">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold mb-1">
                 Established
               </span>
               <div>
-                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight font-mono">
                   2009
                 </div>
                 <div className="text-xs text-slate-500 dark:text-zinc-400 font-normal mt-0.5">
@@ -251,28 +349,34 @@ export default function AboutPage({ onNavigate }) {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors h-full flex flex-col justify-between">
-              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
+            {/* Jurisdiction */}
+            <div className="charter-spec-col flex flex-col border-t-2 border-slate-300 dark:border-zinc-700 pt-3">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold mb-1">
                 Jurisdiction
               </span>
               <div>
                 <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
                   Region 10
                 </div>
-                <div className="text-xs text-slate-500 dark:text-zinc-400 font-normal mt-0.5">
+                <div className="text-xs text-slate-500 dark:text-zinc-400 font-normal mt-0.5 font-mono">
                   APAC
                 </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm hover:border-ieee-blue/40 transition-colors h-full flex flex-col justify-between">
-              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 block mb-1">
+            {/* Status */}
+            <div className="charter-spec-col flex flex-col border-t-2 border-emerald-500/70 dark:border-emerald-400/70 pt-3">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold mb-1">
                 Status
               </span>
-              <div>
-                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                   Active
-                </div>
+                </span>
               </div>
             </div>
           </div>
@@ -280,15 +384,11 @@ export default function AboutPage({ onNavigate }) {
       </section>
 
       {/* =========================================================
-          2. IEEE NMAMIT GLOBAL VIEW
+          2. IEEE NMAMIT GLOBAL VIEW (REDESIGNED CIRCUIT-TRACE AFFILIATION LADDER)
       ========================================================= */}
-
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20 border-b border-slate-200 dark:border-zinc-800/80">
-
         {/* Centered Heading with Left-Aligned Reading Paragraph */}
-
         <div className="max-w-4xl mx-auto">
-
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white text-center leading-tight">
             IEEE NMAMIT global view
           </h2>
@@ -300,76 +400,95 @@ export default function AboutPage({ onNavigate }) {
             Organization. IEEE NMAMIT is further connected through the
             IEEE Mangalore Subsection.
           </p>
-
         </div>
 
-        {/* IEEE NITK Style Stepper */}
-
-        <div className="mt-12 sm:mt-16 flex justify-center">
-
-          <div className="relative flex flex-col">
-
-            {/* Continuous vertical spine line connecting all dots */}
-
+        {/* 
+            CIRCUIT-TRACE ORGANIZATIONAL HIERARCHY VISUAL (Option b):
+            Replaces generic vertical dotted line with engineering circuit trace language,
+            conductive signal junction nodes, hierarchy tier markers, and ScrollTrigger staggered reveal.
+        */}
+        <div ref={ladderRef} className="mt-14 sm:mt-18 max-w-3xl mx-auto">
+          <div className="relative pl-6 sm:pl-10">
+            {/* Continuous SVG Circuit Spine with glowing conductive pulse */}
             <div
-              className="absolute left-[15px] sm:left-[19px] top-6 bottom-6 w-[2px] bg-slate-300 dark:bg-zinc-700"
+              className="absolute left-[13px] sm:left-[21px] top-4 bottom-8 w-[2px] bg-gradient-to-b from-[#00629B] via-[#0096D6] to-[#00629B]/30 dark:from-[#4DA3D9] dark:via-[#00F2FE]/80 dark:to-[#4DA3D9]/20"
               aria-hidden="true"
             />
 
-            {AFFILIATIONS.map((item) => (
-              <div
-                key={item.id}
-                className="relative flex items-center gap-4 sm:gap-8 py-4 sm:py-5"
-              >
-
-                {/* Step dot on vertical line */}
-
-                <div className="relative z-10 flex items-center justify-center w-8 sm:w-10 shrink-0">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-800 dark:bg-ieee-blue text-white ring-4 ring-slate-50 dark:ring-[#05060A] flex items-center justify-center shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                  </div>
-                </div>
-
-                {/* Clickable Logo */}
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedAffiliation(item)}
-                  aria-label={`Open details for ${item.name}`}
-                  className="group p-2 bg-transparent hover:scale-105 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue rounded-lg cursor-pointer"
+            <div className="space-y-6 sm:space-y-8">
+              {AFFILIATIONS.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="ladder-step-node relative flex items-center gap-4 sm:gap-6 group"
                 >
-                  {item.logoDark ? (
-                    <>
-                      <img
-                        src={item.logo}
-                        alt={`${item.name} logo`}
-                        className="dark:hidden w-40 sm:w-52 md:w-60 h-auto max-h-16 sm:max-h-20 md:max-h-24 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
-                      />
-                      <img
-                        src={item.logoDark}
-                        alt={`${item.name} logo`}
-                        className="hidden dark:block w-40 sm:w-52 md:w-60 h-auto max-h-16 sm:max-h-20 md:max-h-24 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
-                      />
-                    </>
-                  ) : (
-                    <img
-                      src={item.logo}
-                      alt={`${item.name} logo`}
-                      className="w-40 sm:w-52 md:w-60 h-auto max-h-16 sm:max-h-20 md:max-h-24 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
-                    />
-                  )}
-                </button>
+                  {/* Circuit Junction Node on the spine */}
+                  <div className="absolute -left-[23px] sm:-left-[31px] z-10 flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-slate-50 dark:bg-[#07090e] border-2 border-[#00629B]/50 dark:border-[#4DA3D9]/50 ring-4 ring-slate-100 dark:ring-black shadow-md group-hover:scale-110 group-hover:border-[#00629B] dark:group-hover:border-[#00F2FE] transition-all duration-300">
+                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#00629B] dark:bg-[#4DA3D9] group-hover:bg-[#0096D6] dark:group-hover:bg-[#00F2FE] shadow-[0_0_8px_rgba(0,150,214,0.6)] transition-colors" />
+                  </div>
 
-              </div>
-            ))}
+                  {/* Horizontal conductive trace branch connecting spine to card */}
+                  <div
+                    className="w-4 sm:w-6 h-[2px] bg-[#00629B]/40 dark:bg-[#4DA3D9]/40 group-hover:bg-[#00629B] dark:group-hover:bg-[#4DA3D9] shrink-0 transition-colors"
+                    aria-hidden="true"
+                  />
 
+                  {/* High-Finish Interactive Hierarchy Card */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAffiliation(item)}
+                    aria-label={`Open details for ${item.name}`}
+                    className="flex-1 text-left p-3.5 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/80 dark:bg-zinc-900/40 backdrop-blur-md shadow-sm hover:shadow-xl hover:border-[#00629B]/40 dark:hover:border-[#0096D6]/40 transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  >
+                    <div className="flex flex-col gap-1">
+                      {/* Technical hierarchy scope badge */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-ieee-blue dark:text-ieee-teal font-bold px-2 py-0.5 rounded-md bg-ieee-blue/10 dark:bg-ieee-blue/20 shrink-0">
+                          {item.tier}
+                        </span>
+                        <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold">
+                          {item.scope}
+                        </span>
+                      </div>
+                      <span className="font-heading font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-ieee-blue dark:group-hover:text-ieee-teal transition-colors">
+                        {item.name}
+                      </span>
+                    </div>
+
+                    {/* Official IEEE Hierarchy Logo Lockup */}
+                    <div className="flex items-center justify-start sm:justify-end shrink-0 sm:pl-4">
+                      {item.logoDark ? (
+                        <>
+                          <img
+                            src={item.logo}
+                            alt={`${item.name} logo`}
+                            className="dark:hidden w-36 sm:w-48 h-auto max-h-12 sm:max-h-14 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
+                          />
+                          <img
+                            src={item.logoDark}
+                            alt={`${item.name} logo`}
+                            className="hidden dark:block w-36 sm:w-48 h-auto max-h-12 sm:max-h-14 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
+                          />
+                        </>
+                      ) : (
+                        <img
+                          src={item.logo}
+                          alt={`${item.name} logo`}
+                          className="w-36 sm:w-48 h-auto max-h-12 sm:max-h-14 object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
+                        />
+                      )}
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
+
       {/* =========================================================
           3. CAMPUS CONTEXT & MISSION (ENGINEERING RIGOR)
       ========================================================= */}
-      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20 border-b border-slate-200 dark:border-zinc-800/80">
+      <section ref={missionSectionRef} className="max-w-6xl mx-auto px-5 sm:px-8 py-20 border-b border-slate-200 dark:border-zinc-800/80">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <div className="lg:col-span-5">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full border border-ieee-blue/20 bg-ieee-blue/5 text-ieee-blue dark:text-ieee-teal text-xs font-medium mb-3">
@@ -386,14 +505,21 @@ export default function AboutPage({ onNavigate }) {
               under Nitte (Deemed to be University).
             </p>
 
-            {/* 35+ Years Legacy Highlight Card */}
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800/80 bg-gradient-to-br from-slate-50 to-white dark:from-zinc-900/60 dark:to-zinc-900/20 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-ieee-blue/10 dark:bg-ieee-blue/20 flex items-center justify-center text-ieee-blue dark:text-ieee-teal shrink-0">
-                <span className="text-xl font-bold">35+</span>
+            {/* 
+                35+ YEARS LEGACY HIGHLIGHT:
+                Replaced flat generic box with a distinct commemorative milestone banner with an IEEE-Blue accent bar.
+            */}
+            <div className="milestone-callout-anim relative overflow-hidden rounded-2xl border-y border-r border-slate-200/90 dark:border-zinc-800/90 border-l-4 border-l-[#00629B] dark:border-l-[#0096D6] bg-gradient-to-r from-slate-100/90 via-white/80 to-slate-50/50 dark:from-zinc-900/85 dark:via-zinc-900/40 dark:to-zinc-950/20 backdrop-blur-md p-4 sm:p-5 shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-ieee-blue/10 dark:bg-ieee-blue/20 flex items-center justify-center text-[#00629B] dark:text-[#38bdf8] shrink-0 font-heading">
+                <span className="text-xl sm:text-2xl font-black">35+</span>
               </div>
               <div>
-                <div className="text-sm font-bold text-slate-900 dark:text-white">Years of engineering excellence</div>
-                <div className="text-xs text-slate-500 dark:text-zinc-400 font-medium">Pioneering technical education since 1986</div>
+                <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
+                  Years of engineering excellence
+                </div>
+                <div className="text-xs text-slate-500 dark:text-zinc-400 font-medium mt-0.5">
+                  Pioneering technical education since 1986
+                </div>
               </div>
             </div>
           </div>
@@ -413,37 +539,46 @@ export default function AboutPage({ onNavigate }) {
               researchers across different fields.
             </p>
 
-            <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700 dark:text-zinc-300">
-              <div className="group flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/40 hover:border-ieee-blue/40 hover:shadow-md transition-all">
-                <CheckCircle2
-                  size={16}
-                  className="text-ieee-blue dark:text-ieee-teal shrink-0 group-hover:scale-110 transition-transform"
-                />
-                <span className="font-medium text-slate-800 dark:text-zinc-200">Peer-to-peer technical bootcamps</span>
+            {/* 
+                MISSION FEATURE CHECKMARKS:
+                Treated as a clean 2x2 checklist with generous spacing, checkmark icon with subtle accent,
+                and no heavy box containers, breaking the repeated flat box pattern.
+            */}
+            <div ref={missionListRef} className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700 dark:text-zinc-300">
+              <div className="mission-feature-item group flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100/80 dark:hover:bg-zinc-900/50 transition-colors">
+                <div className="w-7 h-7 rounded-full bg-[#00629B]/10 dark:bg-[#0096D6]/20 flex items-center justify-center text-[#00629B] dark:text-[#38bdf8] shrink-0 group-hover:scale-110 transition-transform">
+                  <CheckCircle2 size={16} strokeWidth={2.5} />
+                </div>
+                <span className="font-medium text-slate-800 dark:text-zinc-200">
+                  Peer-to-peer technical bootcamps
+                </span>
               </div>
 
-              <div className="group flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/40 hover:border-ieee-blue/40 hover:shadow-md transition-all">
-                <CheckCircle2
-                  size={16}
-                  className="text-ieee-blue dark:text-ieee-teal shrink-0 group-hover:scale-110 transition-transform"
-                />
-                <span className="font-medium text-slate-800 dark:text-zinc-200">National hackathons & competitions</span>
+              <div className="mission-feature-item group flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100/80 dark:hover:bg-zinc-900/50 transition-colors">
+                <div className="w-7 h-7 rounded-full bg-[#00629B]/10 dark:bg-[#0096D6]/20 flex items-center justify-center text-[#00629B] dark:text-[#38bdf8] shrink-0 group-hover:scale-110 transition-transform">
+                  <CheckCircle2 size={16} strokeWidth={2.5} />
+                </div>
+                <span className="font-medium text-slate-800 dark:text-zinc-200">
+                  National hackathons & competitions
+                </span>
               </div>
 
-              <div className="group flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/40 hover:border-ieee-blue/40 hover:shadow-md transition-all">
-                <CheckCircle2
-                  size={16}
-                  className="text-ieee-blue dark:text-ieee-teal shrink-0 group-hover:scale-110 transition-transform"
-                />
-                <span className="font-medium text-slate-800 dark:text-zinc-200">Undergrad research & paper guidance</span>
+              <div className="mission-feature-item group flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100/80 dark:hover:bg-zinc-900/50 transition-colors">
+                <div className="w-7 h-7 rounded-full bg-[#00629B]/10 dark:bg-[#0096D6]/20 flex items-center justify-center text-[#00629B] dark:text-[#38bdf8] shrink-0 group-hover:scale-110 transition-transform">
+                  <CheckCircle2 size={16} strokeWidth={2.5} />
+                </div>
+                <span className="font-medium text-slate-800 dark:text-zinc-200">
+                  Undergrad research & paper guidance
+                </span>
               </div>
 
-              <div className="group flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/40 hover:border-ieee-blue/40 hover:shadow-md transition-all">
-                <CheckCircle2
-                  size={16}
-                  className="text-ieee-blue dark:text-ieee-teal shrink-0 group-hover:scale-110 transition-transform"
-                />
-                <span className="font-medium text-slate-800 dark:text-zinc-200">Global IEEE technical community</span>
+              <div className="mission-feature-item group flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100/80 dark:hover:bg-zinc-900/50 transition-colors">
+                <div className="w-7 h-7 rounded-full bg-[#00629B]/10 dark:bg-[#0096D6]/20 flex items-center justify-center text-[#00629B] dark:text-[#38bdf8] shrink-0 group-hover:scale-110 transition-transform">
+                  <CheckCircle2 size={16} strokeWidth={2.5} />
+                </div>
+                <span className="font-medium text-slate-800 dark:text-zinc-200">
+                  Global IEEE technical community
+                </span>
               </div>
             </div>
           </div>
@@ -513,13 +648,9 @@ export default function AboutPage({ onNavigate }) {
       {/* =========================================================
           5. TEAM CTA
       ========================================================= */}
-
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20">
-
         <div className="p-8 sm:p-12 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-gradient-to-r from-slate-100 via-ieee-blue/10 to-slate-100 dark:from-zinc-900/60 dark:via-ieee-blue/10 dark:to-zinc-900/60 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-
           <div>
-
             <div className="text-xs font-medium text-ieee-blue dark:text-ieee-teal mb-2">
               Student leadership
             </div>
@@ -532,7 +663,6 @@ export default function AboutPage({ onNavigate }) {
               Explore our core executive committee, chapter leads, and faculty
               advisors.
             </p>
-
           </div>
 
           <button
@@ -560,17 +690,15 @@ export default function AboutPage({ onNavigate }) {
             <span>Meet the team</span>
             <ArrowRight size={15} />
           </button>
-
         </div>
       </section>
-            {/* =========================================================
+
+      {/* =========================================================
           6. AFFILIATION MODAL (PORTALED TO BODY FOR PERFECT CENTERING)
       ========================================================= */}
-
       {selectedAffiliation &&
         typeof document !== 'undefined' &&
         createPortal(
-
           <div
             className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm transition-opacity"
             onClick={() => setSelectedAffiliation(null)}
@@ -578,16 +706,12 @@ export default function AboutPage({ onNavigate }) {
             aria-modal="true"
             aria-labelledby="affiliation-modal-title"
           >
-
             {/* Modal Card */}
-
             <div
               className="relative w-full max-w-md rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0c101a] shadow-2xl p-6 sm:p-8 text-center"
               onClick={(e) => e.stopPropagation()}
             >
-
               {/* X Close button */}
-
               <button
                 type="button"
                 onClick={() => setSelectedAffiliation(null)}
@@ -598,9 +722,7 @@ export default function AboutPage({ onNavigate }) {
               </button>
 
               {/* Logo display */}
-
               <div className="flex items-center justify-center min-h-[5rem] sm:min-h-[6rem] py-2 mt-2 mb-5">
-
                 {selectedAffiliation.logoDark ? (
                   <>
                     <img
@@ -621,11 +743,9 @@ export default function AboutPage({ onNavigate }) {
                     className="h-auto max-h-24 sm:max-h-28 w-auto max-w-[240px] sm:max-w-[280px] object-contain drop-shadow-sm"
                   />
                 )}
-
               </div>
 
               {/* Title */}
-
               <h3
                 id="affiliation-modal-title"
                 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug"
@@ -634,15 +754,12 @@ export default function AboutPage({ onNavigate }) {
               </h3>
 
               {/* Brief introduction in one line */}
-
               <p className="mt-3 text-sm text-slate-600 dark:text-zinc-300 leading-relaxed max-w-sm mx-auto font-normal text-left">
                 {selectedAffiliation.intro}
               </p>
 
               {/* Action Buttons */}
-
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
-
                 <button
                   type="button"
                   onClick={() => setSelectedAffiliation(null)}
@@ -652,7 +769,6 @@ export default function AboutPage({ onNavigate }) {
                 </button>
 
                 {/* Visit Site Button: ONLY for first five (url !== null) */}
-
                 {selectedAffiliation.url && (
                   <a
                     href={selectedAffiliation.url}
@@ -664,17 +780,11 @@ export default function AboutPage({ onNavigate }) {
                     <ExternalLink size={15} />
                   </a>
                 )}
-
               </div>
-
             </div>
-
           </div>,
-
           document.body
-
         )}
-
     </div>
   );
 }

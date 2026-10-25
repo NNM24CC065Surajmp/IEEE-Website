@@ -27,6 +27,11 @@
     @apply scroll-smooth;
   }
 
+  html.lenis,
+  html.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
   body {
     @apply bg-ieee-black text-slate-100 antialiased font-body overflow-x-hidden;
     background-color: var(--bg-primary);
