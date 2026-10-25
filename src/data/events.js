@@ -1,0 +1,273 @@
+// Event Data for IEEE Student Branch NMAMIT
+
+export const EVENTS_DATA = [
+  {
+    id: "b-htc-2024",
+    title: "2024 IEEE Bangalore Humanitarian Technology Conference (IEEE B-HTC 2024)",
+    category: "Conference",
+    date: "2024-03-21T15:00:00Z",
+    venue: "Sowparnika Seminar Hall",
+    time: "03:00 PM",
+    description: "Inauguration of 2024 IEEE Bangalore Humanitarian Technology Conference. Theme: SDG14 - Life Below Water. Chief Guest: Dr. Chengappa M R. President: Dr. Niranjan N Chiplunkar.",
+    image: "/events/b-htc-2024.jpg",
+    registrationLink: "",
+    isFlagship: true
+  },
+  {
+    id: "project-to-paper",
+    title: "Project to Paper",
+    category: "Competition",
+    date: "2024-11-23T23:59:00Z",
+    venue: "NMAMIT",
+    time: "Submit before November 23, 2024",
+    description: "A competition organized by the IEEE Student Branch to evaluate the technical writing skills of the students. Submit research papers based on the academic year project. Total Prize money Rs. 12,000/-.",
+    image: "/events/project-to-paper.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "primed-aptitude-test",
+    title: "PRIMED Placement Hackathon Round One Aptitude Test",
+    category: "Hackathon",
+    date: "2025-05-02T19:30:00Z",
+    venue: "Online Mode",
+    time: "07:30 PM",
+    description: "IEEE Mangalore Subsection Student Activity Committee and Industry relations Committee Presents PRIMED Placement Hackathon Round One Aptitude Test. Only For 3rd Year Students studying in MSS Region Colleges.",
+    image: "/events/primed-aptitude.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "grss-inaugural",
+    title: "IEEE GRSS Student Branch Chapter Inaugural Function",
+    category: "Workshop",
+    date: "2025-08-12T10:00:00Z",
+    venue: "RS & GIS LAB, SMV BLOCK",
+    time: "10:00 AM",
+    description: "Department of Civil Engineering Inaugural Function of IEEE GRSS Student Branch Chapter & Technical Talk by Dr. Chandan M.C, Assistant Professor, Department of Water Resources and Ocean Engineering, NITK Surathkal.",
+    image: "/events/grss-inaugural.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "ieee-day-2024-real",
+    title: "IEEE DAY 2024 Celebration",
+    category: "Celebration",
+    date: "2024-10-03T14:00:00Z",
+    venue: "Karyagar Sabhangan (Mechanical Workshop)",
+    time: "02:00 PM",
+    description: "Lets celebrate innovation, technology, and the spirit of collaboration. Event Highlights: Quizz, Ideate - Develop limitless ideas, Exciting Cash prizes, Membership drive.",
+    image: "/events/ieee-day-2024.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "spark-hunt-real",
+    title: "Spark Hunt",
+    category: "Competition",
+    date: "2025-04-11T13:45:00Z",
+    venue: "ADL04",
+    time: "01:45 PM",
+    description: "AS PART OF THE WORLD CREATIVITY & INNOVATION DAY CELEBRATIONS NMAMIT IEEE STUDENT BRANCH & INSTITUTIONS INNOVATION COUNCIL PRESENTS Spark Hunt. Web Hunt Level 1 & Level 2. Prize pool 5K.",
+    image: "/events/spark-hunt.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "primed-placement-hackathon",
+    title: "PRIMED: The Placement Hackathon",
+    category: "Hackathon",
+    date: "2025-05-02T09:00:00Z",
+    venue: "Online & AJIET, Mangalore",
+    time: "Round 1: 02/05/2025",
+    description: "IEEE Mangalore Sub-Section SAC Presents PRIMED \"The Placement Hackathon\". Round 1: Aptitude (02/05/2025), Round 2: Technical (09/05/2025), Round 3 & 4: Interviews (17/05/2025). Winners stand a chance to secure an industrial internship!",
+    image: "/events/primed-hackathon.jpg",
+    registrationLink: "",
+    isFlagship: true
+  },
+  {
+    id: "treasure-hunt-grss",
+    title: "Treasure Hunt by IEEE GRSS",
+    category: "Competition",
+    date: "2024-08-08T14:00:00Z",
+    venue: "ISL02 & ISL03",
+    time: "02:00 PM - 03:45 PM",
+    description: "IEEE GRSS presents Treasure Hunt. ₹ 6000 Prize Pool + Gifts! Free entry for 1st year students & IEEE members. Non-IEEE members registration fee ₹ 100 only.",
+    image: "/events/treasure-hunt-grss.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "activity-inauguration-26-27",
+    title: "Activity Inauguration 2026-27",
+    category: "Inauguration",
+    date: "2026-10-07T14:30:00Z",
+    venue: "SHAMBHAVI HALL, APJ 1ST FLOOR",
+    time: "02:30 PM",
+    description: "IEEE NMAMIT Student Branch presents Activity Inauguration 2026-27. New Beginnings | Bigger Dreams. A new chapter begins with ideas, innovation and you.",
+    image: "/events/activity-inauguration.jpg",
+    registrationLink: "",
+    isFlagship: false
+  }
+  ,
+  {
+    id: 'grss-event-upcoming',
+    title: 'GRSS Event: Earth Observation & Geospatial Analytics',
+    category: 'Workshop',
+    date: '2026-10-18T10:00:00Z',
+    venue: 'MCA Seminar Hall, Ground Floor, NMAMIT',
+    time: '10:00 AM - 04:30 PM IST',
+    description: 'Specialized IEEE Geoscience and Remote Sensing Society hands-on workshop covering synthetic aperture radar (SAR), satellite spectral data processing, and open GIS mapping pipelines using Python.',
+    image: null,
+    registrationLink: 'https://forms.gle/ieee-nmamit-grss-2026',
+    isFlagship: false
+  },
+  {
+    id: 'techtide-2027',
+    title: 'TechTide 2027: 36h National Flagship Hackathon',
+    category: 'Hackathon',
+    date: '2027-03-20T09:00:00Z',
+    venue: 'Centre for High Performance Computing & Main Quad, NMAMIT',
+    time: 'Starts 09:00 AM IST (36 Hours Non-Stop)',
+    description: 'Our pinnacle annual national hackathon assembling 70+ top collegiate squads to engineer breakthrough software and hardware prototypes in AI, Edge Systems, Web3, and Sustainable Engineering.',
+    image: null,
+    registrationLink: 'https://techtide.ieeenmamit.org/register',
+    isFlagship: true
+  }
+  ,
+  {
+    id: 'ieee-day-quiz-2026',
+    title: 'Online Technical Quiz on account of IEEE Day',
+    category: 'Competition',
+    date: '2026-10-04T18:00:00Z',
+    venue: 'Online Mode',
+    time: '6:00 to 8:00 PM',
+    description: 'Student Activity Committee (SAC) of IEEE Mangalore Subsection is Organizing ONLINE TECHNICAL QUIZ on account of IEEE Day.\nRound 1 - Basic\nRound 2 - Intermediate\nOpen to IEEE Members - All branches.\nLast day to register: October 1, 2026.',
+    image: '/events/ieee-day-quiz-2026.jpg',
+    registrationLink: '',
+    isFlagship: false
+  },
+  {
+    id: "wie-summit-2024",
+    title: "IEEE WIE International Leadership Summit",
+    category: "Summit",
+    date: "2024-10-03T09:00:00Z",
+    venue: "College of Engineering, Guindy, Anna University, Chennai",
+    time: "Oct 3-5, 2024",
+    description: "IEEE Women in Engineering Madras Section Affinity Group presents IEEE WIE International Leadership Summit. Tracks: Start-up Spirit, TechForGood, EmpowerED, LeadHERship.",
+    image: "/events/pdf2-page2.jpg",
+    registrationLink: "",
+    isFlagship: true
+  },
+  {
+    id: "wie-scholarship-2024",
+    title: "WIE Scholarship 2024-25",
+    category: "Scholarship",
+    date: "2025-01-31T23:59:00Z",
+    venue: "Online",
+    time: "Apply by January 31st, 2025",
+    description: "Funded by CSR initiatives of Quest Global. Rs. 50,000 to pay the college fee. For female students pursuing engineering.",
+    image: "/events/pdf2-page5.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "agm-2025",
+    title: "Annual General Meeting of IEEE Mangalore Subsection",
+    category: "Meeting",
+    date: "2025-01-11T14:00:00Z",
+    venue: "Sambhram Auditorium, NMAMIT",
+    time: "02:00 PM",
+    description: "AGM of IEEE Mangalore Subsection. Agenda includes Welcome by Chair, Approval of AGM 2024 MOM, Activity and Financial reports, and Awards.",
+    image: "/events/pdf2-page6.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "ob-conclave-2024",
+    title: "Office Bearer's Conclave",
+    category: "Conclave",
+    date: "2024-07-05T09:00:00Z",
+    venue: "Nitte Meenakshi Institute of Technology Yelahanka, Bangalore",
+    time: "09:00 AM to 04:30 PM",
+    description: "Student Activities Committee IEEE Bangalore Section presents Office Bearer's Conclave.",
+    image: "/events/pdf2-page7.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "bc-meet-2",
+    title: "BC MEET-2: Talk on Conference Approval",
+    category: "Meeting",
+    date: "2024-08-01T10:00:00Z",
+    venue: "Online / TBA",
+    time: "TBA",
+    description: "Talk on conference approval by IEEE Bangalore Section. Welcome address by Dr. Parameshachari B D, Chair's Address by Dr. Srinivas T.",
+    image: "/events/pdf2-page8.jpg",
+    registrationLink: "https://forms.gle/ufCrenfCPfJaZMUz6",
+    isFlagship: false
+  },
+  {
+    id: "membership-drive-50",
+    title: "Join IEEE at 50% Price",
+    category: "Membership",
+    date: "2024-12-31T23:59:00Z",
+    venue: "Online",
+    time: "Valid till December 2024",
+    description: "Gain expertise and open career doors. Build and expand your network. Free certification programs. UG students: $7. PG/PhD: $13.5.",
+    image: "/events/pdf2-page9.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "aide-2025",
+    title: "2025 International Conference on Artificial Intelligence and Data Engineering (AIDE)",
+    category: "Conference",
+    date: "2025-02-06T09:00:00Z",
+    venue: "Nitte, Karnataka",
+    time: "February 06 - 07, 2025",
+    description: "Technically Cosponsored by IEEE Bangalore Section and IEEE Mangalore Subsection.",
+    image: "/events/pdf2-page10.jpg",
+    registrationLink: "",
+    isFlagship: true
+  },
+  {
+    id: "tech-triad-real",
+    title: "THE TECH TRIAD",
+    category: "Competition",
+    date: "2025-03-22T09:00:00Z",
+    venue: "SMV BLOCK ADL 01, 03, NMAMIT",
+    time: "09:00 AM - 01:00 PM",
+    description: "Offline Event. Prize Pool 15K. Open to all.",
+    image: "/events/pdf2-page17.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "project-to-paper-2026",
+    title: "Project to Paper 2026",
+    category: "Competition",
+    date: "2026-10-04T23:59:00Z",
+    venue: "NMAMIT",
+    time: "Submit before October 4 2026 (11:59PM)",
+    description: "A competition organized by the IEEE Student Branch to evaluate the technical writing skills of the students. Submit research papers based on the academic year project.",
+    image: "/events/pdf1-page1.jpg",
+    registrationLink: "",
+    isFlagship: false
+  },
+  {
+    id: "ieee-benefits-webinar",
+    title: "Webinar on benefits of IEEE membership",
+    category: "Webinar",
+    date: "2024-08-22T19:30:00Z",
+    venue: "Online / Google Meet",
+    time: "7:30 PM",
+    description: "Speaker: Suprith Patil, MDC Lead IEEE Bangalore Section. Google Meet ID: mmj-ctgu-hbi",
+    image: "/events/pdf2-page4.jpg",
+    registrationLink: "https://meet.google.com/mmj-ctgu-hbi",
+    isFlagship: false
+  }
+
+];
+
+export default EVENTS_DATA;

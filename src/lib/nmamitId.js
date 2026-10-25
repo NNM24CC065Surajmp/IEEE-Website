@@ -18,8 +18,8 @@ export const BRANCH_CODES = {
   ME: 'Mechanical Engineering',              // TODO: confirm short code used
   MECH: 'Mechanical Engineering',
   VLSI: 'VLSI Design and Technology',  
-  CC:'Computer and Communication Engineering'      // TODO: confirm short code used
-  CCE: 'Computer and Communication Engineering', // TODO: confirm full name
+  CC:'Computer and Communication Engineering',      // TODO: confirm short code used
+  CCE:'Computer and Communication Engineering', // TODO: confirm full name
   CY: 'Cyber Security',                      // TODO: confirm short code used
   CYBER: 'Cyber Security',                   // TODO: confirm full name
   AIML: 'Artificial Intelligence and Machine Learning',
