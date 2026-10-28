@@ -19,6 +19,9 @@ import {
   Plus,
   Trash2,
   Pencil,
+  User,
+  LogIn,
+  UserPlus,
 } from 'lucide-react';
 import {
   getUserProfile,
@@ -27,7 +30,7 @@ import {
 } from '../lib/firebase.js';
 import { parseNmamitIdentity } from '../lib/nmamitId.js';
 
-export default function ProfilePage({ authUser }) {
+export default function ProfilePage({ authUser, onOpenAuth }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -128,6 +131,29 @@ export default function ProfilePage({ authUser }) {
       } catch (err) {
         if (!active) return;
         console.error('Failed to load profile:', err);
+
+        // Fallback for QR-verified sessions or offline profiles
+        if (authUser?.isQrSession || authUser?.usn) {
+          const identity = parseNmamitIdentity(authUser.displayName || `${authUser.usn || ''} ${authUser.name || ''}`);
+          const fallbackProfile = {
+            name: identity?.name || authUser.name || authUser.displayName || 'IEEE Member',
+            usn: identity?.usn || authUser.usn || '',
+            branch: identity?.branchName || authUser.branch || '',
+            branchCode: identity?.branchCode || '',
+            batchYear: identity?.batchYear ?? null,
+            roll: identity?.roll || '',
+            year: identity?.yearLabel || authUser.year || '',
+            collegeEmail: authUser.email || `${(authUser.usn || 'member').toLowerCase()}@nmamit.in`,
+            bio: authUser.bio || 'Verified IEEE Member via QR Pass',
+            membershipId: authUser.membershipId || authUser.usn || '',
+            socialLinks: authUser.socialLinks || { linkedin: '', github: '', instagram: '', website: '' },
+            achievements: authUser.achievements || [],
+          };
+          setProfile(fallbackProfile);
+          setLoading(false);
+          return;
+        }
+
         if (err?.message === 'COLLEGE_EMAIL_REQUIRED') {
           setLoadError('Please sign in using your @nmamit.in college account.');
         } else if (err?.code === 'permission-denied') {
@@ -299,10 +325,38 @@ export default function ProfilePage({ authUser }) {
 
   if (!authUser) {
     return (
-      <div className="pt-28 sm:pt-36 pb-20 max-w-xl mx-auto px-5 text-center">
-        <p className="text-slate-500 dark:text-zinc-500">
-          Sign in to view and manage your IEEE NMAMIT profile.
-        </p>
+      <div className="pt-32 sm:pt-40 pb-24 max-w-md mx-auto px-5 text-center">
+        <div className="p-8 sm:p-10 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/60 backdrop-blur-xl shadow-xl">
+          <div className="w-16 h-16 rounded-full bg-[#00629B]/10 dark:bg-[#0096D6]/20 flex items-center justify-center mx-auto mb-4 text-[#00629B] dark:text-[#0096D6]">
+            <User size={30} />
+          </div>
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+            Member Profile
+          </h2>
+          <p className="text-slate-500 dark:text-zinc-400 text-sm leading-relaxed mb-6">
+            Sign in with your @nmamit.in college account to view and manage your IEEE NMAMIT profile.
+          </p>
+          {onOpenAuth && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => onOpenAuth('login')}
+                className="flex-1 group relative inline-flex items-center justify-center gap-2 py-3 px-6 rounded-full bg-gradient-to-r from-[#00629B] via-[#0077b6] to-[#0096D6] hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider font-mono transition-all duration-300 shadow-lg shadow-[#00629B]/30 hover:shadow-[#0096D6]/40 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              >
+                <LogIn size={15} className="group-hover:translate-x-0.5 transition-transform" />
+                <span>Sign In</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenAuth('register')}
+                className="flex-1 group relative inline-flex items-center justify-center gap-2 py-3 px-6 rounded-full border border-slate-300 dark:border-zinc-700 bg-slate-100/70 dark:bg-zinc-800/60 hover:bg-slate-200 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-200 font-bold text-xs uppercase tracking-wider font-mono transition-all duration-300 hover:border-[#0096D6] cursor-pointer"
+              >
+                <UserPlus size={15} className="group-hover:scale-110 transition-transform text-[#0096D6]" />
+                <span>Sign Up</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
