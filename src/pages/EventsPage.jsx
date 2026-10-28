@@ -16,9 +16,11 @@ import {
 import { gsap } from '../lib/gsap';
 import { useGSAP } from '@gsap/react';
 import { prefersReducedMotion } from '../lib/motion';
+import { getLenis } from '../lib/smoothScroll';
 import { EVENTS_DATA } from '../data/events.js';
 import Reveal from '../components/Reveal';
 import FilterTabs from '../components/FilterTabs';
+import EventModal from '../components/EventModal';
 
 // --------------------------------------------------------------------------
 // Utilities
@@ -100,7 +102,6 @@ const AbstractFallback = ({ category, variant = 'standard' }) => {
   );
 };
 
-import EventModal from '../components/EventModal';
 
 // Rebuilt EventCardVariant (Upcoming)
 const EventCardVariant = ({ event, featured = false, onClick }) => {
@@ -152,7 +153,7 @@ const EventCardVariant = ({ event, featured = false, onClick }) => {
              <span>{event.time || 'TBA'}</span>
           </div>
           <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ieee-blue dark:hover:bg-ieee-teal transition-colors group/btn">
-              <span>Register</span>
+              <span>{(event?.parsedDate ?? new Date(event?.date || 0)) >= new Date() && event.registrationLink ? 'Register' : 'View Details'}</span>
               <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </button>
         </div>
@@ -292,7 +293,7 @@ const FlagshipShowcaseCard = ({ event, index }) => {
 // Rebuilt CountdownCard (Hero-scale card)
 const CountdownCard = ({ event }) => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  const eventTime = event.parsedDate.getTime();
+  const eventTime = event?.parsedDate?.getTime?.() ?? (event?.date ? new Date(event.date).getTime() : 0);
   const imageUrl = event.image || event.poster || event.posterImage;
 
   useEffect(() => {
@@ -370,7 +371,41 @@ export default function EventsPage({ onNavigate }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedYear, setSelectedYear] = useState('All');
   const listWrapperRef = useRef(null);
+  const filterBarRef = useRef(null);
   const isReduced = prefersReducedMotion();
+
+  const scrollToEvents = () => {
+    const targetElement = filterBarRef.current || listWrapperRef.current;
+    if (targetElement) {
+      const navOffset = 76;
+      const lenis = getLenis();
+      if (lenis && !isReduced) {
+        // Silky smooth cubic ease-in-out with zero start jerk
+        lenis.scrollTo(targetElement, {
+          offset: -navOffset,
+          duration: 1.3,
+          easing: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+          lock: false,
+        });
+      } else {
+        const elementTop = targetElement.getBoundingClientRect().top + window.scrollY;
+        const targetY = Math.max(0, elementTop - navOffset);
+        window.scrollTo({ top: targetY, behavior: isReduced ? 'auto' : 'smooth' });
+      }
+    }
+  };
+
+  const handleCategoryChange = (cat) => {
+    setSelectedCategory(cat);
+  };
+
+  const handleYearChange = (year) => {
+    setSelectedYear(year);
+    // Use requestAnimationFrame for perfectly synchronized frame timing
+    requestAnimationFrame(() => {
+      scrollToEvents();
+    });
+  };
 
   // Parse events once
 
@@ -421,7 +456,7 @@ export default function EventsPage({ onNavigate }) {
   const categories = ['All', 'Workshops', 'Hackathons', 'Flagship', 'Competitions'];
   
   const availableYears = useMemo(() => {
-    const years = new Set(allEvents.map(e => e.year));
+    const years = new Set(allEvents.map(e => e.year).filter(y => y !== '2027'));
     return ['All', ...Array.from(years).sort((a, b) => b - a)];
   }, [allEvents]);
 
@@ -434,6 +469,18 @@ export default function EventsPage({ onNavigate }) {
     const yearMatch = selectedYear === 'All' || event.year === selectedYear;
     return catMatch && yearMatch;
   };
+
+  const nextUpcomingEvent = useMemo(() => {
+    return allEvents
+      .filter((e) => e.parsedDate >= today)
+      .sort((a, b) => a.parsedDate - b.parsedDate)[0];
+  }, [allEvents, today]);
+
+  const yearFilteredEvents = useMemo(() => {
+    return allEvents
+      .filter(matchesFilters)
+      .sort((a, b) => b.parsedDate - a.parsedDate);
+  }, [allEvents, selectedCategory, selectedYear]);
 
   const upcomingEvents = allEvents.filter((e) => e.parsedDate >= today && matchesFilters(e)).sort((a, b) => a.parsedDate - b.parsedDate);
   const pastEvents = allEvents.filter((e) => e.parsedDate < today && matchesFilters(e)).sort((a, b) => b.parsedDate - a.parsedDate);
@@ -462,9 +509,9 @@ export default function EventsPage({ onNavigate }) {
           </div>
 
           {/* Live Countdown */}
-          {upcomingEvents.length > 0 && (
+          {nextUpcomingEvent && (
             <div className="w-full lg:w-auto shrink-0 mt-8 lg:mt-0 relative z-10">
-              <CountdownCard event={upcomingEvents[0]} />
+              <CountdownCard event={nextUpcomingEvent} />
             </div>
           )}
         </section>
@@ -491,13 +538,13 @@ export default function EventsPage({ onNavigate }) {
 
                 <div className={`flex flex-col sm:flex-row items-center gap-2 sm:gap-6 overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${showCollapsed ? 'max-w-0 opacity-0' : 'max-w-[800px] opacity-100'}`}>
                   <div className="w-full sm:w-auto overflow-x-auto no-scrollbar">
-                    <FilterTabs options={categories} selected={selectedCategory} onChange={setSelectedCategory} />
+                    <FilterTabs options={categories} selected={selectedCategory} onChange={handleCategoryChange} />
                   </div>
                   
                   <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-white/20 shrink-0"></div>
                   
                   <div className="w-full sm:w-auto overflow-x-auto no-scrollbar">
-                    <FilterTabs options={availableYears} selected={selectedYear} onChange={setSelectedYear} />
+                    <FilterTabs options={availableYears} selected={selectedYear} onChange={handleYearChange} />
                   </div>
                 </div>
 
@@ -508,103 +555,149 @@ export default function EventsPage({ onNavigate }) {
         )}
 
         {/* LISTINGS WRAPPER */}
-        <div ref={listWrapperRef} className="pb-32">
+        <div ref={listWrapperRef} className="pb-32 min-h-screen">
           
-          {/* MOBILE STATIC FILTERS */}
-          <div className="hidden max-md:flex flex-col gap-4 px-6 mt-4 mb-8 w-full">
-            <div className="w-full overflow-x-auto no-scrollbar pb-2">
-              <FilterTabs options={categories} selected={selectedCategory} onChange={setSelectedCategory} />
-            </div>
-            <div className="w-full overflow-x-auto no-scrollbar pb-2">
-              <FilterTabs options={availableYears} selected={selectedYear} onChange={setSelectedYear} />
+          {/* STICKY FILTER BAR */}
+          <div ref={filterBarRef} className="sticky top-[72px] z-30 bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-2xl border-y border-slate-200/80 dark:border-white/10 shadow-sm transition-colors duration-300 mb-8 sm:mb-12">
+            <div className="max-w-7xl mx-auto px-6 sm:px-12 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-6">
+              <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-500 font-bold shrink-0">
+                  Category
+                </span>
+                <FilterTabs options={categories} selected={selectedCategory} onChange={handleCategoryChange} ariaLabel="Filter by category" />
+              </div>
+
+              <div className="flex items-center gap-3 md:border-l md:border-slate-200 md:dark:border-white/10 md:pl-6 overflow-x-auto no-scrollbar">
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-500 font-bold shrink-0">
+                  Year
+                </span>
+                <FilterTabs options={availableYears} selected={selectedYear} onChange={handleYearChange} ariaLabel="Filter by year" />
+              </div>
             </div>
           </div>
           
-          {/* UPCOMING EVENTS */}
-          {upcomingEvents.length > 0 && (
-            <section className="upcoming-section max-w-7xl mx-auto px-6 sm:px-12 py-24 sm:py-32 border-b border-slate-200 dark:border-white/5">
-              <Reveal>
-                <div className="mb-12">
-                  <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-ieee-blue dark:text-ieee-teal font-bold mb-3 block">
-                    Happening Soon
-                  </span>
-                  <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
-                    Upcoming
-                  </h2>
-                </div>
-              </Reveal>
+          {selectedYear !== 'All' ? (
+            /* DEDICATED YEAR VIEW: Directly show that year's events */
+            yearFilteredEvents.length > 0 && (
+              <section className="year-events-section max-w-7xl mx-auto px-6 sm:px-12 py-16 sm:py-24 border-b border-slate-200 dark:border-white/5">
+                <Reveal>
+                  <div className="mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div>
+                      <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-ieee-blue dark:text-ieee-teal font-bold mb-3 block">
+                        {selectedCategory === 'All' ? 'Timeline' : selectedCategory} · {selectedYear}
+                      </span>
+                      <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                        {selectedYear} Events
+                      </h2>
+                    </div>
+                    <span className="text-xs sm:text-sm font-mono text-slate-500 dark:text-zinc-400">
+                      Showing {yearFilteredEvents.length} event{yearFilteredEvents.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </Reveal>
 
-              <div className="flex flex-col gap-8">
-                <div className="event-card-anim">
-                  <EventCardVariant event={upcomingEvents[0]} featured={true} onClick={setSelectedEvent} />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                  {yearFilteredEvents.map((event) => (
+                    <div key={event.id} className="event-card-anim">
+                      <EventCardVariant event={event} featured={false} onClick={setSelectedEvent} />
+                    </div>
+                  ))}
                 </div>
-                {upcomingEvents.length > 1 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-4">
-                    {upcomingEvents.slice(1).map((event) => (
-                      <div key={event.id} className="event-card-anim">
-                        <EventCardVariant event={event} featured={false} onClick={setSelectedEvent} />
+              </section>
+            )
+          ) : (
+            <>
+              {/* UPCOMING EVENTS */}
+              {upcomingEvents.length > 0 && (
+                <section className="upcoming-section max-w-7xl mx-auto px-6 sm:px-12 py-24 sm:py-32 border-b border-slate-200 dark:border-white/5">
+                  <Reveal>
+                    <div className="mb-12">
+                      <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-ieee-blue dark:text-ieee-teal font-bold mb-3 block">
+                        Happening Soon
+                      </span>
+                      <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                        Upcoming
+                      </h2>
+                    </div>
+                  </Reveal>
+
+                  <div className="flex flex-col gap-8">
+                    <div className="event-card-anim">
+                      <EventCardVariant event={upcomingEvents[0]} featured={true} onClick={setSelectedEvent} />
+                    </div>
+                    {upcomingEvents.length > 1 && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-4">
+                        {upcomingEvents.slice(1).map((event) => (
+                          <div key={event.id} className="event-card-anim">
+                            <EventCardVariant event={event} featured={false} onClick={setSelectedEvent} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* FLAGSHIP EXPERIENCES */}
+              {flagshipEvents.length > 0 && (
+                <section className="flagship-section max-w-7xl mx-auto px-6 sm:px-12 py-24 sm:py-32 border-b border-slate-200 dark:border-white/5">
+                  <Reveal>
+                    <div className="mb-16 md:flex justify-between items-end">
+                      <div>
+                        <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-amber-500 font-bold mb-3 block flex items-center gap-2">
+                          <Trophy size={14} /> Signature Experiences
+                        </span>
+                        <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                          Flagship
+                        </h2>
+                      </div>
+                    </div>
+                  </Reveal>
+                  <div className="flex flex-col gap-16">
+                    {flagshipEvents.map((flagship, idx) => (
+                      <div key={flagship.id} className="event-card-anim">
+                        <FlagshipShowcaseCard event={flagship} index={idx} />
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
-            </section>
-          )}
+                </section>
+              )}
 
-          {/* FLAGSHIP EXPERIENCES */}
-          {flagshipEvents.length > 0 && (
-            <section className="flagship-section max-w-7xl mx-auto px-6 sm:px-12 py-24 sm:py-32 border-b border-slate-200 dark:border-white/5">
-              <Reveal>
-                <div className="mb-16 md:flex justify-between items-end">
-                  <div>
-                    <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-amber-500 font-bold mb-3 block flex items-center gap-2">
-                      <Trophy size={14} /> Signature Experiences
-                    </span>
-                    <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
-                      Flagship
-                    </h2>
+              {/* PAST EVENTS ARCHIVE */}
+              {pastEvents.length > 0 && (
+                <section className="past-section max-w-7xl mx-auto px-6 sm:px-12 py-24 sm:py-32">
+                  <Reveal>
+                    <div className="mb-16 flex items-center gap-4">
+                      <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                        Archive
+                      </h2>
+                      <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
+                    </div>
+                  </Reveal>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+                    {pastEvents.map((event) => (
+                      <div key={event.id} className="event-card-anim">
+                        <PastArchiveCard event={event} onClick={setSelectedEvent} />
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </Reveal>
-              <div className="flex flex-col gap-16">
-                {flagshipEvents.map((flagship, idx) => (
-                  <div key={flagship.id} className="event-card-anim">
-                    <FlagshipShowcaseCard event={flagship} index={idx} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* PAST EVENTS ARCHIVE */}
-          {pastEvents.length > 0 && (
-            <section className="past-section max-w-7xl mx-auto px-6 sm:px-12 py-24 sm:py-32">
-              <Reveal>
-                <div className="mb-16 flex items-center gap-4">
-                  <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
-                    Archive
-                  </h2>
-                  <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
-                </div>
-              </Reveal>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-                {pastEvents.map((event) => (
-                  <div key={event.id} className="event-card-anim">
-                    <PastArchiveCard event={event} onClick={setSelectedEvent} />
-                  </div>
-                ))}
-              </div>
-            </section>
+                </section>
+              )}
+            </>
           )}
 
           {/* EMPTY STATE */}
-          {upcomingEvents.length === 0 && flagshipEvents.length === 0 && pastEvents.length === 0 && (
+          {((selectedYear === 'All' && upcomingEvents.length === 0 && flagshipEvents.length === 0 && pastEvents.length === 0) || (selectedYear !== 'All' && yearFilteredEvents.length === 0)) && (
             <div className="max-w-7xl mx-auto px-6 sm:px-12 py-32 flex flex-col items-center justify-center text-center event-card-anim">
               <div className="w-24 h-24 rounded-full bg-slate-200 dark:bg-zinc-900 flex items-center justify-center text-slate-400 dark:text-zinc-600 mb-6">
                 <Calendar size={40} strokeWidth={1} />
               </div>
               <h3 className="font-heading text-2xl font-bold text-slate-900 dark:text-white mb-2">No events found</h3>
-              <p className="text-slate-500 dark:text-zinc-400 mb-6">Adjust your category or timeline filters to see more results.</p>
+              <p className="text-slate-500 dark:text-zinc-400 mb-6">
+                {selectedYear !== 'All'
+                  ? `There are no ${selectedCategory !== 'All' ? selectedCategory.toLowerCase() + ' ' : ''}events found for ${selectedYear}.`
+                  : 'Adjust your category or timeline filters to see more results.'}
+              </p>
               <button 
                 onClick={() => { setSelectedCategory('All'); setSelectedYear('All'); }}
                 className="text-sm font-mono font-bold text-ieee-blue hover:underline uppercase tracking-widest"

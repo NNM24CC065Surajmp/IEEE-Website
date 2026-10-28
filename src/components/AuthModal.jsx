@@ -1,42 +1,195 @@
-import React, { useState, useEffect } from 'react';
-import { X, Mail, Lock, User, Hash, LogIn, UserPlus, Loader2, Chrome } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  X,
+  Mail,
+  Lock,
+  User,
+  Hash,
+  LogIn,
+  UserPlus,
+  Loader2,
+  QrCode,
+  UploadCloud,
+  CheckCircle2,
+  GraduationCap,
+  Building2,
+  ArrowLeft,
+  AlertCircle,
+} from 'lucide-react';
+import { gsap } from '../lib/gsap';
+import { prefersReducedMotion } from '../lib/motion';
+import { getLenis } from '../lib/smoothScroll.js';
 import {
   loginWithEmail,
   registerWithEmail,
   loginWithGoogle,
+  loginAnonymously,
   resetPassword,
   logoutUser,
   createUserProfile,
   getUserProfile,
 } from '../lib/firebase.js';
 import { parseNmamitIdentity } from '../lib/nmamitId.js';
+import { decodeQrFromImage, parseMemberQrPayload } from '../lib/qrHelper.js';
+import FloatingLabelInput from './FloatingLabelInput.jsx';
 
 const ALLOWED_GOOGLE_DOMAIN = 'nmamit.in';
 
-export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
-  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'reset'
+const COMMON_BRANCHES = [
+  'Computer Science and Engineering (CSE)',
+  'Information Science and Engineering (ISE)',
+  'Electronics and Communication Engineering (ECE)',
+  'Artificial Intelligence and Data Science (AI&DS)',
+  'Artificial Intelligence and Machine Learning (AI&ML)',
+  'Computer and Communication Engineering (CCE)',
+  'Electrical and Electronics Engineering (EEE)',
+  'Mechanical Engineering (MECH)',
+  'Civil Engineering (CIVIL)',
+  'Biotechnology Engineering (BTY)',
+  'Cyber Security (CYBER)',
+  'VLSI Design and Technology (VLSI)',
+];
+
+const GRAD_YEARS = ['2025', '2026', '2027', '2028', '2029'];
+
+export default function AuthModal({ isOpen, onClose, theme = 'dark', initialMode = 'login' }) {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState(initialMode || 'login'); // 'login' | 'register' | 'reset'
+
+  // Sub-view: Sign In with Member QR mode
+  const [signInWithQr, setSignInWithQr] = useState(false);
+
+  // Form Fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // Extra fields collected at registration
   const [name, setName] = useState('');
   const [branch, setBranch] = useState('');
   const [year, setYear] = useState('');
   const [usn, setUsn] = useState('');
 
+  // Inline Validation Errors
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  // Status & Feedback
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [resetSent, setResetSent] = useState(false);
+  const [qrScanning, setQrScanning] = useState(false);
+  const [qrSuccessMessage, setQrSuccessMessage] = useState('');
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  // Scroll Indicators
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  // References
+  const qrFileInputRef = useRef(null);
+  const backdropRef = useRef(null);
+  const modalCardRef = useRef(null);
+  const scrollBodyRef = useRef(null);
 
   const isLight = theme === 'light';
+  const isReduced = prefersReducedMotion();
 
+  // Reset errors and sync initial mode on open
   useEffect(() => {
     if (isOpen) {
       setError('');
+      setFieldErrors({});
       setResetSent(false);
+      setSignInWithQr(false);
+      setQrSuccessMessage('');
+      if (initialMode) setMode(initialMode);
     }
-  }, [isOpen, mode]);
+  }, [isOpen, initialMode]);
 
+  // Clean form state and smooth scroll to top when switching tabs
+  const handleTabSwitch = (newMode) => {
+    setMode(newMode);
+    setError('');
+    setFieldErrors({});
+    setResetSent(false);
+    setSignInWithQr(false);
+    setQrSuccessMessage('');
+    if (scrollBodyRef.current) {
+      scrollBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // ─── Modal Entrance Animation, Body Lock, & Lenis Pause ────────────
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // 1. Lock standard body scroll
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // 2. Pause Lenis smooth scrolling so it does NOT hijack modal wheel events!
+    const lenis = getLenis();
+    lenis?.stop();
+
+    // 3. Entrance animation
+    if (isReduced) {
+      if (backdropRef.current) gsap.set(backdropRef.current, { opacity: 1 });
+      if (modalCardRef.current) gsap.set(modalCardRef.current, { opacity: 1, scale: 1 });
+    } else {
+      if (backdropRef.current) {
+        gsap.fromTo(
+          backdropRef.current,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.18, ease: 'power2.out' }
+        );
+      }
+      if (modalCardRef.current) {
+        gsap.fromTo(
+          modalCardRef.current,
+          { opacity: 0, scale: 0.98, y: 6 },
+          { opacity: 1, scale: 1, y: 0, duration: 0.22, ease: 'power2.out' }
+        );
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+    };
+  }, [isOpen, isReduced]);
+
+  // Check scroll state for indicators
+  const checkScrollState = () => {
+    const el = scrollBodyRef.current;
+    if (!el) return;
+    const hasMoreDown = el.scrollHeight - el.scrollTop - el.clientHeight > 12;
+    const hasMoreUp = el.scrollTop > 8;
+    setCanScrollUp(hasMoreUp);
+    setCanScrollDown(hasMoreDown);
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const timer = setTimeout(checkScrollState, 50);
+    const el = scrollBodyRef.current;
+    if (!el) return () => clearTimeout(timer);
+
+    el.addEventListener('scroll', checkScrollState, { passive: true });
+    window.addEventListener('resize', checkScrollState, { passive: true });
+
+    return () => {
+      clearTimeout(timer);
+      el.removeEventListener('scroll', checkScrollState);
+      window.removeEventListener('resize', checkScrollState);
+    };
+  }, [isOpen, mode, signInWithQr, qrSuccessMessage, error]);
+
+  // Forward backdrop wheel events directly into the scroll body
+  const handleBackdropWheel = (e) => {
+    if (scrollBodyRef.current) {
+      scrollBodyRef.current.scrollTop += e.deltaY;
+    }
+  };
+
+  // Close on Escape key
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') onClose?.();
@@ -48,42 +201,158 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
   if (!isOpen) return null;
 
   const friendlyError = (code) => {
-    const map = {
-      'auth/invalid-email': 'That email address looks invalid.',
-      'auth/user-not-found': 'No account found with that email.',
-      'auth/wrong-password': 'Incorrect password.',
-      'auth/invalid-credential': 'Incorrect email or password.',
-      'auth/email-already-in-use': 'An account already exists with that email.',
-      'auth/weak-password': 'Password should be at least 6 characters.',
-      'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
-      'auth/too-many-requests': 'Too many attempts. Please wait and try again.',
-    };
-    return map[code] || 'Something went wrong. Please try again.';
+    switch (code) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        return 'Invalid email or password. Please verify your credentials.';
+      case 'auth/email-already-in-use':
+        return 'An account with this college email already exists. Try signing in.';
+      case 'auth/weak-password':
+        return 'Password must be at least 6 characters.';
+      case 'auth/invalid-email':
+        return 'Please enter a valid email address.';
+      case 'auth/popup-closed-by-user':
+        return 'Google sign-in was closed before completion.';
+      default:
+        return 'Authentication failed. Please check your network and try again.';
+    }
   };
 
+  // ─── Real-time Inline Field Validation ─────────────────────────────
+  const validateField = (field, val) => {
+    const nextErrors = { ...fieldErrors };
+
+    if (field === 'email') {
+      if (!val) {
+        nextErrors.email = 'Email address is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+        nextErrors.email = 'Please enter a valid email address';
+      } else if (mode === 'register' && !val.toLowerCase().endsWith(`@${ALLOWED_GOOGLE_DOMAIN}`)) {
+        nextErrors.email = `Must be your official @${ALLOWED_GOOGLE_DOMAIN} address`;
+      } else {
+        delete nextErrors.email;
+      }
+    }
+
+    if (field === 'password') {
+      if (!val) {
+        nextErrors.password = 'Password is required';
+      } else if (val.length < 6) {
+        nextErrors.password = 'Password must be at least 6 characters';
+      } else {
+        delete nextErrors.password;
+      }
+    }
+
+    if (field === 'name') {
+      if (!val.trim()) {
+        nextErrors.name = 'Full name is required';
+      } else {
+        delete nextErrors.name;
+      }
+    }
+
+    if (field === 'branch') {
+      if (!val.trim()) {
+        nextErrors.branch = 'Branch is required';
+      } else {
+        delete nextErrors.branch;
+      }
+    }
+
+    if (field === 'year') {
+      if (!val.trim()) {
+        nextErrors.year = 'Graduation year is required';
+      } else {
+        delete nextErrors.year;
+      }
+    }
+
+    if (field === 'usn') {
+      const cleanUsn = val.trim();
+      if (!cleanUsn) {
+        nextErrors.usn = 'College USN is required';
+      } else if (cleanUsn.length < 6) {
+        nextErrors.usn = 'Please enter a valid USN (e.g. NN25CSE021)';
+      } else {
+        delete nextErrors.usn;
+      }
+    }
+
+    setFieldErrors(nextErrors);
+    return nextErrors;
+  };
+
+  // ─── Standard Form Submission ──────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Sign Up Field Validation
+    if (mode === 'register') {
+      const errs = {};
+      if (!name.trim()) errs.name = 'Full name is required';
+      if (!branch.trim()) errs.branch = 'Branch is required';
+      if (!year.trim()) errs.year = 'Graduation year is required';
+      if (!usn.trim()) errs.usn = 'College USN is required';
+      if (!email.trim()) errs.email = 'College email is required';
+      else if (!email.toLowerCase().endsWith(`@${ALLOWED_GOOGLE_DOMAIN}`)) {
+        errs.email = `Must be your official @${ALLOWED_GOOGLE_DOMAIN} address`;
+      }
+      if (!password) errs.password = 'Password is required';
+      else if (password.length < 6) errs.password = 'Password must be at least 6 characters';
+
+      if (Object.keys(errs).length > 0) {
+        setFieldErrors(errs);
+        return;
+      }
+    }
+
+    // Sign In Validation
+    if (mode === 'login') {
+      if (!email.trim() || !password) {
+        setError('Please enter both your email address and password.');
+        return;
+      }
+    }
+
     setLoading(true);
+
     try {
       if (mode === 'login') {
         await loginWithEmail(email, password);
+        onClose?.();
       } else if (mode === 'register') {
-        const user = await registerWithEmail(email, password);
-        await createUserProfile(user.uid, {
+        const cred = await registerWithEmail(email, password);
+        await createUserProfile(cred.user.uid, {
           name: name.trim(),
+          email: cred.user.email,
           branch: branch.trim(),
-          year,
+          year: year.trim(),
           usn: usn.trim().toUpperCase(),
-          collegeEmail: email.trim(),
+          role: 'member',
+          photoURL: '',
           bio: '',
-          membershipId: '',
+          skills: [],
+          socials: {
+            linkedin: '',
+            github: '',
+            instagram: '',
+            website: '',
+          },
+          achievements: [],
         });
+        onClose?.();
       } else if (mode === 'reset') {
+        if (!email.trim()) {
+          setError('Please enter your college email to receive a reset link.');
+          setLoading(false);
+          return;
+        }
         await resetPassword(email);
         setResetSent(true);
       }
-      // App.jsx's onAuthStateChanged listener closes the modal automatically on success.
     } catch (err) {
       setError(friendlyError(err.code));
     } finally {
@@ -91,39 +360,43 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
     }
   };
 
+  // ─── Google Authentication ─────────────────────────────────────────
   const handleGoogle = async () => {
     setError('');
     setLoading(true);
     try {
-      const user = await loginWithGoogle();
+      const cred = await loginWithGoogle();
+      const userEmail = cred.user.email || '';
 
-      // ─── Enforce the college domain ───────────────────────────
-      // The `hd` param on the provider only hints the account picker;
-      // this is the actual check. Anyone outside @nmamit.in is signed
-      // back out immediately and never gets a session.
-      const userEmail = (user.email || '').toLowerCase();
       if (!userEmail.endsWith(`@${ALLOWED_GOOGLE_DOMAIN}`)) {
         await logoutUser();
-        setError(`Only NMAMIT college accounts (@${ALLOWED_GOOGLE_DOMAIN}) can sign in with Google.`);
+        setError(`Please use your NMAMIT college email (@${ALLOWED_GOOGLE_DOMAIN}) to sign in.`);
         return;
       }
 
-      // First time this account signs in, seed the profile — parsing
-      // USN / branch / year / name out of the Google display name,
-      // which NMAMIT formats as "<USN> <FULL NAME>".
-      const existing = await getUserProfile(user.uid);
+      const existing = await getUserProfile(cred.user.uid);
       if (!existing) {
-        const identity = parseNmamitIdentity(user.displayName || '');
-        await createUserProfile(user.uid, {
-          name: identity?.name || user.displayName || '',
-          branch: identity?.branchName || '',
-          year: identity?.yearLabel || '',
-          usn: identity?.usn || '',
-          collegeEmail: user.email || '',
+        const parsed = parseNmamitIdentity(cred.user.displayName || '');
+        await createUserProfile(cred.user.uid, {
+          name: parsed?.name || cred.user.displayName || 'Member',
+          email: userEmail,
+          branch: parsed?.branchName || parsed?.branchCode || '',
+          year: parsed?.yearLabel || '',
+          usn: parsed?.usn || '',
+          role: 'member',
+          photoURL: cred.user.photoURL || '',
           bio: '',
-          membershipId: '',
+          skills: [],
+          socials: {
+            linkedin: '',
+            github: '',
+            instagram: '',
+            website: '',
+          },
+          achievements: [],
         });
       }
+      onClose?.();
     } catch (err) {
       setError(friendlyError(err.code));
     } finally {
@@ -131,235 +404,658 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark' }) {
     }
   };
 
-  const inputWrapClass = `mt-1 flex items-center gap-2 rounded-lg border px-3 py-2.5 ${
-    isLight ? 'bg-slate-50 border-slate-200 focus-within:border-[#00629B]' : 'bg-zinc-900/80 border-zinc-800 focus-within:border-[#0096D6]'
-  }`;
-  const inputFieldClass = `w-full bg-transparent text-sm outline-none ${
-    isLight ? 'text-slate-900 placeholder:text-slate-400' : 'text-zinc-100 placeholder:text-zinc-600'
-  }`;
-  const labelClass = `text-[10px] font-mono uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-zinc-500'}`;
+  // ─── QR Code Processing for Sign In & Sign Up ──────────────────────
+  const processQrFile = async (file) => {
+    if (!file) return;
+
+    setError('');
+    setQrSuccessMessage('');
+    setQrScanning(true);
+
+    try {
+      const rawPayload = await decodeQrFromImage(file);
+      const member = parseMemberQrPayload(rawPayload);
+
+      if (mode === 'login' || signInWithQr) {
+        // Sign In Flow with QR
+        const memberUsn = member.usn || 'IEEE-MEMBER';
+        const memberName = member.name || 'IEEE Member';
+        const memberEmail = member.email || `${memberUsn.toLowerCase()}@nmamit.in`;
+
+        let resolvedUid = member.uid;
+
+        try {
+          const anonUser = await loginAnonymously();
+          resolvedUid = anonUser.uid;
+        } catch {
+          resolvedUid = `qr_${memberUsn}`;
+        }
+
+        const qrUserData = {
+          uid: resolvedUid,
+          email: memberEmail,
+          displayName: `${memberUsn} ${memberName}`,
+          name: memberName,
+          usn: memberUsn,
+          branch: member.branch || '',
+          year: member.year || '',
+          role: 'member',
+          isQrSession: true,
+        };
+
+        try {
+          const existing = await getUserProfile(resolvedUid);
+          if (!existing) {
+            await createUserProfile(resolvedUid, {
+              ...qrUserData,
+              bio: 'Verified IEEE Member via QR Pass',
+              socialLinks: { linkedin: '', github: '', instagram: '', website: '' },
+              achievements: member.achievements || [],
+            });
+          }
+        } catch {
+          // Handled via local session
+        }
+
+        window.dispatchEvent(new CustomEvent('ieee:qr-auth', { detail: qrUserData }));
+        setQrSuccessMessage(`Verified pass for ${memberName} (${memberUsn})`);
+
+        setTimeout(() => {
+          onClose?.();
+          navigate('/profile');
+        }, 500);
+
+      } else if (mode === 'register') {
+        // Sign Up Flow with QR: Auto-fill registration form
+        if (member.name) setName(member.name);
+        if (member.usn) setUsn(member.usn);
+        if (member.branch) setBranch(member.branch);
+        if (member.year) setYear(member.year);
+        if (member.email) setEmail(member.email);
+
+        if (member.usn && (!member.branch || !member.year)) {
+          const parsed = parseNmamitIdentity(`${member.usn} ${member.name || ''}`);
+          if (parsed) {
+            if (!member.branch && parsed.branchName) setBranch(parsed.branchName);
+            if (!member.year && parsed.yearLabel) setYear(parsed.yearLabel);
+          }
+        }
+
+        setFieldErrors({});
+        setQrSuccessMessage(`Autofilled details for ${member.name || member.usn}. Create a password to finish.`);
+      }
+    } catch (err) {
+      setError(err.message || 'Could not read a valid IEEE QR code from this image. Please ensure the QR is clear and well-lit.');
+    } finally {
+      setQrScanning(false);
+      if (qrFileInputRef.current) qrFileInputRef.current.value = '';
+    }
+  };
+
+  const handleQrFileInput = (e) => {
+    const file = e.target.files?.[0];
+    if (file) processQrFile(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processQrFile(file);
+  };
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 overflow-y-auto"
-      style={{ background: 'rgba(3,4,6,0.75)', backdropFilter: 'blur(6px)' }}
+      ref={backdropRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-modal-title"
+      data-lenis-prevent="true"
+      onWheel={handleBackdropWheel}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/60 dark:bg-black/70 backdrop-blur-xs transition-opacity duration-200 cursor-pointer"
       onClick={onClose}
     >
+      {/* 
+        PREMIUM AUTHENTICATION CARD OVERLAY
+        - Pauses Lenis while open so native mouse wheel and touch momentum scroll smoothly without resistance.
+        - Pinned header keeps branding, close button, and mode switch accessible.
+        - Effortless scrolling in a single smooth container with visible scrollbar.
+      */}
       <div
+        ref={modalCardRef}
+        data-lenis-prevent="true"
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-sm rounded-2xl border p-7 shadow-2xl my-auto ${
-          isLight ? 'bg-white border-slate-200' : 'bg-[#0a0d11] border-zinc-800'
+        className={`cursor-default relative w-full max-w-[430px] max-h-[min(92vh,760px)] sm:max-h-[min(90vh,740px)] flex flex-col rounded-2xl transition-colors duration-150 overflow-hidden ${
+          isLight
+            ? 'bg-white text-slate-900 border border-slate-200/90 shadow-[0_20px_50px_-12px_rgba(15,23,42,0.15),0_0_1px_rgba(15,23,42,0.08)]'
+            : 'bg-[#0E131F] text-slate-100 border border-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),0_0_1px_rgba(255,255,255,0.06)]'
         }`}
       >
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className={`absolute top-4 right-4 w-8 h-8 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
-            isLight
-              ? 'border-slate-200 text-slate-500 hover:border-[#00629B] hover:text-[#00629B]'
-              : 'border-zinc-800 text-zinc-400 hover:border-[#0096D6] hover:text-[#0096D6]'
+        {/* Datalists for quick & accurate branch/year selection */}
+        <datalist id="auth-branch-list">
+          {COMMON_BRANCHES.map((b) => (
+            <option key={b} value={b} />
+          ))}
+        </datalist>
+        <datalist id="auth-year-list">
+          {GRAD_YEARS.map((y) => (
+            <option key={y} value={y} />
+          ))}
+        </datalist>
+
+        {/* Hidden File Input for QR Code scanning */}
+        <input
+          ref={qrFileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/jpg,image/webp"
+          className="hidden"
+          onChange={handleQrFileInput}
+        />
+
+        {/* ─── 1. PINNED BRAND, CLOSE BUTTON, & MODE TABS ─────────────── */}
+        <div
+          className={`shrink-0 px-5 sm:px-6 pt-4 pb-3 border-b bg-inherit z-10 transition-shadow ${
+            canScrollUp
+              ? 'border-slate-200 dark:border-slate-800 shadow-xs'
+              : 'border-slate-100 dark:border-slate-800/80'
           }`}
         >
-          <X size={16} />
-        </button>
-
-        <div className="mb-6">
-          <p className={labelClass}>IEEE NMAMIT · Student Branch</p>
-          <h2 className={`text-xl font-bold mt-1 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-            {mode === 'login' && 'Welcome back'}
-            {mode === 'register' && 'Create an account'}
-            {mode === 'reset' && 'Reset your password'}
-          </h2>
-        </div>
-
-        {mode === 'reset' && resetSent ? (
-          <div
-            className={`text-sm rounded-lg p-4 border ${
-              isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-            }`}
-          >
-            Password reset email sent to <span className="font-medium">{email}</span>. Check your inbox.
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-3.5">
-            {mode === 'register' && (
-              <>
-                <div>
-                  <label className={labelClass}>Full Name</label>
-                  <div className={inputWrapClass}>
-                    <User size={15} className={isLight ? 'text-slate-400' : 'text-zinc-500'} />
-                    <input
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Anagha Shetty"
-                      className={inputFieldClass}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelClass}>Branch</label>
-                    <div className={inputWrapClass}>
-                      <input
-                        type="text"
-                        required
-                        value={branch}
-                        onChange={(e) => setBranch(e.target.value)}
-                        placeholder="CSE / ISE / ECE..."
-                        className={inputFieldClass}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className={labelClass}>Year</label>
-                    <div className={inputWrapClass}>
-                      <select
-                        required
-                        value={year}
-                        onChange={(e) => setYear(e.target.value)}
-                        className={`${inputFieldClass} cursor-pointer`}
-                      >
-                        <option value="" disabled>Select</option>
-                        <option>1st Year</option>
-                        <option>2nd Year</option>
-                        <option>3rd Year</option>
-                        <option>4th Year</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className={labelClass}>USN</label>
-                  <div className={inputWrapClass}>
-                    <Hash size={15} className={isLight ? 'text-slate-400' : 'text-zinc-500'} />
-                    <input
-                      type="text"
-                      required
-                      value={usn}
-                      onChange={(e) => setUsn(e.target.value)}
-                      placeholder="NN25CSE021"
-                      className={`${inputFieldClass} uppercase`}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            <div>
-              <label className={labelClass}>{mode === 'register' ? 'College Email' : 'Email'}</label>
-              <div className={inputWrapClass}>
-                <Mail size={15} className={isLight ? 'text-slate-400' : 'text-zinc-500'} />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@nmamit.in"
-                  className={inputFieldClass}
+          <div className="flex items-center justify-between">
+            {/* Authentic Brand Identity */}
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-1 flex items-center justify-center shrink-0">
+                <img
+                  src="/images/ieee-nmamit-mark-only.png"
+                  alt="IEEE NMAMIT"
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
                 />
               </div>
-            </div>
-
-            {mode !== 'reset' && (
               <div>
-                <label className={labelClass}>Password</label>
-                <div className={inputWrapClass}>
-                  <Lock size={15} className={isLight ? 'text-slate-400' : 'text-zinc-500'} />
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className={inputFieldClass}
-                  />
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold tracking-wide text-slate-900 dark:text-slate-100">
+                    IEEE NMAMIT
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded font-mono font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/70 dark:border-slate-700/60 leading-none">
+                    STB 60002
+                  </span>
                 </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+                  Student Branch Portal
+                </p>
               </div>
-            )}
-
-            {mode === 'login' && (
-              <button
-                type="button"
-                onClick={() => setMode('reset')}
-                className={`text-xs font-mono cursor-pointer ${isLight ? 'text-[#00629B] hover:underline' : 'text-[#0096D6] hover:underline'}`}
-              >
-                Forgot password?
-              </button>
-            )}
-
-            {error && (
-              <p className={`text-xs rounded-lg px-3 py-2 border ${isLight ? 'bg-red-50 border-red-200 text-red-600' : 'bg-red-500/10 border-red-500/30 text-red-400'}`}>
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#00629B] hover:bg-[#00558a] text-white text-sm font-semibold py-2.5 transition-colors disabled:opacity-60 cursor-pointer"
-            >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : mode === 'register' ? <UserPlus size={16} /> : <LogIn size={16} />}
-              {mode === 'login' && 'Sign In'}
-              {mode === 'register' && 'Create Account'}
-              {mode === 'reset' && 'Send Reset Link'}
-            </button>
-          </form>
-        )}
-
-        {mode !== 'reset' && (
-          <>
-            <div className="flex items-center gap-3 my-5">
-              <div className={`h-px flex-1 ${isLight ? 'bg-slate-200' : 'bg-zinc-800'}`} />
-              <span className={`text-[10px] font-mono uppercase tracking-wider ${isLight ? 'text-slate-400' : 'text-zinc-600'}`}>or</span>
-              <div className={`h-px flex-1 ${isLight ? 'bg-slate-200' : 'bg-zinc-800'}`} />
             </div>
 
+            {/* Pinned Close Control */}
             <button
               type="button"
-              onClick={handleGoogle}
-              disabled={loading}
-              className={`w-full flex items-center justify-center gap-2 rounded-lg border text-sm font-medium py-2.5 transition-colors disabled:opacity-60 cursor-pointer ${
-                isLight ? 'border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50' : 'border-zinc-800 text-zinc-200 hover:border-zinc-700 hover:bg-zinc-900'
+              onClick={onClose}
+              aria-label="Close dialog"
+              className="p-1.5 -mr-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B]"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Pinned Segmented Mode Switcher */}
+          {mode !== 'reset' && !signInWithQr && (
+            <div
+              role="tablist"
+              aria-label="Authentication mode"
+              className={`grid grid-cols-2 p-1 rounded-xl border mt-3 ${
+                isLight
+                  ? 'bg-slate-100/90 border-slate-200/80'
+                  : 'bg-[#111726] border-slate-800'
               }`}
             >
-              <Chrome size={16} />
-              Continue with Google
-            </button>
-            <p className={`text-[11px] mt-2 text-center ${isLight ? 'text-slate-400' : 'text-zinc-600'}`}>
-              NMAMIT college accounts only (@{ALLOWED_GOOGLE_DOMAIN}) — name, USN, branch and year are pulled in automatically.
-            </p>
-          </>
-        )}
-
-        <p className={`text-center text-xs mt-6 ${isLight ? 'text-slate-500' : 'text-zinc-500'}`}>
-          {mode === 'login' && (
-            <>
-              Don&apos;t have an account?{' '}
-              <button type="button" onClick={() => setMode('register')} className={isLight ? 'text-[#00629B] font-medium hover:underline cursor-pointer' : 'text-[#0096D6] font-medium hover:underline cursor-pointer'}>
-                Sign up
-              </button>
-            </>
-          )}
-          {mode === 'register' && (
-            <>
-              Already have an account?{' '}
-              <button type="button" onClick={() => setMode('login')} className={isLight ? 'text-[#00629B] font-medium hover:underline cursor-pointer' : 'text-[#0096D6] font-medium hover:underline cursor-pointer'}>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === 'login'}
+                onClick={() => handleTabSwitch('login')}
+                className={`py-1.5 text-xs font-semibold rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B] ${
+                  mode === 'login'
+                    ? isLight
+                      ? 'bg-white text-slate-900 shadow-xs'
+                      : 'bg-[#182136] text-white shadow-xs border border-slate-700/60'
+                    : isLight
+                    ? 'text-slate-600 hover:text-slate-900'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
                 Sign in
               </button>
-            </>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === 'register'}
+                onClick={() => handleTabSwitch('register')}
+                className={`py-1.5 text-xs font-semibold rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B] ${
+                  mode === 'register'
+                    ? isLight
+                      ? 'bg-white text-slate-900 shadow-xs'
+                      : 'bg-[#182136] text-white shadow-xs border border-slate-700/60'
+                    : isLight
+                    ? 'text-slate-600 hover:text-slate-900'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Create account
+              </button>
+            </div>
           )}
-          {mode === 'reset' && (
-            <button type="button" onClick={() => setMode('login')} className={isLight ? 'text-[#00629B] font-medium hover:underline cursor-pointer' : 'text-[#0096D6] font-medium hover:underline cursor-pointer'}>
-              ← Back to sign in
-            </button>
+        </div>
+
+        {/* ─── 2. EFFORTLESS SCROLL AREA FOR FORM CONTENT ──────────────── */}
+        <div
+          ref={scrollBodyRef}
+          tabIndex={0}
+          data-lenis-prevent="true"
+          className="auth-card-scroll flex-1 overflow-y-auto overscroll-contain px-5 sm:px-6 py-4 space-y-3.5 focus:outline-none relative"
+        >
+          {/* Header Context Text */}
+          <div>
+            <h2
+              id="auth-modal-title"
+              className="text-base font-heading font-semibold tracking-tight text-slate-900 dark:text-slate-100"
+            >
+              {mode === 'login' && (signInWithQr ? 'Sign in with Member Pass' : 'Sign in to your account')}
+              {mode === 'register' && 'Create branch account'}
+              {mode === 'reset' && 'Reset your password'}
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+              {mode === 'login' && !signInWithQr && 'Access registered events, member resources, and branch profile.'}
+              {mode === 'login' && signInWithQr && 'Upload or drop your IEEE digital pass to authenticate immediately.'}
+              {mode === 'register' && 'Register with your NMAMIT credentials to activate membership access.'}
+              {mode === 'reset' && 'Enter your registered college email and we will send a password reset link.'}
+            </p>
+          </div>
+
+          {/* Feedback: QR Auto-fill / Success Confirmation */}
+          {qrSuccessMessage && (
+            <div className="p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/80 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2.5">
+              <CheckCircle2 size={16} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+              <span className="font-medium leading-tight">{qrSuccessMessage}</span>
+            </div>
           )}
-        </p>
+
+          {/* Feedback: Error Alert */}
+          {error && (
+            <div className="p-3 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/80 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5">
+              <AlertCircle size={16} className="shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
+              <span className="leading-tight">{error}</span>
+            </div>
+          )}
+
+          {/* Reset Sent Confirmation View */}
+          {mode === 'reset' && resetSent ? (
+            <div className="space-y-4 pt-1">
+              <div
+                className={`p-4 rounded-xl border text-xs leading-relaxed ${
+                  isLight
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    : 'bg-emerald-950/20 border-emerald-900/50 text-emerald-300'
+                }`}
+              >
+                <p className="font-semibold mb-1 flex items-center gap-1.5">
+                  <CheckCircle2 size={16} className="text-emerald-500" />
+                  Password reset link sent
+                </p>
+                <p>
+                  We have dispatched a reset link to <span className="font-medium underline">{email}</span>. Please verify your inbox and spam folder.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleTabSwitch('login')}
+                className="w-full h-10 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-xs font-medium text-slate-700 dark:text-slate-300 transition-colors flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B]"
+              >
+                <ArrowLeft size={14} />
+                <span>Return to sign in</span>
+              </button>
+            </div>
+          ) : mode === 'login' && signInWithQr ? (
+            /* =========================================================
+               SIGN IN WITH MEMBER QR (DRAG & DROP / FILE BROWSE)
+            ========================================================= */
+            <div className="space-y-4 pt-1">
+              <div
+                onClick={() => qrFileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(true);
+                }}
+                onDragLeave={() => setIsDragOver(false)}
+                onDrop={handleDrop}
+                className={`relative border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-colors ${
+                  isDragOver
+                    ? 'border-[#00629B] bg-[#00629B]/5'
+                    : isLight
+                    ? 'border-slate-300 bg-slate-50/50 hover:border-slate-400'
+                    : 'border-slate-800 bg-[#111726] hover:border-slate-700'
+                }`}
+              >
+                <div className="w-10 h-10 mx-auto rounded-xl bg-[#00629B]/10 dark:bg-[#00629B]/20 text-[#00629B] dark:text-[#38bdf8] flex items-center justify-center mb-2">
+                  {qrScanning ? (
+                    <Loader2 size={20} className="animate-spin text-[#00629B] dark:text-[#38bdf8]" />
+                  ) : (
+                    <QrCode size={20} />
+                  )}
+                </div>
+
+                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  {qrScanning ? 'Verifying member pass...' : 'Upload IEEE Member Pass'}
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
+                  Drag and drop your badge image here, or browse from device (PNG, JPG, WebP up to 5 MB).
+                </p>
+
+                <button
+                  type="button"
+                  disabled={qrScanning}
+                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#00629B] dark:text-[#38bdf8] bg-[#00629B]/10 dark:bg-[#00629B]/20 hover:bg-[#00629B]/15 transition-colors"
+                >
+                  <UploadCloud size={14} />
+                  <span>Browse image</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSignInWithQr(false)}
+                className="w-full py-1.5 text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors flex items-center justify-center gap-1.5 font-medium"
+              >
+                <ArrowLeft size={13} />
+                <span>Return to email and password</span>
+              </button>
+            </div>
+          ) : (
+            /* =========================================================
+               STANDARD CREDENTIAL FORMS (SIGN IN / SIGN UP / RESET)
+            ========================================================= */
+            <form onSubmit={handleSubmit} className="space-y-3 pt-0.5">
+              {/* Quick Fill with QR (Sign Up only) */}
+              {mode === 'register' && (
+                <div className="p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-[#00629B]/10 dark:bg-[#00629B]/20 text-[#00629B] dark:text-[#38bdf8] flex items-center justify-center shrink-0">
+                      {qrScanning ? <Loader2 size={14} className="animate-spin" /> : <QrCode size={14} />}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium text-slate-800 dark:text-slate-200 truncate">Have an IEEE QR Pass?</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Autofill your student profile in one click</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => qrFileInputRef.current?.click()}
+                    disabled={qrScanning}
+                    className="px-2.5 py-1 rounded-lg text-xs font-medium text-[#00629B] dark:text-[#38bdf8] hover:bg-[#00629B]/10 dark:hover:bg-[#00629B]/20 transition-colors shrink-0"
+                  >
+                    {qrScanning ? 'Reading...' : 'Upload pass'}
+                  </button>
+                </div>
+              )}
+
+              {/* SIGN UP EXCLUSIVE FIELDS */}
+              {mode === 'register' && (
+                <>
+                  <FloatingLabelInput
+                    id="reg-name"
+                    label="Full Name"
+                    icon={User}
+                    placeholder="e.g., Alan Turing"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      if (fieldErrors.name) validateField('name', e.target.value);
+                    }}
+                    onBlur={(e) => validateField('name', e.target.value)}
+                    error={fieldErrors.name}
+                    required
+                    theme={theme}
+                  />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <FloatingLabelInput
+                      id="reg-branch"
+                      label="Branch"
+                      icon={Building2}
+                      placeholder="e.g., CSE"
+                      list="auth-branch-list"
+                      value={branch}
+                      onChange={(e) => {
+                        setBranch(e.target.value);
+                        if (fieldErrors.branch) validateField('branch', e.target.value);
+                      }}
+                      onBlur={(e) => validateField('branch', e.target.value)}
+                      error={fieldErrors.branch}
+                      required
+                      theme={theme}
+                    />
+
+                    <FloatingLabelInput
+                      id="reg-year"
+                      label="Grad Year"
+                      icon={GraduationCap}
+                      placeholder="e.g., 2027"
+                      list="auth-year-list"
+                      value={year}
+                      onChange={(e) => {
+                        setYear(e.target.value);
+                        if (fieldErrors.year) validateField('year', e.target.value);
+                      }}
+                      onBlur={(e) => validateField('year', e.target.value)}
+                      error={fieldErrors.year}
+                      required
+                      theme={theme}
+                    />
+                  </div>
+
+                  <FloatingLabelInput
+                    id="reg-usn"
+                    label="College USN"
+                    icon={Hash}
+                    placeholder="e.g., NN25CSE021"
+                    value={usn}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase();
+                      setUsn(val);
+                      if (fieldErrors.usn) validateField('usn', val);
+                    }}
+                    onBlur={(e) => validateField('usn', e.target.value)}
+                    error={fieldErrors.usn}
+                    required
+                    theme={theme}
+                  />
+                </>
+              )}
+
+              {/* EMAIL FIELD (SIGN IN, SIGN UP, RESET) */}
+              <FloatingLabelInput
+                id="auth-email"
+                type="email"
+                label={mode === 'register' ? 'College Email (@nmamit.in)' : 'College Email'}
+                icon={Mail}
+                placeholder="you@nmamit.in"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email) validateField('email', e.target.value);
+                }}
+                onBlur={(e) => validateField('email', e.target.value)}
+                error={fieldErrors.email}
+                helperText={mode === 'register' ? 'Must be your official @nmamit.in address' : ''}
+                required
+                theme={theme}
+              />
+
+              {/* PASSWORD FIELD (SIGN IN, SIGN UP) */}
+              {mode !== 'reset' && (
+                <FloatingLabelInput
+                  id="auth-password"
+                  type="password"
+                  label="Password"
+                  icon={Lock}
+                  placeholder={mode === 'register' ? 'Create a secure password' : '••••••••'}
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (fieldErrors.password) validateField('password', e.target.value);
+                  }}
+                  onBlur={(e) => {
+                    if (mode === 'register') validateField('password', e.target.value);
+                  }}
+                  error={fieldErrors.password}
+                  helperText={mode === 'register' ? 'Minimum 6 characters' : ''}
+                  required
+                  theme={theme}
+                />
+              )}
+
+              {/* Forgot Password Link (Sign In only) */}
+              {mode === 'login' && (
+                <div className="flex justify-end pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('reset');
+                      setError('');
+                    }}
+                    className="text-xs text-[#00629B] dark:text-[#38bdf8] hover:underline font-medium focus:outline-none"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
+              {/* PRIMARY SUBMIT ACTION */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full h-10 mt-1 rounded-xl bg-[#00629B] hover:bg-[#005080] active:bg-[#00426b] text-white font-medium text-sm transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00629B]"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>
+                      {mode === 'login' && 'Signing in...'}
+                      {mode === 'register' && 'Creating account...'}
+                      {mode === 'reset' && 'Sending link...'}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {mode === 'login' && <LogIn size={15} />}
+                    {mode === 'register' && <UserPlus size={15} />}
+                    <span>
+                      {mode === 'login' && 'Sign in'}
+                      {mode === 'register' && 'Create branch account'}
+                      {mode === 'reset' && 'Send reset link'}
+                    </span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* ─── 3. SECONDARY & TERTIARY ACTIONS ────────────────────── */}
+          {mode !== 'reset' && !signInWithQr && (
+            <div className="pt-0.5">
+              <div className="relative my-3.5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span
+                    className={`px-2.5 font-medium ${
+                      isLight ? 'bg-white text-slate-400' : 'bg-[#0E131F] text-slate-500'
+                    }`}
+                  >
+                    or continue with
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {/* Secondary Action: Member QR Login (Sign In mode) */}
+                {mode === 'login' && (
+                  <button
+                    type="button"
+                    onClick={() => setSignInWithQr(true)}
+                    className="w-full h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/30 hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-medium transition-colors flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B]"
+                  >
+                    <QrCode size={16} className="text-[#00629B] dark:text-[#38bdf8]" />
+                    <span>Sign in with Member QR</span>
+                  </button>
+                )}
+
+                {/* Tertiary Action: Google SSO */}
+                <button
+                  type="button"
+                  onClick={handleGoogle}
+                  disabled={loading}
+                  className="w-full h-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-medium transition-colors flex items-center justify-center gap-2.5 shadow-2xs disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00629B]"
+                >
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
+                </button>
+              </div>
+
+              <p className="text-[11px] text-center text-slate-400 dark:text-slate-500 mt-2.5">
+                Restricted to @{ALLOWED_GOOGLE_DOMAIN} college accounts
+              </p>
+            </div>
+          )}
+
+          {/* Footer Navigation (Reset flow return) */}
+          {mode === 'reset' && !resetSent && (
+            <div className="pt-1 text-center">
+              <button
+                type="button"
+                onClick={() => handleTabSwitch('login')}
+                className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors inline-flex items-center gap-1.5 font-medium"
+              >
+                <ArrowLeft size={13} />
+                <span>Back to sign in</span>
+              </button>
+            </div>
+          )}
+
+          {/* Generous bottom spacing spacer ensuring nothing is clipped */}
+          <div className="h-4 shrink-0" />
+        </div>
+
+        {/* Subtle Bottom Scroll Fade Indicator (when more content is below) */}
+        {canScrollDown && (
+          <div
+            className={`pointer-events-none absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t ${
+              isLight
+                ? 'from-white via-white/80 to-transparent'
+                : 'from-[#0E131F] via-[#0E131F]/80 to-transparent'
+            } transition-opacity duration-200`}
+          />
+        )}
       </div>
     </div>
   );

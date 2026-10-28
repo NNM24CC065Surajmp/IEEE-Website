@@ -141,8 +141,11 @@ export default function StatsPanel() {
   return (
     <div
       ref={containerRef}
-      className="w-full max-w-[420px] p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm"
+      className="relative w-full max-w-[420px] p-6 sm:p-7 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-gradient-to-b from-white/90 via-slate-50/80 to-white/90 dark:from-zinc-900/85 dark:via-zinc-950/90 dark:to-[#080a10]/95 backdrop-blur-xl shadow-[0_20px_50px_-15px_rgba(0,98,155,0.12),0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_30px_rgba(0,98,155,0.18)] ring-1 ring-black/[0.04] dark:ring-white/[0.06] overflow-hidden"
     >
+      {/* Subtle top edge glow */}
+      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#00629B] dark:via-[#0096D6] to-transparent opacity-70 pointer-events-none" />
+
       <div>
         {ROWS.map((row, idx) => (
           <div key={row.key}>
@@ -155,15 +158,15 @@ export default function StatsPanel() {
                 transform: isReducedMotion ? 'scaleX(1)' : 'scaleX(0)',
                 willChange: 'transform',
               }}
-              className="bg-slate-200 dark:bg-zinc-800 w-full"
+              className="bg-slate-200/80 dark:bg-zinc-800/80 w-full"
             />
-            {/* Two-column row: number on left, label right-aligned on right */}
-            <div className="grid grid-cols-[1fr_160px] items-center py-4 sm:py-5 gap-4">
+            {/* Two-column row: number on left, label right-aligned on right with distinguishing IEEE Blue left accent */}
+            <div className="grid grid-cols-[1fr_160px] items-center py-4 sm:py-5 gap-4 pl-3.5 border-l-2 border-[#00629B] dark:border-[#0096D6]">
               {/* Left Cell: overlay phantom reserving final width + animated value on top */}
               <div className="relative grid grid-cols-1 grid-rows-1 items-center min-w-0 overflow-hidden">
                 {/* Invisible phantom with final value to lock width and prevent any shift */}
                 <span
-                  className="invisible select-none [grid-area:1/1] font-heading font-bold text-3xl sm:text-4xl lg:text-[40px] tracking-tight tabular-nums whitespace-nowrap leading-none"
+                  className="invisible select-none [grid-area:1/1] font-heading font-extrabold text-3xl sm:text-4xl lg:text-[42px] tracking-tight tabular-nums whitespace-nowrap leading-none"
                   aria-hidden="true"
                 >
                   {row.finalDisplay}
@@ -172,7 +175,7 @@ export default function StatsPanel() {
                 {/* Visible animated number */}
                 <span
                   ref={(el) => (numRefs.current[idx] = el)}
-                  className="[grid-area:1/1] font-heading font-bold text-3xl sm:text-4xl lg:text-[40px] tracking-tight tabular-nums whitespace-nowrap leading-none text-slate-900 dark:text-white"
+                  className="[grid-area:1/1] font-heading font-extrabold text-3xl sm:text-4xl lg:text-[42px] tracking-tight tabular-nums whitespace-nowrap leading-none text-slate-900 dark:text-white"
                 >
                   {isReducedMotion ? row.finalDisplay : '0'}
                 </span>
@@ -201,7 +204,7 @@ export default function StatsPanel() {
             transform: isReducedMotion ? 'scaleX(1)' : 'scaleX(0)',
             willChange: 'transform',
           }}
-          className="bg-slate-200 dark:bg-zinc-800 w-full"
+          className="bg-slate-200/80 dark:bg-zinc-800/80 w-full"
         />
       </div>
     </div>

@@ -9,6 +9,7 @@ import {
   GoogleAuthProvider,
   sendPasswordResetEmail,
   signOut,
+  signInAnonymously,
   onAuthStateChanged,
 } from 'firebase/auth';
 import {
@@ -87,6 +88,12 @@ export async function resetPassword(email) {
 /** Sign out the current user */
 export async function logoutUser() {
   await signOut(auth);
+}
+
+/** Sign in anonymously (used for QR code verified member sessions) */
+export async function loginAnonymously() {
+  const cred = await signInAnonymously(auth);
+  return cred.user;
 }
 
 /**
