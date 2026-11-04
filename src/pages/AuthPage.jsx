@@ -29,7 +29,7 @@ import {
   getUserProfile,
 } from '../lib/firebase.js';
 import { parseNmamitIdentity } from '../lib/nmamitId.js';
-import { decodeQrFromImage, parseMemberQrPayload } from '../lib/qrHelper.js';
+import { decodeQrFromImage, parseMemberQrPayload, isUrlLike } from '../lib/qrHelper.js';
 import FloatingLabelInput from '../components/FloatingLabelInput.jsx';
 
 const ALLOWED_GOOGLE_DOMAIN = 'nmamit.in';
@@ -343,8 +343,8 @@ export default function AuthPage({
       if (mode === 'login' || signInWithQr) {
         // Sign In Flow with QR
         const memberUsn = member.usn || (member.membershipId ? `IEEE-${member.membershipId}` : 'IEEE-MEMBER');
-        const memberName = member.name || 'IEEE Member';
-        const memberEmail = member.email || (member.usn ? `${member.usn.toLowerCase()}@nmamit.in` : 'member@nmamit.in');
+        const memberName = (member.name && !isUrlLike(member.name)) ? member.name : (member.membershipId ? `IEEE Member #${member.membershipId}` : 'IEEE Member');
+        const memberEmail = member.email || (member.usn ? `${member.usn.toLowerCase()}@nmamit.in` : '');
         const memberId = member.membershipId || member.usn || '';
 
         let resolvedUid = member.uid || `qr_${memberId || memberUsn}_${Date.now()}`;
@@ -366,11 +366,15 @@ export default function AuthPage({
           branch: member.branch || '',
           year: member.year || '',
           membershipId: memberId,
-          role: member.role || 'member',
-          bio: member.bio || `Verified IEEE Member (${memberId ? `ID: ${memberId}` : 'Pass'})`,
+          role: member.role || 'Student Member',
+          validThrough: member.validThrough || '31 December 2027',
+          subsection: member.subsection || 'Mangalore Subsection',
+          bio: member.bio || `Verified IEEE ${member.role || 'Student Member'} · ${member.subsection || 'Mangalore Subsection'} · Member ID: ${memberId}`,
           socialLinks: member.socialLinks || { linkedin: '', github: '', instagram: '', website: '' },
           achievements: member.achievements || [],
           isQrSession: true,
+          isQrVerified: true,
+          isIeeePass: Boolean(member.isIeeePass),
           qrVerifiedAt: new Date().toISOString(),
         };
 
@@ -387,7 +391,7 @@ export default function AuthPage({
         }
 
         window.dispatchEvent(new CustomEvent('ieee:qr-auth', { detail: qrUserData }));
-        setQrSuccessMessage(`Verified pass for ${memberName} (${memberId || memberUsn})`);
+        setQrSuccessMessage(`Verified IEEE ${member.role || 'Member'}: ${memberName} (Member #${memberId || memberUsn})`);
 
         setTimeout(() => {
           navigate('/profile');
@@ -395,7 +399,7 @@ export default function AuthPage({
 
       } else if (mode === 'register') {
         // Sign Up Flow with QR: Auto-fill registration form
-        if (member.name) setName(member.name);
+        if (member.name && !isUrlLike(member.name)) setName(member.name);
         if (member.usn) setUsn(member.usn);
         if (member.branch) setBranch(member.branch);
         if (member.year) setYear(member.year);
@@ -410,7 +414,7 @@ export default function AuthPage({
         }
 
         setFieldErrors({});
-        setQrSuccessMessage(`Autofilled details for ${member.name || member.usn}. Create a password to finish.`);
+        setQrSuccessMessage(`Autofilled details for ${member.name || member.usn} (Member #${member.membershipId}). Enter your USN and create a password to finish.`);
       }
     } catch (err) {
       setError(err.message || 'Could not read a valid IEEE QR code from this image. Please ensure the QR is clear and well-lit.');
