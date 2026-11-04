@@ -67,6 +67,7 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark', initialMode
   const [branch, setBranch] = useState('');
   const [year, setYear] = useState('');
   const [usn, setUsn] = useState('');
+  const [scannedMembershipId, setScannedMembershipId] = useState('');
 
   // Inline Validation Errors
   const [fieldErrors, setFieldErrors] = useState({});
@@ -328,12 +329,14 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark', initialMode
         await createUserProfile(cred.user.uid, {
           name: name.trim(),
           email: cred.user.email,
+          collegeEmail: cred.user.email,
           branch: branch.trim(),
           year: year.trim(),
           usn: usn.trim().toUpperCase(),
+          membershipId: scannedMembershipId || usn.trim().toUpperCase(),
           role: 'member',
           photoURL: '',
-          bio: '',
+          bio: scannedMembershipId ? `Verified IEEE Member (ID: ${scannedMembershipId})` : '',
           skills: [],
           socials: {
             linkedin: '',
@@ -344,6 +347,7 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark', initialMode
           achievements: [],
         });
         onClose?.();
+        navigate('/profile');
       } else if (mode === 'reset') {
         if (!email.trim()) {
           setError('Please enter your college email to receive a reset link.');
@@ -418,52 +422,58 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark', initialMode
 
       if (mode === 'login' || signInWithQr) {
         // Sign In Flow with QR
-        const memberUsn = member.usn || 'IEEE-MEMBER';
+        const memberUsn = member.usn || (member.membershipId ? `IEEE-${member.membershipId}` : 'IEEE-MEMBER');
         const memberName = member.name || 'IEEE Member';
-        const memberEmail = member.email || `${memberUsn.toLowerCase()}@nmamit.in`;
+        const memberEmail = member.email || (member.usn ? `${member.usn.toLowerCase()}@nmamit.in` : 'member@nmamit.in');
+        const memberId = member.membershipId || member.usn || '';
 
-        let resolvedUid = member.uid;
+        let resolvedUid = member.uid || `qr_${memberId || memberUsn}_${Date.now()}`;
 
         try {
           const anonUser = await loginAnonymously();
-          resolvedUid = anonUser.uid;
+          if (anonUser?.uid) resolvedUid = anonUser.uid;
         } catch {
-          resolvedUid = `qr_${memberUsn}`;
+          // Handled via local session
         }
 
         const qrUserData = {
           uid: resolvedUid,
           email: memberEmail,
-          displayName: `${memberUsn} ${memberName}`,
+          collegeEmail: memberEmail,
+          displayName: memberName,
           name: memberName,
-          usn: memberUsn,
+          usn: member.usn || '',
           branch: member.branch || '',
           year: member.year || '',
-          role: 'member',
+          membershipId: memberId,
+          role: member.role || 'member',
+          bio: member.bio || `Verified IEEE Member (${memberId ? `ID: ${memberId}` : 'Pass'})`,
+          socialLinks: member.socialLinks || { linkedin: '', github: '', instagram: '', website: '' },
+          achievements: member.achievements || [],
           isQrSession: true,
+          qrVerifiedAt: new Date().toISOString(),
         };
+
+        // Cache immediately in both sessionStorage and localStorage
+        sessionStorage.setItem('ieee_qr_user', JSON.stringify(qrUserData));
+        localStorage.setItem('ieee_member_profile', JSON.stringify(qrUserData));
 
         try {
           const existing = await getUserProfile(resolvedUid);
           if (!existing) {
-            await createUserProfile(resolvedUid, {
-              ...qrUserData,
-              bio: 'Verified IEEE Member via QR Pass',
-              socialLinks: { linkedin: '', github: '', instagram: '', website: '' },
-              achievements: member.achievements || [],
-            });
+            await createUserProfile(resolvedUid, qrUserData);
           }
         } catch {
           // Handled via local session
         }
 
         window.dispatchEvent(new CustomEvent('ieee:qr-auth', { detail: qrUserData }));
-        setQrSuccessMessage(`Verified pass for ${memberName} (${memberUsn})`);
+        setQrSuccessMessage(`Verified pass for ${memberName} (${memberId || memberUsn})`);
 
         setTimeout(() => {
           onClose?.();
           navigate('/profile');
-        }, 500);
+        }, 400);
 
       } else if (mode === 'register') {
         // Sign Up Flow with QR: Auto-fill registration form
@@ -472,6 +482,7 @@ export default function AuthModal({ isOpen, onClose, theme = 'dark', initialMode
         if (member.branch) setBranch(member.branch);
         if (member.year) setYear(member.year);
         if (member.email) setEmail(member.email);
+        if (member.membershipId) setScannedMembershipId(member.membershipId);
 
         if (member.usn && (!member.branch || !member.year)) {
           const parsed = parseNmamitIdentity(`${member.usn} ${member.name || ''}`);

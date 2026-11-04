@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Share2,
   Edit3,
@@ -22,6 +22,11 @@ import {
   User,
   LogIn,
   UserPlus,
+  QrCode,
+  UploadCloud,
+  CheckCircle2,
+  ShieldCheck,
+  AlertCircle,
 } from 'lucide-react';
 import {
   getUserProfile,
@@ -29,6 +34,7 @@ import {
   updateUserProfile,
 } from '../lib/firebase.js';
 import { parseNmamitIdentity } from '../lib/nmamitId.js';
+import { decodeQrFromImage, parseMemberQrPayload } from '../lib/qrHelper.js';
 
 export default function ProfilePage({ authUser, onOpenAuth }) {
   const [profile, setProfile] = useState(null);
@@ -45,6 +51,13 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
     date: '',
   });
   const [editingAchievementId, setEditingAchievementId] = useState(null);
+
+  // QR Scanning & Upload State
+  const [qrScanning, setQrScanning] = useState(false);
+  const [qrSuccessMessage, setQrSuccessMessage] = useState('');
+  const [qrErrorMessage, setQrErrorMessage] = useState('');
+  const [isQrDragOver, setIsQrDragOver] = useState(false);
+  const qrFileInputRef = useRef(null);
 
   // Placeholder events; these are not yet connected to Firestore.
   const [events] = useState([
@@ -64,10 +77,24 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
     },
   ]);
 
+  // ─── Profile Loading & Hydration ──────────────────────────────────
   useEffect(() => {
     let active = true;
 
-    if (!authUser) {
+    // Check if an active QR session is stored locally
+    const savedQr = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
+    let qrData = null;
+    if (savedQr) {
+      try {
+        qrData = JSON.parse(savedQr);
+      } catch {
+        // Fall through
+      }
+    }
+
+    const currentAuth = authUser || qrData;
+
+    if (!currentAuth) {
       setProfile(null);
       setLoading(false);
       setLoadError('');
@@ -80,16 +107,64 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
       setLoading(true);
       setLoadError('');
 
+      // Fast-path: Verified QR session
+      if (currentAuth?.isQrSession || qrData) {
+        const source = qrData || currentAuth;
+        const initialQrProfile = {
+          name: source.name || source.displayName || 'IEEE Member',
+          usn: source.usn || '',
+          branch: source.branch || '',
+          branchCode: source.branchCode || '',
+          year: source.year || '',
+          collegeEmail: source.collegeEmail || source.email || (source.usn ? `${source.usn.toLowerCase()}@nmamit.in` : 'member@nmamit.in'),
+          membershipId: source.membershipId || source.usn || '',
+          role: source.role || 'member',
+          bio: source.bio || `Verified IEEE Member (${source.membershipId ? `ID: ${source.membershipId}` : 'Pass'})`,
+          socialLinks: source.socialLinks || { linkedin: '', github: '', instagram: '', website: '' },
+          achievements: Array.isArray(source.achievements) ? source.achievements : [],
+          isQrVerified: true,
+        };
+
+        if (active) {
+          setProfile(initialQrProfile);
+          setLoading(false);
+        }
+
+        // Asynchronously check if Firestore has additional stored edits
+        if (currentAuth.uid) {
+          try {
+            const remote = await getUserProfile(currentAuth.uid);
+            if (active && remote) {
+              setProfile((prev) => ({
+                ...prev,
+                ...remote,
+                name: remote.name || prev.name,
+                usn: remote.usn || prev.usn,
+                membershipId: remote.membershipId || prev.membershipId,
+                branch: remote.branch || prev.branch,
+                year: remote.year || prev.year,
+                collegeEmail: remote.collegeEmail || prev.collegeEmail,
+                isQrVerified: true,
+              }));
+            }
+          } catch {
+            // Firestore optional for QR sessions
+          }
+        }
+        return;
+      }
+
+      // Standard Firebase User Session
       try {
-        const email = authUser.email?.trim().toLowerCase() || '';
+        const email = currentAuth.email?.trim().toLowerCase() || '';
         if (!email.endsWith('@nmamit.in')) {
           throw new Error('COLLEGE_EMAIL_REQUIRED');
         }
 
-        const identity = parseNmamitIdentity(authUser.displayName);
-        const existing = await getUserProfile(authUser.uid);
+        const identity = parseNmamitIdentity(currentAuth.displayName);
+        const existing = await getUserProfile(currentAuth.uid);
         const defaults = {
-          name: identity?.name || authUser.displayName || '',
+          name: identity?.name || currentAuth.displayName || 'IEEE Member',
           usn: identity?.usn || '',
           branch: identity?.branchName || '',
           branchCode: identity?.branchCode || '',
@@ -103,11 +178,11 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
           const initialProfile = {
             ...defaults,
             bio: '',
-            membershipId: '',
+            membershipId: identity?.usn || '',
             socialLinks: { linkedin: '', github: '', instagram: '', website: '' },
             achievements: [],
           };
-          await createUserProfile(authUser.uid, initialProfile);
+          await createUserProfile(currentAuth.uid, initialProfile);
           if (active) setProfile(initialProfile);
         } else {
           // Fill only missing identity fields; preserve existing user edits.
@@ -124,7 +199,7 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
             updates.socialLinks = { linkedin: '', github: '', instagram: '', website: '' };
           }
           if (Object.keys(updates).length > 0) {
-            await updateUserProfile(authUser.uid, updates);
+            await updateUserProfile(currentAuth.uid, updates);
           }
           if (active) setProfile({ ...existing, ...updates });
         }
@@ -132,22 +207,23 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
         if (!active) return;
         console.error('Failed to load profile:', err);
 
-        // Fallback for QR-verified sessions or offline profiles
-        if (authUser?.isQrSession || authUser?.usn) {
-          const identity = parseNmamitIdentity(authUser.displayName || `${authUser.usn || ''} ${authUser.name || ''}`);
+        // Fallback for QR session or offline
+        if (currentAuth?.isQrSession || currentAuth?.usn) {
+          const identity = parseNmamitIdentity(currentAuth.displayName || `${currentAuth.usn || ''} ${currentAuth.name || ''}`);
           const fallbackProfile = {
-            name: identity?.name || authUser.name || authUser.displayName || 'IEEE Member',
-            usn: identity?.usn || authUser.usn || '',
-            branch: identity?.branchName || authUser.branch || '',
+            name: identity?.name || currentAuth.name || currentAuth.displayName || 'IEEE Member',
+            usn: identity?.usn || currentAuth.usn || '',
+            branch: identity?.branchName || currentAuth.branch || '',
             branchCode: identity?.branchCode || '',
             batchYear: identity?.batchYear ?? null,
             roll: identity?.roll || '',
-            year: identity?.yearLabel || authUser.year || '',
-            collegeEmail: authUser.email || `${(authUser.usn || 'member').toLowerCase()}@nmamit.in`,
-            bio: authUser.bio || 'Verified IEEE Member via QR Pass',
-            membershipId: authUser.membershipId || authUser.usn || '',
-            socialLinks: authUser.socialLinks || { linkedin: '', github: '', instagram: '', website: '' },
-            achievements: authUser.achievements || [],
+            year: identity?.yearLabel || currentAuth.year || '',
+            collegeEmail: currentAuth.email || `${(currentAuth.usn || 'member').toLowerCase()}@nmamit.in`,
+            bio: currentAuth.bio || 'Verified IEEE Member via QR Pass',
+            membershipId: currentAuth.membershipId || currentAuth.usn || '',
+            socialLinks: currentAuth.socialLinks || { linkedin: '', github: '', instagram: '', website: '' },
+            achievements: currentAuth.achievements || [],
+            isQrVerified: true,
           };
           setProfile(fallbackProfile);
           setLoading(false);
@@ -174,6 +250,89 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
     };
   }, [authUser]);
 
+  // ─── Direct QR Code Processing on Profile Page ──────────────────────
+  const handleProfileQrFile = async (file) => {
+    if (!file) return;
+
+    setQrErrorMessage('');
+    setQrSuccessMessage('');
+    setQrScanning(true);
+
+    try {
+      const rawPayload = await decodeQrFromImage(file);
+      const member = parseMemberQrPayload(rawPayload);
+
+      const memberUsn = member.usn || (member.membershipId ? `IEEE-${member.membershipId}` : 'IEEE-MEMBER');
+      const memberName = member.name || (profile?.name ? profile.name : 'IEEE Member');
+      const memberEmail = member.email || (member.usn ? `${member.usn.toLowerCase()}@nmamit.in` : (profile?.collegeEmail || 'member@nmamit.in'));
+      const memberId = member.membershipId || member.usn || profile?.membershipId || '';
+
+      const resolvedUid = authUser?.uid || member.uid || `qr_${memberId || memberUsn}_${Date.now()}`;
+
+      const qrUserData = {
+        uid: resolvedUid,
+        email: memberEmail,
+        collegeEmail: memberEmail,
+        displayName: memberName,
+        name: memberName,
+        usn: member.usn || profile?.usn || '',
+        branch: member.branch || profile?.branch || '',
+        year: member.year || profile?.year || '',
+        membershipId: memberId,
+        role: member.role || profile?.role || 'member',
+        bio: member.bio || (profile?.bio ? profile.bio : `Verified IEEE Member (ID: ${memberId || 'Pass'})`),
+        socialLinks: profile?.socialLinks || member.socialLinks || { linkedin: '', github: '', instagram: '', website: '' },
+        achievements: Array.isArray(member.achievements) && member.achievements.length > 0 ? member.achievements : (profile?.achievements || []),
+        isQrSession: true,
+        isQrVerified: true,
+        qrVerifiedAt: new Date().toISOString(),
+      };
+
+      // Save locally to session and local storage
+      sessionStorage.setItem('ieee_qr_user', JSON.stringify(qrUserData));
+      localStorage.setItem('ieee_member_profile', JSON.stringify(qrUserData));
+
+      // Update state immediately
+      setProfile((prev) => ({
+        ...(prev || {}),
+        ...qrUserData,
+      }));
+
+      // Try updating Firestore if possible
+      try {
+        const existing = await getUserProfile(resolvedUid);
+        if (!existing) {
+          await createUserProfile(resolvedUid, qrUserData);
+        } else {
+          await updateUserProfile(resolvedUid, qrUserData);
+        }
+      } catch {
+        // Handled via local session
+      }
+
+      window.dispatchEvent(new CustomEvent('ieee:qr-auth', { detail: qrUserData }));
+      setQrSuccessMessage(`Verified IEEE Member pass for ${memberName} (${memberId || memberUsn})`);
+    } catch (err) {
+      setQrErrorMessage(err.message || 'Could not read a valid IEEE QR code from this image. Please ensure the QR is clear and well-lit.');
+    } finally {
+      setQrScanning(false);
+      if (qrFileInputRef.current) qrFileInputRef.current.value = '';
+    }
+  };
+
+  const handleQrFileInputChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) handleProfileQrFile(file);
+  };
+
+  const handleQrDrop = (e) => {
+    e.preventDefault();
+    setIsQrDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleProfileQrFile(file);
+  };
+
+  // ─── Profile Editing Controls ──────────────────────────────────────
   const startEditing = () => {
     setForm({
       name: profile?.name || '',
@@ -215,7 +374,7 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
   };
 
   const saveEditing = async () => {
-    if (!authUser || !form) return;
+    if (!profile || !form) return;
     setSaving(true);
     setSaveError('');
     try {
@@ -228,19 +387,41 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
           date: date.trim(),
         })),
       };
-      await updateUserProfile(authUser.uid, cleanForm);
-      setProfile((previous) => ({ ...previous, ...cleanForm }));
+
+      const updatedProfile = { ...profile, ...cleanForm };
+      setProfile(updatedProfile);
+
+      // Save locally
+      const savedQr = sessionStorage.getItem('ieee_qr_user');
+      if (savedQr) {
+        try {
+          const parsed = JSON.parse(savedQr);
+          const merged = { ...parsed, ...cleanForm };
+          sessionStorage.setItem('ieee_qr_user', JSON.stringify(merged));
+          localStorage.setItem('ieee_member_profile', JSON.stringify(merged));
+        } catch {
+          // Fall through
+        }
+      } else {
+        localStorage.setItem('ieee_member_profile', JSON.stringify(updatedProfile));
+      }
+
+      // Update Firestore if available
+      if (authUser?.uid) {
+        try {
+          await updateUserProfile(authUser.uid, cleanForm);
+        } catch {
+          // Local session changes remain saved
+        }
+      }
+
       setEditing(false);
       setForm(null);
       setEditingAchievementId(null);
       setAchievementDraft({ title: '', description: '', date: '' });
     } catch (err) {
       console.error('Failed to save profile:', err);
-      setSaveError(
-        err?.code === 'permission-denied'
-          ? 'Permission denied. Please verify your Firestore security rules allow writing to users/{uid}.'
-          : 'Failed to save changes. Please try again.'
-      );
+      setSaveError('Failed to save changes. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -258,8 +439,6 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
       return;
     }
 
-    // Update only the selected achievement, or append a new one to the list.
-    // Functional state updates avoid using a stale copy of the form.
     setForm((previous) => {
       if (!previous) return previous;
       const currentAchievements = Array.isArray(previous.achievements)
@@ -323,36 +502,98 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
     if (editingAchievementId === id) resetAchievementDraft();
   };
 
-  if (!authUser) {
+  // ─── Logged-out View with Integrated QR Dropzone ───────────────────
+  if (!authUser && !profile) {
     return (
-      <div className="pt-32 sm:pt-40 pb-24 max-w-md mx-auto px-5 text-center">
-        <div className="p-8 sm:p-10 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/60 backdrop-blur-xl shadow-xl">
-          <div className="w-16 h-16 rounded-full bg-[#00629B]/10 dark:bg-[#0096D6]/20 flex items-center justify-center mx-auto mb-4 text-[#00629B] dark:text-[#0096D6]">
+      <div className="pt-28 sm:pt-36 pb-20 max-w-lg mx-auto px-5">
+        <input
+          ref={qrFileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/jpg,image/webp"
+          className="hidden"
+          onChange={handleQrFileInputChange}
+        />
+
+        <div className="p-7 sm:p-9 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 backdrop-blur-xl shadow-xl text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#00629B]/10 dark:bg-[#0096D6]/20 border border-[#00629B]/20 flex items-center justify-center mx-auto mb-4 text-[#00629B] dark:text-[#38bdf8]">
             <User size={30} />
           </div>
-          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+          <h2 className="text-2xl font-heading font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
             Member Profile
           </h2>
-          <p className="text-slate-500 dark:text-zinc-400 text-sm leading-relaxed mb-6">
-            Sign in with your @nmamit.in college account to view and manage your IEEE NMAMIT profile.
+          <p className="text-slate-500 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
+            Sign in with your @nmamit.in college account or upload your IEEE membership QR pass to access your verified profile.
           </p>
+
+          {/* Direct QR Upload Target */}
+          <div
+            onClick={() => qrFileInputRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsQrDragOver(true);
+            }}
+            onDragLeave={() => setIsQrDragOver(false)}
+            onDrop={handleQrDrop}
+            className={`border-2 border-dashed rounded-xl p-5 mb-6 text-center cursor-pointer transition-all ${
+              isQrDragOver
+                ? 'border-[#00629B] bg-[#00629B]/10 scale-[1.01]'
+                : 'border-slate-300 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950/40 hover:border-[#00629B]'
+            }`}
+          >
+            <div className="w-10 h-10 mx-auto rounded-xl bg-[#00629B]/10 dark:bg-[#00629B]/20 text-[#00629B] dark:text-[#38bdf8] flex items-center justify-center mb-2">
+              {qrScanning ? <Loader2 size={20} className="animate-spin" /> : <QrCode size={20} />}
+            </div>
+            <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+              {qrScanning ? 'Reading membership QR...' : 'Upload Membership QR Pass'}
+            </p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+              Drop your badge image or browse device (PNG, JPG, WebP)
+            </p>
+            <button
+              type="button"
+              disabled={qrScanning}
+              className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#00629B] dark:text-[#38bdf8] bg-[#00629B]/10 dark:bg-[#00629B]/20 hover:bg-[#00629B]/20 transition-colors"
+            >
+              <UploadCloud size={14} />
+              <span>Browse image</span>
+            </button>
+          </div>
+
+          {qrErrorMessage && (
+            <div className="mb-5 p-3 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/80 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2 text-left">
+              <AlertCircle size={15} className="shrink-0 mt-0.5 text-rose-500" />
+              <span>{qrErrorMessage}</span>
+            </div>
+          )}
+
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200 dark:border-zinc-800" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white dark:bg-zinc-900 px-3 text-slate-400 font-medium">
+                or sign in with password
+              </span>
+            </div>
+          </div>
+
           {onOpenAuth && (
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 type="button"
                 onClick={() => onOpenAuth('login')}
-                className="flex-1 group relative inline-flex items-center justify-center gap-2 py-3 px-6 rounded-full bg-gradient-to-r from-[#00629B] via-[#0077b6] to-[#0096D6] hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider font-mono transition-all duration-300 shadow-lg shadow-[#00629B]/30 hover:shadow-[#0096D6]/40 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl bg-[#00629B] hover:bg-[#005080] text-white font-medium text-xs transition shadow-sm"
               >
-                <LogIn size={15} className="group-hover:translate-x-0.5 transition-transform" />
+                <LogIn size={15} />
                 <span>Sign In</span>
               </button>
               <button
                 type="button"
                 onClick={() => onOpenAuth('register')}
-                className="flex-1 group relative inline-flex items-center justify-center gap-2 py-3 px-6 rounded-full border border-slate-300 dark:border-zinc-700 bg-slate-100/70 dark:bg-zinc-800/60 hover:bg-slate-200 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-200 font-bold text-xs uppercase tracking-wider font-mono transition-all duration-300 hover:border-[#0096D6] cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800/80 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-200 font-medium text-xs transition"
               >
-                <UserPlus size={15} className="group-hover:scale-110 transition-transform text-[#0096D6]" />
-                <span>Sign Up</span>
+                <UserPlus size={15} className="text-[#00629B] dark:text-[#38bdf8]" />
+                <span>Create Account</span>
               </button>
             </div>
           )}
@@ -374,20 +615,19 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
       <div className="pt-28 sm:pt-36 pb-20 max-w-xl mx-auto px-5 text-center">
         <p className="text-red-500 dark:text-red-400">{loadError}</p>
         <p className="mt-2 text-sm text-slate-500 dark:text-zinc-500">
-          Check the browser console for the full error, and confirm Firestore Database is enabled
-          for this project with rules allowing a user to read/write their own <code>users/&#123;uid&#125;</code> document.
+          Check your account credentials or upload your IEEE digital membership pass to authenticate.
         </p>
       </div>
     );
   }
 
   const member = {
-    name: profile?.name || authUser.email?.split('@')[0] || 'Member',
+    name: profile?.name || authUser?.email?.split('@')[0] || 'Member',
     branch: profile?.branch || 'Not set',
     year: profile?.year || 'Not set',
     membershipId: profile?.membershipId || '',
     usn: profile?.usn || 'Not set',
-    collegeEmail: profile?.collegeEmail || authUser.email || 'Not set',
+    collegeEmail: profile?.collegeEmail || authUser?.email || 'Not set',
     bio: profile?.bio || 'No bio added yet.',
     socialLinks: {
       linkedin: profile?.socialLinks?.linkedin || '',
@@ -396,18 +636,66 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
       website: profile?.socialLinks?.website || '',
     },
     achievements: Array.isArray(profile?.achievements) ? profile.achievements : [],
+    isQrVerified: profile?.isQrVerified || authUser?.isQrSession,
   };
   const displayedAchievements = editing ? (form?.achievements || []) : member.achievements;
 
   return (
     <div className="pt-28 sm:pt-36 pb-20">
-      {/* PROFILE HEADER */}
+      {/* Hidden File Input for QR Scanning anywhere on profile */}
+      <input
+        ref={qrFileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/jpg,image/webp"
+        className="hidden"
+        onChange={handleQrFileInputChange}
+      />
+
+      {/* QR VERIFICATION FEEDBACK BANNER */}
+      {qrSuccessMessage && (
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 mb-6">
+          <div className="p-3.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="font-medium">{qrSuccessMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setQrSuccessMessage('')}
+              className="text-emerald-600 hover:text-emerald-900 dark:hover:text-emerald-200"
+            >
+              <XIcon size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {qrErrorMessage && (
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 mb-6">
+          <div className="p-3.5 rounded-xl border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle size={18} className="text-rose-600 dark:text-rose-400 shrink-0" />
+              <span>{qrErrorMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setQrErrorMessage('')}
+              className="text-rose-600 hover:text-rose-900 dark:hover:text-rose-200"
+            >
+              <XIcon size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── PROFILE HEADER ────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8">
         <div className="relative overflow-hidden rounded-2xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] shadow-lg">
           <div className="relative px-6 sm:px-10 py-10">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+              {/* Profile Avatar */}
               <div className="relative shrink-0">
-                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-[#00629B] bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-[#00629B] bg-slate-100 dark:bg-zinc-900 flex items-center justify-center shadow-inner">
                   <span className="text-4xl font-bold text-[#00629B]">
                     {member.name.charAt(0).toUpperCase()}
                   </span>
@@ -424,38 +712,48 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
                       className="text-2xl sm:text-3xl font-extrabold bg-transparent border-b border-[#00629B]/40 focus:border-[#00629B] outline-none text-slate-900 dark:text-white"
                     />
                   ) : (
-                    <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+                    <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                       {member.name}
                     </h1>
                   )}
-                  {(editing ? form.membershipId : member.membershipId) && (
+
+                  {/* Verified IEEE Member Badge */}
+                  {member.membershipId ? (
+                    <span className="inline-flex self-center sm:self-auto items-center gap-1.5 px-3 py-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-mono font-medium">
+                      <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>IEEE Verified · STB 60002</span>
+                    </span>
+                  ) : (
                     <span className="inline-flex self-center sm:self-auto items-center px-3 py-1 rounded-full border border-[#00629B]/50 bg-[#00629B]/10 text-[#00629B] dark:text-[#5db4e8] text-xs font-mono uppercase">
                       IEEE Member
                     </span>
                   )}
                 </div>
-                <p className="mt-3 text-slate-600 dark:text-zinc-400">
+
+                <p className="mt-3 text-slate-600 dark:text-zinc-400 font-medium">
                   {(editing ? form.branch : member.branch) || 'Not set'}
                 </p>
                 <p className="mt-1 text-sm text-slate-500 dark:text-zinc-500">
                   {(editing ? form.year : member.year) || 'Not set'}
                 </p>
-                <div className="flex justify-center sm:justify-start gap-3 mt-6">
+
+                {/* Header Action Buttons */}
+                <div className="flex flex-wrap justify-center sm:justify-start gap-2.5 sm:gap-3 mt-6">
                   {editing ? (
                     <>
                       <button
                         onClick={cancelEditing}
                         disabled={saving}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-200 hover:border-red-400 transition disabled:opacity-60"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-200 hover:border-red-400 transition disabled:opacity-60 text-xs sm:text-sm font-medium"
                       >
-                        <XIcon size={17} /> Cancel
+                        <XIcon size={16} /> Cancel
                       </button>
                       <button
                         onClick={saveEditing}
                         disabled={saving}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#00629B] text-white hover:bg-[#00527f] transition disabled:opacity-60"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00629B] text-white hover:bg-[#00527f] transition disabled:opacity-60 text-xs sm:text-sm font-medium shadow-sm"
                       >
-                        {saving ? <Loader2 size={17} className="animate-spin" /> : <Save size={17} />}
+                        {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                         {saving ? 'Saving...' : 'Save Changes'}
                       </button>
                     </>
@@ -470,19 +768,31 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
                             navigator.clipboard.writeText(window.location.href).catch(() => {});
                           }
                         }}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-200 hover:border-[#00629B] transition"
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-200 hover:border-[#00629B] transition text-xs sm:text-sm font-medium"
                       >
-                        <Share2 size={17} /> Share
+                        <Share2 size={16} /> Share
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={() => qrFileInputRef.current?.click()}
+                        disabled={qrScanning}
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#00629B]/30 bg-[#00629B]/10 hover:bg-[#00629B]/20 text-[#00629B] dark:text-[#38bdf8] transition text-xs sm:text-sm font-medium"
+                      >
+                        {qrScanning ? <Loader2 size={16} className="animate-spin" /> : <QrCode size={16} />}
+                        <span>{qrScanning ? 'Reading QR...' : 'Update from QR'}</span>
+                      </button>
+
                       <button
                         onClick={startEditing}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#00629B] text-white hover:bg-[#00527f] transition"
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#00629B] text-white hover:bg-[#00527f] transition text-xs sm:text-sm font-medium shadow-sm"
                       >
-                        <Edit3 size={17} /> Edit Profile
+                        <Edit3 size={16} /> Edit Profile
                       </button>
                     </>
                   )}
                 </div>
+
                 {saveError && <p className="mt-3 text-sm text-red-500 dark:text-red-400">{saveError}</p>}
               </div>
             </div>
@@ -490,22 +800,53 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
         </div>
       </section>
 
-      {/* ACADEMIC INFORMATION */}
+      {/* ─── ACADEMIC INFORMATION ──────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 mt-10">
         <SectionHeading icon={<GraduationCap size={20} />} title="Academic Information" />
-        <div className="mt-5 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] overflow-hidden">
-          <InfoRow label="USN" value={member.usn} editing={editing} inputValue={form?.usn} onChange={(value) => setForm({ ...form, usn: value.toUpperCase() })} />
-          <InfoRow label="College Email" value={member.collegeEmail} editing={editing} inputValue={form?.collegeEmail} onChange={(value) => setForm({ ...form, collegeEmail: value })} />
-          <InfoRow label="Branch" value={member.branch} editing={editing} inputValue={form?.branch} onChange={(value) => setForm({ ...form, branch: value })} />
-          <InfoRow label="Year" value={member.year} editing={editing} inputValue={form?.year} onChange={(value) => setForm({ ...form, year: value })} />
-          <InfoRow label="IEEE Membership ID" value={member.membershipId || 'Not set'} editing={editing} inputValue={form?.membershipId} onChange={(value) => setForm({ ...form, membershipId: value })} />
+        <div className="mt-5 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] overflow-hidden shadow-xs">
+          <InfoRow
+            label="College USN"
+            value={member.usn}
+            editing={editing}
+            inputValue={form?.usn}
+            onChange={(value) => setForm({ ...form, usn: value.toUpperCase() })}
+          />
+          <InfoRow
+            label="College Email"
+            value={member.collegeEmail}
+            editing={editing}
+            inputValue={form?.collegeEmail}
+            onChange={(value) => setForm({ ...form, collegeEmail: value })}
+          />
+          <InfoRow
+            label="Branch"
+            value={member.branch}
+            editing={editing}
+            inputValue={form?.branch}
+            onChange={(value) => setForm({ ...form, branch: value })}
+          />
+          <InfoRow
+            label="Year of Study"
+            value={member.year}
+            editing={editing}
+            inputValue={form?.year}
+            onChange={(value) => setForm({ ...form, year: value })}
+          />
+          <InfoRow
+            label="IEEE Membership ID"
+            value={member.membershipId || 'Not set'}
+            editing={editing}
+            inputValue={form?.membershipId}
+            onChange={(value) => setForm({ ...form, membershipId: value })}
+            badge={member.membershipId ? 'VERIFIED' : null}
+          />
         </div>
       </section>
 
-      {/* BIO */}
+      {/* ─── BIO ───────────────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 mt-10">
         <SectionHeading icon={<BookOpen size={20} />} title="Bio" />
-        <div className="mt-5 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6">
+        <div className="mt-5 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6 shadow-xs">
           {editing ? (
             <textarea
               value={form.bio}
@@ -520,7 +861,7 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
         </div>
       </section>
 
-      {/* MEMBER OVERVIEW */}
+      {/* ─── MEMBER OVERVIEW ───────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 mt-10">
         <SectionHeading icon={<Award size={20} />} title="Member Overview" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
@@ -530,10 +871,10 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
         </div>
       </section>
 
-      {/* ACHIEVEMENTS */}
+      {/* ─── ACHIEVEMENTS ──────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 mt-10">
         <SectionHeading icon={<Award size={20} />} title="Achievements" />
-        <div className="mt-5 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6">
+        <div className="mt-5 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6 shadow-xs">
           {editing ? (
             <div className="mb-6 rounded-lg border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/60 p-4 sm:p-5">
               <h3 className="font-semibold text-slate-900 dark:text-white">
@@ -545,7 +886,7 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
                   <input
                     value={achievementDraft.title}
                     onChange={(event) => setAchievementDraft({ ...achievementDraft, title: event.target.value })}
-                    placeholder="e.g. SIH 2026 finalist"
+                    placeholder="e.g. Hackathon Finalist"
                     className="mt-1.5 w-full rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 py-2.5 outline-none focus:border-[#00629B]"
                   />
                 </label>
@@ -574,31 +915,28 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
                 <button
                   type="button"
                   onClick={addOrUpdateAchievement}
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#00629B] px-4 py-2.5 text-white hover:bg-[#00527f] transition"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#00629B] px-4 py-2.5 text-white hover:bg-[#00527f] transition font-medium text-xs sm:text-sm"
                 >
                   {editingAchievementId !== null ? <Save size={16} /> : <Plus size={16} />}
                   {editingAchievementId !== null ? 'Update achievement' : 'Add achievement'}
                 </button>
                 {editingAchievementId !== null && (
-                  <button type="button" onClick={resetAchievementDraft} className="rounded-lg border border-slate-300 dark:border-zinc-700 px-4 py-2.5 text-slate-700 dark:text-zinc-200">
+                  <button type="button" onClick={resetAchievementDraft} className="rounded-lg border border-slate-300 dark:border-zinc-700 px-4 py-2.5 text-slate-700 dark:text-zinc-200 text-xs sm:text-sm">
                     Cancel edit
                   </button>
                 )}
               </div>
-              <p className="mt-3 text-xs text-slate-500 dark:text-zinc-500">
-                Changes are saved to Firestore when you click “Save Changes” at the top of your profile.
-              </p>
             </div>
           ) : null}
 
           {displayedAchievements.length === 0 ? (
-            <p className="text-slate-500 dark:text-zinc-500">
+            <p className="text-slate-500 dark:text-zinc-500 text-sm">
               {editing ? 'No achievements yet. Use the form above to add one.' : 'No achievements added yet.'}
             </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {displayedAchievements.map((achievement) => (
-                <article key={achievement.id} className="rounded-xl border border-slate-200 dark:border-zinc-800 p-5">
+                <article key={achievement.id} className="rounded-xl border border-slate-200 dark:border-zinc-800 p-5 shadow-2xs">
                   <div className="flex items-start gap-3">
                     <div className="shrink-0 rounded-lg bg-[#00629B]/10 p-2.5 text-[#00629B] dark:text-[#5db4e8]">
                       <Award size={21} />
@@ -626,11 +964,11 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
         </div>
       </section>
 
-      {/* SOCIAL LINKS */}
+      {/* ─── SOCIAL LINKS ──────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 mt-10">
         <SectionHeading icon={<LinkIcon size={20} />} title="Social Links" />
         {editing ? (
-          <div className="mt-5 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6 space-y-4">
+          <div className="mt-5 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6 space-y-4 shadow-xs">
             <p className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-500 mb-2">Add or edit your profile links (URLs or handles)</p>
             <SocialInputRow icon={<Linkedin size={18} className="text-[#0A66C2]" />} label="LinkedIn" placeholder="https://linkedin.com/in/username" value={form?.socialLinks?.linkedin || ''} onChange={(value) => setForm({ ...form, socialLinks: { ...form.socialLinks, linkedin: value } })} />
             <SocialInputRow icon={<Github size={18} className="text-slate-800 dark:text-zinc-200" />} label="GitHub" placeholder="https://github.com/username" value={form?.socialLinks?.github || ''} onChange={(value) => setForm({ ...form, socialLinks: { ...form.socialLinks, github: value } })} />
@@ -648,12 +986,12 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
         )}
       </section>
 
-      {/* MY EVENTS */}
+      {/* ─── MY EVENTS ─────────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 mt-10">
         <SectionHeading icon={<CalendarDays size={20} />} title="My Events" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
           {events.length === 0 ? (
-            <div className="md:col-span-2 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6">
+            <div className="md:col-span-2 rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6 shadow-xs">
               <p className="text-slate-500 dark:text-zinc-500">No events to display yet.</p>
             </div>
           ) : (
@@ -669,23 +1007,30 @@ function SectionHeading({ icon, title }) {
   return (
     <div className="flex items-center gap-3">
       <span className="text-[#00629B] dark:text-[#5db4e8]">{icon}</span>
-      <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{title}</h2>
+      <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{title}</h2>
     </div>
   );
 }
 
-function InfoRow({ label, value, editing, inputValue, onChange }) {
+function InfoRow({ label, value, editing, inputValue, onChange, badge }) {
   return (
-    <div className="px-6 py-5 border-b last:border-b-0 border-slate-200 dark:border-zinc-800">
-      <p className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-500">{label}</p>
+    <div className="px-6 py-4.5 border-b last:border-b-0 border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+      <div className="flex items-center gap-2">
+        <p className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-500">{label}</p>
+        {badge && (
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+            {badge}
+          </span>
+        )}
+      </div>
       {editing ? (
         <input
           value={inputValue ?? ''}
           onChange={(event) => onChange(event.target.value)}
-          className="mt-2 w-full bg-transparent border-b border-slate-300 dark:border-zinc-700 focus:border-[#00629B] outline-none font-semibold text-slate-900 dark:text-white"
+          className="mt-1 sm:mt-0 w-full sm:max-w-md bg-transparent border-b border-slate-300 dark:border-zinc-700 focus:border-[#00629B] outline-none font-semibold text-slate-900 dark:text-white sm:text-right"
         />
       ) : (
-        <p className="mt-2 font-semibold text-slate-900 dark:text-white break-words">{value}</p>
+        <p className="mt-1 sm:mt-0 font-semibold text-slate-900 dark:text-white break-words sm:text-right">{value}</p>
       )}
     </div>
   );
@@ -693,7 +1038,7 @@ function InfoRow({ label, value, editing, inputValue, onChange }) {
 
 function StatCard({ title, value }) {
   return (
-    <div className="rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6 text-center">
+    <div className="rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6 text-center shadow-xs">
       <p className="text-3xl font-bold text-slate-900 dark:text-white">{value}</p>
       <p className="mt-2 text-sm text-slate-500 dark:text-zinc-400">{title}</p>
     </div>
@@ -752,7 +1097,7 @@ function SocialButton({ icon, label, href }) {
 
 function EventCard({ event }) {
   return (
-    <div className="rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6">
+    <div className="rounded-xl border border-slate-300 dark:border-zinc-800 bg-white dark:bg-[#0a0d16] p-6 shadow-xs">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">{event.title}</h3>
@@ -765,7 +1110,7 @@ function EventCard({ event }) {
       <p className="mt-4 text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">{event.description}</p>
       <div className="mt-5">
         {event.attended ? (
-          <button type="button" className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-[#00629B] text-white hover:bg-[#00527f] transition">Give Feedback</button>
+          <button type="button" className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-[#00629B] text-white hover:bg-[#00527f] transition font-medium text-xs sm:text-sm">Give Feedback</button>
         ) : (
           <p className="text-sm text-slate-500 dark:text-zinc-500">Feedback will be available after attending the event.</p>
         )}

@@ -342,51 +342,56 @@ export default function AuthPage({
 
       if (mode === 'login' || signInWithQr) {
         // Sign In Flow with QR
-        const memberUsn = member.usn || 'IEEE-MEMBER';
+        const memberUsn = member.usn || (member.membershipId ? `IEEE-${member.membershipId}` : 'IEEE-MEMBER');
         const memberName = member.name || 'IEEE Member';
-        const memberEmail = member.email || `${memberUsn.toLowerCase()}@nmamit.in`;
+        const memberEmail = member.email || (member.usn ? `${member.usn.toLowerCase()}@nmamit.in` : 'member@nmamit.in');
+        const memberId = member.membershipId || member.usn || '';
 
-        let resolvedUid = member.uid;
+        let resolvedUid = member.uid || `qr_${memberId || memberUsn}_${Date.now()}`;
 
         try {
           const anonUser = await loginAnonymously();
-          resolvedUid = anonUser.uid;
+          if (anonUser?.uid) resolvedUid = anonUser.uid;
         } catch {
-          resolvedUid = `qr_${memberUsn}`;
+          // Handled via local session
         }
 
         const qrUserData = {
           uid: resolvedUid,
           email: memberEmail,
-          displayName: `${memberUsn} ${memberName}`,
+          collegeEmail: memberEmail,
+          displayName: memberName,
           name: memberName,
-          usn: memberUsn,
+          usn: member.usn || '',
           branch: member.branch || '',
           year: member.year || '',
-          role: 'member',
+          membershipId: memberId,
+          role: member.role || 'member',
+          bio: member.bio || `Verified IEEE Member (${memberId ? `ID: ${memberId}` : 'Pass'})`,
+          socialLinks: member.socialLinks || { linkedin: '', github: '', instagram: '', website: '' },
+          achievements: member.achievements || [],
           isQrSession: true,
+          qrVerifiedAt: new Date().toISOString(),
         };
+
+        sessionStorage.setItem('ieee_qr_user', JSON.stringify(qrUserData));
+        localStorage.setItem('ieee_member_profile', JSON.stringify(qrUserData));
 
         try {
           const existing = await getUserProfile(resolvedUid);
           if (!existing) {
-            await createUserProfile(resolvedUid, {
-              ...qrUserData,
-              bio: 'Verified IEEE Member via QR Pass',
-              socialLinks: { linkedin: '', github: '', instagram: '', website: '' },
-              achievements: member.achievements || [],
-            });
+            await createUserProfile(resolvedUid, qrUserData);
           }
         } catch {
           // Handled via local session
         }
 
         window.dispatchEvent(new CustomEvent('ieee:qr-auth', { detail: qrUserData }));
-        setQrSuccessMessage(`Verified pass for ${memberName} (${memberUsn})`);
+        setQrSuccessMessage(`Verified pass for ${memberName} (${memberId || memberUsn})`);
 
         setTimeout(() => {
           navigate('/profile');
-        }, 600);
+        }, 400);
 
       } else if (mode === 'register') {
         // Sign Up Flow with QR: Auto-fill registration form

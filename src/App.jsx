@@ -181,7 +181,19 @@ export default function App() {
     return 'dark';
   });
 
-  const [authUser, setAuthUser] = useState(null);
+  // Hydrate authUser immediately from active QR session if available
+  const [authUser, setAuthUser] = useState(() => {
+    const savedQrUser = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
+    if (savedQrUser) {
+      try {
+        return JSON.parse(savedQrUser);
+      } catch {
+        // Fall through
+      }
+    }
+    return null;
+  });
+
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login');
 
@@ -191,8 +203,8 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Check if there is an active QR session in sessionStorage
-    const savedQrUser = sessionStorage.getItem('ieee_qr_user');
+    // Check if there is an active QR session in sessionStorage or localStorage
+    const savedQrUser = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
     if (savedQrUser && !authUser) {
       try {
         setAuthUser(JSON.parse(savedQrUser));
@@ -202,9 +214,38 @@ export default function App() {
     }
 
     const unsubscribe = subscribeToAuthChanges((user) => {
-      setAuthUser(user);
       if (user) {
+        // If this is an anonymous Firebase session, preserve and merge the QR session data!
+        const savedQr = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
+        if (savedQr && (user.isAnonymous || !user.email)) {
+          try {
+            const qrData = JSON.parse(savedQr);
+            setAuthUser({
+              ...user,
+              ...qrData,
+              uid: user.uid,
+              isQrSession: true,
+            });
+            setAuthModalOpen(false);
+            return;
+          } catch {
+            // Fall through
+          }
+        }
+        setAuthUser(user);
         setAuthModalOpen(false);
+      } else {
+        // If Firebase auth reports null user, retain active QR pass session
+        const savedQr = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
+        if (savedQr) {
+          try {
+            setAuthUser(JSON.parse(savedQr));
+            return;
+          } catch {
+            // Fall through
+          }
+        }
+        setAuthUser(null);
       }
     });
 
@@ -212,6 +253,7 @@ export default function App() {
       if (e.detail) {
         setAuthUser(e.detail);
         sessionStorage.setItem('ieee_qr_user', JSON.stringify(e.detail));
+        localStorage.setItem('ieee_member_profile', JSON.stringify(e.detail));
         setAuthModalOpen(false);
       }
     };
@@ -225,6 +267,8 @@ export default function App() {
 
   const handleLogout = async () => {
     sessionStorage.removeItem('ieee_qr_user');
+    localStorage.removeItem('ieee_member_profile');
+    setAuthUser(null);
     await logoutUser();
   };
 
