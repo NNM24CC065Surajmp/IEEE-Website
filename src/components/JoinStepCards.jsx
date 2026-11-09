@@ -59,7 +59,7 @@ export default function JoinStepCards({ onNavigate, onOpenAuth, authUser }) {
               <span className="text-[11px] font-mono font-bold text-slate-400 dark:text-zinc-600">01 / 02</span>
             </div>
 
-            <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3 tracking-tight">
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
               Create Branch Account
             </h2>
             
@@ -130,7 +130,7 @@ export default function JoinStepCards({ onNavigate, onOpenAuth, authUser }) {
               <span className="text-[11px] font-mono font-bold text-slate-400 dark:text-zinc-600">02 / 02</span>
             </div>
 
-            <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3 tracking-tight">
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
               IEEE Global Membership
             </h2>
             

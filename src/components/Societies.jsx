@@ -88,6 +88,8 @@ export default function Societies() {
                 src={soc.logo} 
                 alt={soc.name} 
                 title={soc.name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-contain filter dark:brightness-110 transition-transform duration-300 group-hover:scale-105"
               />
             </a>

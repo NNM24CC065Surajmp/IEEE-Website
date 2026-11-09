@@ -88,14 +88,14 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
   useEffect(() => {
     let active = true;
 
-    // Check if an active QR session is stored locally
-    const savedQr = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
+    // Check if an active verified QR pass was scanned in this browser session
+    const savedQr = sessionStorage.getItem('ieee_qr_user');
     let qrData = null;
     if (savedQr) {
       try {
         qrData = JSON.parse(savedQr);
       } catch {
-        // Fall through
+        sessionStorage.removeItem('ieee_qr_user');
       }
     }
 
@@ -1003,7 +1003,7 @@ export default function ProfilePage({ authUser, onOpenAuth }) {
               {/* Official Bottom Bar */}
               <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-zinc-800/80 flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-serif italic text-slate-700 dark:text-zinc-300">
+                  <p className="text-xs font-mono font-bold text-slate-800 dark:text-zinc-200">
                     Jill Gostin
                   </p>
                   <p className="text-[10px] font-mono text-slate-400 dark:text-zinc-500">

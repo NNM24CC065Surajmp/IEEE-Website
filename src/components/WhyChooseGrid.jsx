@@ -77,7 +77,7 @@ export default function WhyChooseGrid() {
   return (
     <div ref={gridRef} className="relative">
       <div className="text-center mb-12">
-        <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
+        <h2 className="font-heading text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
           Why Engineers Choose IEEE NMAMIT
         </h2>
       </div>

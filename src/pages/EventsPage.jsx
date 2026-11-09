@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import {
   Calendar,
@@ -105,6 +106,7 @@ const AbstractFallback = ({ category, variant = 'standard' }) => {
 
 // Rebuilt EventCardVariant (Upcoming)
 const EventCardVariant = ({ event, featured = false, onClick }) => {
+  const navigate = useNavigate();
   const dateInfo = formatEventDate(event.date);
   const imageUrl = event.image || event.poster || event.posterImage;
   const isReduced = prefersReducedMotion();
@@ -152,10 +154,22 @@ const EventCardVariant = ({ event, featured = false, onClick }) => {
              <Clock size={12} />
              <span>{event.time || 'TBA'}</span>
           </div>
-          <button className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ieee-blue dark:hover:bg-ieee-teal transition-colors group/btn">
-              <span>{(event?.parsedDate ?? new Date(event?.date || 0)) >= new Date() && event.registrationLink ? 'Register' : 'View Details'}</span>
-              <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-            </button>
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              const isUpcoming = (event?.parsedDate ?? new Date(event?.date || 0)) >= new Date();
+              if (isUpcoming) {
+                navigate(`/events/${event.id}/register`);
+              } else {
+                onClick && onClick(event);
+              }
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ieee-blue dark:hover:bg-ieee-teal transition-colors group/btn cursor-pointer"
+          >
+            <span>{(event?.parsedDate ?? new Date(event?.date || 0)) >= new Date() ? 'Register' : 'View Details'}</span>
+            <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+          </button>
         </div>
       </div>
     </div>
@@ -200,7 +214,8 @@ const PastArchiveCard = ({ event, onClick }) => {
 };
 
 // Rebuilt FlagshipShowcaseCard (Magnetic/Parallax)
-const FlagshipShowcaseCard = ({ event, index }) => {
+const FlagshipShowcaseCard = ({ event, index, onClick }) => {
+  const navigate = useNavigate();
   const cardRef = useRef(null);
   const contentRef = useRef(null);
   const bgRef = useRef(null);
@@ -243,7 +258,8 @@ const FlagshipShowcaseCard = ({ event, index }) => {
     >
       <div 
         ref={cardRef} 
-        className="relative bg-slate-900 rounded-[2rem] border border-amber-500/20 shadow-2xl overflow-hidden flex flex-col md:flex-row group transform-style-3d"
+        onClick={() => onClick && onClick(event)}
+        className="relative bg-slate-900 rounded-[2rem] border border-amber-500/20 shadow-2xl overflow-hidden flex flex-col md:flex-row group transform-style-3d cursor-pointer hover:border-amber-500/50 transition-colors"
       >
         {/* Plaque / Engraved Metal Base Texture */}
         <div ref={bgRef} className="absolute inset-0 z-0 scale-110">
@@ -283,6 +299,28 @@ const FlagshipShowcaseCard = ({ event, index }) => {
             <div className="flex items-center gap-2"><Calendar size={16} className="text-amber-500/70" /> {dateInfo.displayDate}</div>
             <div className="flex items-center gap-2"><MapPin size={16} className="text-amber-500/70" /> {event.location || 'Main Campus'}</div>
           </div>
+
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/events/${event.id}/register`);
+              }}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-widest transition-colors shadow-lg group/btn cursor-pointer"
+            >
+              <span>Register Now</span>
+              <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick && onClick(event); }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-mono text-xs uppercase tracking-wider font-semibold backdrop-blur-sm border border-white/10 transition-colors group/btn cursor-pointer"
+            >
+              <span>View Details</span>
+              <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -291,7 +329,8 @@ const FlagshipShowcaseCard = ({ event, index }) => {
 
 
 // Rebuilt CountdownCard (Hero-scale card)
-const CountdownCard = ({ event }) => {
+const CountdownCard = ({ event, onClick }) => {
+  const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const eventTime = event?.parsedDate?.getTime?.() ?? (event?.date ? new Date(event.date).getTime() : 0);
   const imageUrl = event.image || event.poster || event.posterImage;
@@ -322,7 +361,7 @@ const CountdownCard = ({ event }) => {
   );
 
   return (
-    <div className="relative rounded-[2rem] bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl min-w-[300px] sm:min-w-[400px] overflow-hidden flex flex-col group">
+    <div onClick={() => onClick && onClick(event)} className="relative rounded-[2rem] bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl min-w-[300px] sm:min-w-[400px] overflow-hidden flex flex-col group cursor-pointer hover:border-slate-300 dark:hover:border-white/20 transition-colors">
       <div className="absolute inset-0 bg-gradient-to-br from-ieee-blue/5 to-transparent pointer-events-none z-0" />
       
       {/* Event Image Banner */}
@@ -353,7 +392,18 @@ const CountdownCard = ({ event }) => {
               <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white truncate">{event.title}</h3>
               <p className="text-xs font-mono text-slate-500 mt-2">{formatEventDate(event.date).displayDate}</p>
             </div>
-            <button className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ieee-blue dark:hover:bg-ieee-teal transition-colors group/btn">
+            <button 
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (event?.id) {
+                  navigate(`/events/${event.id}/register`);
+                } else {
+                  onClick && onClick(event);
+                }
+              }}
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ieee-blue dark:hover:bg-ieee-teal transition-colors group/btn cursor-pointer"
+            >
               <span>Register</span>
               <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </button>
@@ -511,7 +561,7 @@ export default function EventsPage({ onNavigate }) {
           {/* Live Countdown */}
           {nextUpcomingEvent && (
             <div className="w-full lg:w-auto shrink-0 mt-8 lg:mt-0 relative z-10">
-              <CountdownCard event={nextUpcomingEvent} />
+              <CountdownCard event={nextUpcomingEvent} onClick={setSelectedEvent} />
             </div>
           )}
         </section>
@@ -656,7 +706,7 @@ export default function EventsPage({ onNavigate }) {
                   <div className="flex flex-col gap-16">
                     {flagshipEvents.map((flagship, idx) => (
                       <div key={flagship.id} className="event-card-anim">
-                        <FlagshipShowcaseCard event={flagship} index={idx} />
+                        <FlagshipShowcaseCard event={flagship} index={idx} onClick={setSelectedEvent} />
                       </div>
                     ))}
                   </div>

@@ -105,17 +105,13 @@ export function subscribeToAuthChanges(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-// ─── User Profile Helpers (Firestore: users/{uid}) ────────────────
-// NOTE: Firestore Database must be enabled in the Firebase console for
-// this project, with security rules allowing a user to read/write only
-// their own document, e.g.:
-//
-//   match /users/{uid} {
-//     allow read, write: if request.auth != null && request.auth.uid == uid;
-//   }
+// ─── User Profile Helpers (Firestore: users/{uid} with Client Cache & Deduplication) ───
+const profileCache = new Map();
+const inFlightRequests = new Map();
 
 /** Create (or merge into) a user's profile document. */
 export async function createUserProfile(uid, data) {
+  profileCache.delete(uid);
   await setDoc(
     doc(db, 'users', uid),
     { ...data, createdAt: serverTimestamp() },
@@ -123,14 +119,37 @@ export async function createUserProfile(uid, data) {
   );
 }
 
-/** Fetch a user's profile document. Returns null if it doesn't exist yet. */
+/** Fetch a user's profile document with 60-second in-memory caching and request deduplication. */
 export async function getUserProfile(uid) {
-  const snap = await getDoc(doc(db, 'users', uid));
-  return snap.exists() ? snap.data() : null;
+  if (!uid) return null;
+
+  const cached = profileCache.get(uid);
+  if (cached && Date.now() - cached.timestamp < 60000) {
+    return cached.data;
+  }
+
+  if (inFlightRequests.has(uid)) {
+    return inFlightRequests.get(uid);
+  }
+
+  const reqPromise = (async () => {
+    try {
+      const snap = await getDoc(doc(db, 'users', uid));
+      const data = snap.exists() ? snap.data() : null;
+      profileCache.set(uid, { data, timestamp: Date.now() });
+      return data;
+    } finally {
+      inFlightRequests.delete(uid);
+    }
+  })();
+
+  inFlightRequests.set(uid, reqPromise);
+  return reqPromise;
 }
 
 /** Update fields on a user profile document (creates if not exists, merges if exists). */
 export async function updateUserProfile(uid, data) {
+  profileCache.delete(uid);
   await setDoc(
     doc(db, 'users', uid),
     { ...data, updatedAt: serverTimestamp() },

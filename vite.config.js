@@ -90,4 +90,47 @@ function ieeePassResolverPlugin() {
 
 export default defineConfig({
   plugins: [react(), ieeePassResolverPlugin()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        // Only proxy if not handled by local plugin
+        bypass: (req) => {
+          if (req.url && req.url.startsWith('/api/resolve-ieee-pass')) {
+            return null; // Handled by ieeePassResolverPlugin in dev
+          }
+        },
+      },
+    },
+  },
+  build: {
+    chunkSizeWarningLimit: 1200,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('scheduler')) {
+              return 'vendor-react';
+            }
+            if (id.includes('firebase')) {
+              return 'vendor-firebase';
+            }
+            if (id.includes('gsap') || id.includes('lenis')) {
+              return 'vendor-animation';
+            }
+            if (id.includes('ogl')) {
+              return 'vendor-graphics';
+            }
+            if (id.includes('lucide-react') || id.includes('react-icons')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('jsqr')) {
+              return 'vendor-qr';
+            }
+          }
+        },
+      },
+    },
+  },
 });

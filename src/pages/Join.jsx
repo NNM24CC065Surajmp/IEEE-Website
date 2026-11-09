@@ -18,11 +18,11 @@ export default function Join({ onNavigate, onOpenAuth, authUser }) {
               <Sparkles size={14} />
               <span>Membership Drive 2026–2027</span>
             </div>
-            <h1 className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl text-slate-900 dark:text-white uppercase tracking-tight mb-5">
-              BUILD YOUR FUTURE WITH <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00629B] to-[#0096D6]">IEEE NMAMIT</span>
+            <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-slate-900 dark:text-white tracking-tight mb-5">
+              Build your future with <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00629B] to-[#0096D6]">IEEE NMAMIT</span>
             </h1>
-            <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 font-medium leading-relaxed">
-              Step into the world&apos;s largest technical society. Join our student branch to innovate, publish research, collaborate on hackathons, and accelerate your engineering career.
+            <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 font-normal leading-relaxed">
+              Step into the world&apos;s largest technical professional community. Join our student branch to build projects, publish research, collaborate on hackathons, and accelerate your engineering journey.
             </p>
           </div>
         </Reveal>

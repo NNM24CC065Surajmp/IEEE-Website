@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -17,13 +17,14 @@ import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { initSmoothScroll, destroySmoothScroll } from './lib/smoothScroll.js';
 import { subscribeToAuthChanges, logoutUser } from './lib/firebase.js';
 
-import HomePage from './pages/HomePage.jsx';
-import AboutPage from './pages/AboutPage.jsx';
-import EventsPage from './pages/EventsPage.jsx';
-import TeamPage from './pages/TeamPage.jsx';
-import Join from './pages/Join.jsx';
-import NotFound from './pages/NotFound.jsx';
-import ProfilePage from './pages/ProfilePage.jsx';
+const HomePage = lazy(() => import('./pages/HomePage.jsx'));
+const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
+const EventsPage = lazy(() => import('./pages/EventsPage.jsx'));
+const TeamPage = lazy(() => import('./pages/TeamPage.jsx'));
+const Join = lazy(() => import('./pages/Join.jsx'));
+const NotFound = lazy(() => import('./pages/NotFound.jsx'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'));
+const EventRegisterPage = lazy(() => import('./pages/EventRegisterPage.jsx'));
 
 function AppContent({ theme, toggleTheme, authUser, onOpenAuth, onLogout }) {
   const navigate = useNavigate();
@@ -33,11 +34,17 @@ function AppContent({ theme, toggleTheme, authUser, onOpenAuth, onLogout }) {
   const activePage =
     location.pathname === '/'
       ? 'home'
+      : location.pathname.startsWith('/events')
+      ? 'events'
       : location.pathname.substring(1);
 
   // Navigation handler
   const navigateTo = (pageId) => {
-    navigate(pageId === 'home' ? '/' : `/${pageId}`);
+    if (pageId.startsWith('/')) {
+      navigate(pageId);
+    } else {
+      navigate(pageId === 'home' ? '/' : `/${pageId}`);
+    }
   };
 
   // If user accesses /login or /register directly, open the overlay on the current page
@@ -108,55 +115,75 @@ function AppContent({ theme, toggleTheme, authUser, onOpenAuth, onLogout }) {
         className="animate-page-fade relative z-10 flex-1"
       >
         <ErrorBoundary resetKey={location.pathname} onNavigateHome={() => navigateTo('home')}>
-          <Routes>
-            {/* Home */}
-            <Route
-              path="/"
-              element={<HomePage onNavigate={navigateTo} />}
-            />
-
-            {/* About */}
-            <Route
-              path="/about"
-              element={<AboutPage onNavigate={navigateTo} />}
-            />
-
-            {/* Events */}
-            <Route
-              path="/events"
-              element={<EventsPage onNavigate={navigateTo} />}
-            />
-
-            {/* Team */}
-            <Route
-              path="/team"
-              element={<TeamPage onNavigate={navigateTo} />}
-            />
-
-            {/* Join */}
-            <Route
-              path="/join"
-              element={<Join onNavigate={navigateTo} onOpenAuth={onOpenAuth} authUser={authUser} />}
-            />
-
-            {/* Profile */}
-            <Route
-              path="/profile"
-              element={
-                <ProfilePage
-                  onNavigate={navigateTo}
-                  authUser={authUser}
-                  onOpenAuth={onOpenAuth}
+          <Suspense
+            fallback={
+              <div className="min-h-[50vh] flex items-center justify-center">
+                <div
+                  className="w-8 h-8 rounded-full border-2 border-[#00629B] border-t-transparent animate-spin"
+                  role="status"
+                  aria-label="Loading content..."
                 />
-              }
-            />
+              </div>
+            }
+          >
+            <Routes>
+              {/* Home */}
+              <Route
+                path="/"
+                element={<HomePage onNavigate={navigateTo} />}
+              />
 
-            {/* 404 */}
-            <Route
-              path="*"
-              element={<NotFound onNavigate={navigateTo} />}
-            />
-          </Routes>
+              {/* About */}
+              <Route
+                path="/about"
+                element={<AboutPage onNavigate={navigateTo} />}
+              />
+
+              {/* Events */}
+              <Route
+                path="/events"
+                element={<EventsPage onNavigate={navigateTo} />}
+              />
+              <Route
+                path="/events/:eventId/register"
+                element={<EventRegisterPage onNavigate={navigateTo} authUser={authUser} />}
+              />
+              <Route
+                path="/events/register/:eventId"
+                element={<EventRegisterPage onNavigate={navigateTo} authUser={authUser} />}
+              />
+
+              {/* Team */}
+              <Route
+                path="/team"
+                element={<TeamPage onNavigate={navigateTo} />}
+              />
+
+              {/* Join */}
+              <Route
+                path="/join"
+                element={<Join onNavigate={navigateTo} onOpenAuth={onOpenAuth} authUser={authUser} />}
+              />
+
+              {/* Profile */}
+              <Route
+                path="/profile"
+                element={
+                  <ProfilePage
+                    onNavigate={navigateTo}
+                    authUser={authUser}
+                    onOpenAuth={onOpenAuth}
+                  />
+                }
+              />
+
+              {/* 404 */}
+              <Route
+                path="*"
+                element={<NotFound onNavigate={navigateTo} />}
+              />
+            </Routes>
+          </Suspense>
         </ErrorBoundary>
       </main>
 
@@ -181,18 +208,8 @@ export default function App() {
     return 'dark';
   });
 
-  // Hydrate authUser immediately from active QR session if available
-  const [authUser, setAuthUser] = useState(() => {
-    const savedQrUser = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
-    if (savedQrUser) {
-      try {
-        return JSON.parse(savedQrUser);
-      } catch {
-        // Fall through
-      }
-    }
-    return null;
-  });
+  // Authenticated user state: Validated strictly by Firebase or backend session (never unverified localStorage)
+  const [authUser, setAuthUser] = useState(null);
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login');
@@ -203,57 +220,33 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Check if there is an active QR session in sessionStorage or localStorage
-    const savedQrUser = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
-    if (savedQrUser && !authUser) {
-      try {
-        setAuthUser(JSON.parse(savedQrUser));
-      } catch {
-        sessionStorage.removeItem('ieee_qr_user');
-      }
-    }
+    // 1. Check verified backend session cookie (/api/auth/me)
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.success && data.user) {
+          setAuthUser(data.user);
+        }
+      })
+      .catch(() => {
+        // Backend not mounted or offline; fall back to Firebase client auth
+      });
 
+    // 2. Subscribe to verified Firebase Auth state
     const unsubscribe = subscribeToAuthChanges((user) => {
       if (user) {
-        // If this is an anonymous Firebase session, preserve and merge the QR session data!
-        const savedQr = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
-        if (savedQr && (user.isAnonymous || !user.email)) {
-          try {
-            const qrData = JSON.parse(savedQr);
-            setAuthUser({
-              ...user,
-              ...qrData,
-              uid: user.uid,
-              isQrSession: true,
-            });
-            setAuthModalOpen(false);
-            return;
-          } catch {
-            // Fall through
-          }
-        }
         setAuthUser(user);
         setAuthModalOpen(false);
       } else {
-        // If Firebase auth reports null user, retain active QR pass session
-        const savedQr = sessionStorage.getItem('ieee_qr_user') || localStorage.getItem('ieee_member_profile');
-        if (savedQr) {
-          try {
-            setAuthUser(JSON.parse(savedQr));
-            return;
-          } catch {
-            // Fall through
-          }
-        }
-        setAuthUser(null);
+        setAuthUser((prev) => (prev && prev.uid && !prev.isAnonymous ? prev : null));
       }
     });
 
+    // 3. Handle verified QR pass presentation event for the active session
     const handleQrAuth = (e) => {
-      if (e.detail) {
+      if (e.detail && e.detail.isQrVerified) {
         setAuthUser(e.detail);
         sessionStorage.setItem('ieee_qr_user', JSON.stringify(e.detail));
-        localStorage.setItem('ieee_member_profile', JSON.stringify(e.detail));
         setAuthModalOpen(false);
       }
     };
@@ -269,6 +262,11 @@ export default function App() {
     sessionStorage.removeItem('ieee_qr_user');
     localStorage.removeItem('ieee_member_profile');
     setAuthUser(null);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch {
+      // Ignore network errors on logout
+    }
     await logoutUser();
   };
 

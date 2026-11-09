@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import EventModal from './EventModal';
 import { Calendar, Cpu, Users, MapPin, ArrowRight } from 'lucide-react';
 import { gsap, useGSAP } from '../lib/gsap';
@@ -22,6 +22,7 @@ function formatDate(dateString) {
 }
 
 export default function EventCard({ event, index = 0 }) {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const cardRef = useRef(null);
   const imgWrapperRef = useRef(null);
@@ -59,6 +60,8 @@ export default function EventCard({ event, index = 0 }) {
             <img
               src={event.image}
               alt={event.title}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover event-image transition-transform duration-500 group-hover:scale-110"
             />
           ) : (
@@ -98,8 +101,17 @@ export default function EventCard({ event, index = 0 }) {
       <div className="pt-4 border-t border-slate-200 dark:border-zinc-800/80 mt-auto">
         <button
           type="button"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsModalOpen(true); }}
-          className="inline-flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider font-semibold text-ieee-blue dark:text-ieee-teal hover:text-[#0077b6] dark:hover:text-cyan-300 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue dark:focus-visible:ring-ieee-teal rounded transition-colors"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const isUpcoming = new Date(event.date) >= new Date();
+            if (isUpcoming && event?.id) {
+              navigate(`/events/${event.id}/register`);
+            } else {
+              setIsModalOpen(true);
+            }
+          }}
+          className="inline-flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider font-semibold text-ieee-blue dark:text-ieee-teal hover:text-[#0077b6] dark:hover:text-cyan-300 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ieee-blue dark:focus-visible:ring-ieee-teal rounded transition-colors cursor-pointer"
         >
           {new Date(event.date) >= new Date() ? <span>Register</span> : <span>View Details</span>}
           <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none" />
