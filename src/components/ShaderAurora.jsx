@@ -107,7 +107,6 @@ const fragment = `
     st *= 4.0;
     
     // Domain warping (flowing/drifting motion)
-    // Increased speed multipliers so motion is actually perceptible over a 10s window
     vec3 q = vec3(0.0);
     q.x = fbm(vec3(st * 1.5, uTime * 0.15));
     q.y = fbm(vec3(st * 1.5 + vec2(1.0), uTime * 0.15));
@@ -122,28 +121,24 @@ const fragment = `
     
     if (uIsDark > 0.5) {
       // DARK MODE: Goal is "near-black with barely-perceptible motion".
-      // Palette: #000000 (black) -> #0e0f12 (extreme dark) -> #22242a (dark charcoal highlight).
-      // Relaxed thresholds slightly so the charcoal shimmer is actually visible without being dominant.
       float mix1 = smoothstep(0.2, 0.9, f); 
       float mix2 = smoothstep(0.5, 0.9, r.x); 
       
       color = mix(uColor1, uColor2, mix1);
       color = mix(color, uColor3, mix2);
       
-      // Vignette effect: broadens the fade so the corners aren't completely crushed, but edges stay dark
+      // Vignette effect
       vec2 center = st / 4.0 - 0.5; 
       float dist = length(center);
       float vignette = smoothstep(0.85, 0.3, dist); 
       
-      // Bumped intensity down to 0.65 for barely-perceptible dark mode
       float darkIntensity = 0.65; 
       gl_FragColor = vec4(color * darkIntensity * vignette, 1.0);
     } else {
-      // LIGHT MODE: Unchanged blending logic. Uses (#f4f5f7 -> #6b7280).
+      // LIGHT MODE
       color = mix(uColor1, uColor2, clamp(f * 1.2, 0.0, 1.0));
       color = mix(color, uColor3, clamp(r.x * 1.5, 0.0, 1.0));
       
-      // Increased intensity back to 0.18 for better visibility
       float lightIntensity = 0.45; 
       vec3 pageBg = vec3(0.976, 0.984, 0.992); // Matches tailwind slate-50
       vec3 finalColor = mix(pageBg, color, lightIntensity);
@@ -155,15 +150,17 @@ const fragment = `
 
 export default function ShaderAurora({ isDarkMode }) {
   const containerRef = useRef(null);
+  const programRef = useRef(null);
   const [hasWebGLFailed, setHasWebGLFailed] = useState(false);
 
+  // Initialize WebGL once
   useEffect(() => {
     if (hasWebGLFailed) return;
+    if (!containerRef.current) return;
 
     let renderer;
     try {
-      renderer = new Renderer({ alpha: true, antialias: false, dpr: Math.min(window.devicePixelRatio, 1.5) });
-      // Initialize size immediately
+      renderer = new Renderer({ alpha: true, antialias: false, dpr: Math.min(window.devicePixelRatio || 1, 1.5) });
       renderer.setSize(window.innerWidth, window.innerHeight);
     } catch (err) {
       console.warn("ShaderAurora: WebGL context creation failed. Falling back gracefully.");
@@ -182,12 +179,11 @@ export default function ShaderAurora({ isDarkMode }) {
     gl.canvas.style.opacity = '0';
     gl.canvas.style.transition = 'opacity 1.5s ease-in-out';
     
-    // Fade in after a brief delay to avoid flash
-    setTimeout(() => {
+    // Fade in after a brief delay
+    const fadeTimer = setTimeout(() => {
       if (gl.canvas) gl.canvas.style.opacity = '1';
     }, 100);
 
-    // Single full-screen triangle is more efficient than a quad
     const geometry = new Geometry(gl, {
       position: { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) },
       uv: { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
@@ -199,13 +195,13 @@ export default function ShaderAurora({ isDarkMode }) {
       uniforms: {
         uTime: { value: 0 },
         uIsDark: { value: isDarkMode ? 1.0 : 0.0 },
-        // Dark Mode (#000000, #0e0f12, #22242a), Light Mode (#f4f5f7, #aeb4bf, #6b7280)
         uColor1: { value: isDarkMode ? [0.0, 0.0, 0.0] : [0.957, 0.961, 0.969] },
         uColor2: { value: isDarkMode ? [0.055, 0.059, 0.071] : [0.682, 0.706, 0.749] },
         uColor3: { value: isDarkMode ? [0.133, 0.141, 0.165] : [0.420, 0.447, 0.502] },
       }
     });
 
+    programRef.current = program;
     const mesh = new Mesh(gl, { geometry, program });
 
     // Handle Resize
@@ -217,7 +213,6 @@ export default function ShaderAurora({ isDarkMode }) {
       }, 100);
     };
     window.addEventListener('resize', resize, false);
-    resize();
 
     // Render loop
     let rafId;
@@ -230,14 +225,12 @@ export default function ShaderAurora({ isDarkMode }) {
     document.addEventListener('visibilitychange', handleVisibility);
 
     const update = (t) => {
-      // 0.001 multiplier keeps the animation drifty and organic
       if (isVisible) {
         program.uniforms.uTime.value = t * 0.001;
         renderer.render({ scene: mesh });
       }
 
       if (isReducedMotion) {
-        // Render exactly one frame then freeze
         renderer.render({ scene: mesh });
         return; 
       }
@@ -248,6 +241,8 @@ export default function ShaderAurora({ isDarkMode }) {
 
     // Cleanup
     return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(resizeTimeout);
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', handleVisibility);
       cancelAnimationFrame(rafId);
@@ -255,12 +250,24 @@ export default function ShaderAurora({ isDarkMode }) {
       if (containerRef.current && gl.canvas.parentNode === containerRef.current) {
         containerRef.current.removeChild(gl.canvas);
       }
-      
-      // ogl handles gl.getExtension('WEBGL_lose_context') internally on GC, but we can explicitly destroy
-      // if we created custom buffers. Mesh/Program don't strictly require manual destroy in ogl for a single canvas,
-      // but it's safe to let JS garbage collection handle the lost DOM node.
+
+      programRef.current = null;
+      try {
+        const loseExt = gl.getExtension('WEBGL_lose_context');
+        if (loseExt) loseExt.loseContext();
+      } catch (e) {}
     };
-  }, [hasWebGLFailed, isDarkMode]);
+  }, [hasWebGLFailed]);
+
+  // Update uniforms when theme changes without re-creating WebGL canvas
+  useEffect(() => {
+    if (!programRef.current) return;
+    const p = programRef.current;
+    p.uniforms.uIsDark.value = isDarkMode ? 1.0 : 0.0;
+    p.uniforms.uColor1.value = isDarkMode ? [0.0, 0.0, 0.0] : [0.957, 0.961, 0.969];
+    p.uniforms.uColor2.value = isDarkMode ? [0.055, 0.059, 0.071] : [0.682, 0.706, 0.749];
+    p.uniforms.uColor3.value = isDarkMode ? [0.133, 0.141, 0.165] : [0.420, 0.447, 0.502];
+  }, [isDarkMode]);
 
   if (hasWebGLFailed) return null;
 
@@ -272,4 +279,3 @@ export default function ShaderAurora({ isDarkMode }) {
     />
   );
 }
-

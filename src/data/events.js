@@ -117,7 +117,7 @@ export const EVENTS_DATA = [
     date: '2026-10-18T10:00:00Z',
     venue: 'MCA Seminar Hall, Ground Floor, NMAMIT',
     time: '10:00 AM - 04:30 PM IST',
-    description: 'Specialized IEEE Geoscience and Remote Sensing Society hands-on workshop covering synthetic aperture radar (SAR), satellite spectral data processing, and open GIS mapping pipelines using Python.',
+    description: 'Hands-on technical workshop exploring satellite imaging, radar data processing, and open GIS mapping pipelines using Python with the IEEE GRSS chapter.',
     image: null,
     registrationLink: 'https://forms.gle/ieee-nmamit-grss-2026',
     isFlagship: false
@@ -129,7 +129,7 @@ export const EVENTS_DATA = [
     date: '2027-03-20T09:00:00Z',
     venue: 'Centre for High Performance Computing & Main Quad, NMAMIT',
     time: 'Starts 09:00 AM IST (36 Hours Non-Stop)',
-    description: 'Our pinnacle annual national hackathon assembling 70+ top collegiate squads to engineer breakthrough software and hardware prototypes in AI, Edge Systems, Web3, and Sustainable Engineering.',
+    description: 'Our annual 36-hour national flagship hackathon bringing top student engineering teams together to build functional software and hardware prototypes with direct industry mentorship.',
     image: null,
     registrationLink: 'https://techtide.ieeenmamit.org/register',
     isFlagship: true

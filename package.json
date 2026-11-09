@@ -1,4 +1,3 @@
-
 {
   "name": "ieee-website",
   "private": true,
@@ -7,15 +6,31 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server/index.js",
+    "start:cluster": "node server/cluster.js",
+    "migrate": "node server/db/migrations.js up",
+    "migrate:rollback": "node server/db/migrations.js down",
+    "load-test": "node load-test/load_test.js"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.3",
     "firebase": "^13.0.0",
     "gsap": "^3.15.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "jsqr": "^1.4.0",
     "lenis": "^1.3.26",
     "lucide-react": "^0.475.0",
     "ogl": "^1.0.11",
+    "pg": "^8.23.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.7.0",
@@ -23,6 +38,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
+    "autocannon": "^9.0.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",

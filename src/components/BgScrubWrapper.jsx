@@ -4,11 +4,11 @@ import { prefersReducedMotion } from '../lib/motion';
 
 export default function BgScrubWrapper({ children }) {
   const wrapperRef = useRef(null);
-
+  
   useGSAP(() => {
     if (prefersReducedMotion()) return;
-
-    // Animate a CSS variable across light and dark modes.
+    
+    // We animate a CSS variable so it works automatically across light/dark modes
     gsap.to(document.documentElement, {
       '--bg-shift': '1',
       ease: 'none',
@@ -16,8 +16,8 @@ export default function BgScrubWrapper({ children }) {
         trigger: document.documentElement,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: true,
-      },
+        scrub: true
+      }
     });
 
     return () => {
@@ -26,8 +26,8 @@ export default function BgScrubWrapper({ children }) {
   }, []);
 
   return (
-    <div
-      ref={wrapperRef}
+    <div 
+      ref={wrapperRef} 
       className="w-full min-h-screen transition-none relative z-10"
     >
       {children}

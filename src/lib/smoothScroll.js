@@ -3,6 +3,7 @@ import { gsap, ScrollTrigger } from './gsap';
 import { prefersReducedMotion } from './motion';
 
 let lenisInstance = null;
+let tickerCallback = null;
 
 export const initSmoothScroll = () => {
   if (typeof window === 'undefined') return null;
@@ -23,9 +24,12 @@ export const initSmoothScroll = () => {
   lenisInstance.on('scroll', ScrollTrigger.update);
 
   // Drive Lenis's raf via GSAP's central ticker (prevents duplicate rAF loops)
-  gsap.ticker.add((time) => {
-    lenisInstance.raf(time * 1000);
-  });
+  tickerCallback = (time) => {
+    if (lenisInstance) {
+      lenisInstance.raf(time * 1000);
+    }
+  };
+  gsap.ticker.add(tickerCallback);
   
   // Ensure GSAP ticker runs independently of requestAnimationFrame if needed
   gsap.ticker.lagSmoothing(0);
@@ -36,6 +40,10 @@ export const initSmoothScroll = () => {
 export const getLenis = () => lenisInstance;
 
 export const destroySmoothScroll = () => {
+  if (tickerCallback) {
+    gsap.ticker.remove(tickerCallback);
+    tickerCallback = null;
+  }
   if (lenisInstance) {
     lenisInstance.destroy();
     lenisInstance = null;

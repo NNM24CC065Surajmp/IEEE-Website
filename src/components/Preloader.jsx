@@ -86,7 +86,10 @@ export default function Preloader() {
       }
     }, 'defocus');
 
-    return () => clearTimeout(fallback);
+    return () => {
+      clearTimeout(fallback);
+      document.body.style.overflow = '';
+    };
   }, [isVisible]);
 
   if (!isVisible) return null;
