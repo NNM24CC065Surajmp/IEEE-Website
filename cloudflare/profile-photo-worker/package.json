@@ -1,0 +1,15 @@
+{
+  "name": "ieee-profile-photo-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "jose": "^6.2.18"
+  },
+  "devDependencies": {
+    "wrangler": "4.166.0"
+  }
+}

@@ -19,11 +19,15 @@ import {
   Plus,
   Trash2,
   Pencil,
+  Camera,
 } from 'lucide-react';
 import {
   getUserProfile,
   createUserProfile,
   updateUserProfile,
+  getProfilePhoto,
+  uploadProfilePhoto,
+  deleteProfilePhoto,
 } from '../lib/firebase.js';
 import { parseNmamitIdentity } from '../lib/nmamitId.js';
 
@@ -36,6 +40,12 @@ export default function ProfilePage({ authUser }) {
   const [loadError, setLoadError] = useState('');
   const [saveError, setSaveError] = useState('');
   const [achievementError, setAchievementError] = useState('');
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
+  const [photoDraft, setPhotoDraft] = useState(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState('');
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState('');
+  const [photoMessage, setPhotoMessage] = useState('');
   const [achievementDraft, setAchievementDraft] = useState({
     title: '',
     description: '',
@@ -147,6 +157,131 @@ export default function ProfilePage({ authUser }) {
       active = false;
     };
   }, [authUser]);
+
+  useEffect(() => {
+    let active = true;
+    let objectUrl = '';
+    setProfilePhotoUrl('');
+
+    if (!authUser || !profile?.profilePhoto?.key) {
+      return () => {
+        active = false;
+      };
+    }
+
+    getProfilePhoto(authUser)
+      .then((blob) => {
+        if (!active || !blob) return;
+        objectUrl = URL.createObjectURL(blob);
+        setProfilePhotoUrl(objectUrl);
+      })
+      .catch((error) => {
+        if (active) setPhotoError(error.message || 'Could not load your profile photo.');
+      });
+
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [authUser, profile?.profilePhoto?.key, profile?.profilePhoto?.version]);
+
+  useEffect(() => {
+    if (!photoDraft) {
+      setPhotoPreviewUrl('');
+      return undefined;
+    }
+    const objectUrl = URL.createObjectURL(photoDraft);
+    setPhotoPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [photoDraft]);
+
+  const handlePhotoSelection = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setPhotoError('');
+    setPhotoMessage('');
+    if (!file.type.startsWith('image/')) {
+      setPhotoError('Choose an image file.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setPhotoError('The source image must be 10 MB or smaller.');
+      return;
+    }
+
+    let bitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+      const cropSize = Math.min(bitmap.width, bitmap.height);
+      const cropX = (bitmap.width - cropSize) / 2;
+      const cropY = (bitmap.height - cropSize) / 2;
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Your browser could not prepare this image.');
+      context.drawImage(bitmap, cropX, cropY, cropSize, cropSize, 0, 0, 512, 512);
+
+      const webp = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.9));
+      if (!webp || webp.type !== 'image/webp') {
+        throw new Error('Your browser could not convert the image to WebP.');
+      }
+      if (webp.size > 1024 * 1024) {
+        throw new Error('The converted photo is over 1 MB. Choose a simpler image and try again.');
+      }
+      setPhotoDraft(webp);
+      setPhotoMessage('Preview ready. The image is center-cropped to 512 × 512.');
+    } catch (error) {
+      setPhotoError(error.message || 'Could not prepare this image.');
+    } finally {
+      bitmap?.close();
+    }
+  };
+
+  const saveProfilePhoto = async () => {
+    if (!authUser || !photoDraft) return;
+    setPhotoBusy(true);
+    setPhotoError('');
+    setPhotoMessage('');
+    try {
+      const result = await uploadProfilePhoto(authUser, photoDraft);
+      const photoMetadata = {
+        key: result.key,
+        contentType: result.contentType,
+        version: Date.now(),
+      };
+      await updateUserProfile(authUser.uid, { profilePhoto: photoMetadata });
+      setProfile((previous) => ({ ...previous, profilePhoto: photoMetadata }));
+      setPhotoDraft(null);
+      setPhotoMessage('Profile photo updated.');
+    } catch (error) {
+      setPhotoError(error.message || 'Could not save your profile photo.');
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
+  const removeProfilePhoto = async () => {
+    if (!authUser || !profile?.profilePhoto?.key) return;
+    if (!window.confirm('Remove your profile photo?')) return;
+
+    setPhotoBusy(true);
+    setPhotoError('');
+    setPhotoMessage('');
+    try {
+      await deleteProfilePhoto(authUser);
+      await updateUserProfile(authUser.uid, { profilePhoto: null });
+      setProfile((previous) => ({ ...previous, profilePhoto: null }));
+      setPhotoDraft(null);
+      setPhotoMessage('Profile photo removed.');
+    } catch (error) {
+      setPhotoError(error.message || 'Could not remove your profile photo.');
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
 
   const startEditing = () => {
     setForm({
@@ -344,6 +479,7 @@ export default function ProfilePage({ authUser }) {
     achievements: Array.isArray(profile?.achievements) ? profile.achievements : [],
   };
   const displayedAchievements = editing ? (form?.achievements || []) : member.achievements;
+  const displayedPhotoUrl = photoPreviewUrl || profilePhotoUrl;
 
   return (
     <div className="pt-28 sm:pt-36 pb-20">
@@ -353,11 +489,69 @@ export default function ProfilePage({ authUser }) {
           <div className="relative px-6 sm:px-10 py-10">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <div className="relative shrink-0">
-                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-[#00629B] bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
-                  <span className="text-4xl font-bold text-[#00629B]">
-                    {member.name.charAt(0).toUpperCase()}
-                  </span>
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-[#00629B] bg-slate-100 dark:bg-zinc-900 flex items-center justify-center overflow-hidden">
+                  {displayedPhotoUrl ? (
+                    <img
+                      src={displayedPhotoUrl}
+                      alt={`${member.name}'s profile`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-4xl font-bold text-[#00629B]">
+                      {member.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </div>
+                <div className="mt-3 flex flex-wrap justify-center gap-2">
+                  <label className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-300 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:border-[#00629B] transition cursor-pointer ${photoBusy ? 'opacity-60 pointer-events-none' : ''}`}>
+                    <Camera size={15} />
+                    {profile?.profilePhoto?.key ? 'Change photo' : 'Choose photo'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      disabled={photoBusy}
+                      onChange={handlePhotoSelection}
+                      aria-label="Choose a profile photo"
+                    />
+                  </label>
+                  {photoDraft && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={saveProfilePhoto}
+                        disabled={photoBusy}
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#00629B] text-white text-xs font-medium hover:bg-[#00527f] transition disabled:opacity-60"
+                      >
+                        {photoBusy ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                        {photoBusy ? 'Uploading...' : 'Save photo'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPhotoDraft(null)}
+                        disabled={photoBusy}
+                        className="px-3 py-2 rounded-lg border border-slate-300 dark:border-zinc-700 text-xs text-slate-600 dark:text-zinc-300 disabled:opacity-60"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  )}
+                  {profile?.profilePhoto?.key && !photoDraft && (
+                    <button
+                      type="button"
+                      onClick={removeProfilePhoto}
+                      disabled={photoBusy}
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-red-300 dark:border-red-900/70 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition disabled:opacity-60"
+                    >
+                      <Trash2 size={14} /> Remove
+                    </button>
+                  )}
+                </div>
+                <p className="mt-2 text-center text-[11px] text-slate-500 dark:text-zinc-500">
+                  Center-cropped to 512 × 512 WebP, under 1 MB.
+                </p>
+                {photoError && <p role="alert" className="mt-2 max-w-56 text-center text-xs text-red-500 dark:text-red-400">{photoError}</p>}
+                {photoMessage && <p role="status" className="mt-2 max-w-56 text-center text-xs text-slate-500 dark:text-zinc-400">{photoMessage}</p>}
               </div>
 
               <div className="flex-1 text-center sm:text-left">
