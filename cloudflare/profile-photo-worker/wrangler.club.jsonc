@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ieee-profile-photo-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-22",
+  "vars": {
+    "FIREBASE_PROJECT_ID": "ieee-b6bf8",
+    "ALLOWED_ORIGINS": "http://localhost:5173"
+  },
+  "r2_buckets": [
+    {
+      "binding": "PHOTOS",
+      "bucket_name": "ieee-profile-photos"
+    }
+  ]
+}

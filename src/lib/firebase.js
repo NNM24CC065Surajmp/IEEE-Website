@@ -12,18 +12,10 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import {
-  getStorage,
-  ref, 
-  uploadBytes, 
-  getDownloadURL
- } from 'firebase/storage';
-
-import {
   getFirestore,
   doc,
   getDoc,
   setDoc,
-  updateDoc,
   serverTimestamp,
 } from 'firebase/firestore';
 
@@ -44,7 +36,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 // Force session-level persistence so the user must log in again
 // every time they close the browser tab/window.
@@ -132,17 +123,63 @@ export async function updateUserProfile(uid, data) {
 }
 
 export { auth, db };
-export async function uploadProfilePicture(uid, file) {
-  if (!file.type.startsWith('image/')) {
-    throw new Error('Please select an image file.');
+
+function getProfilePhotoApiUrl() {
+  const apiUrl = import.meta.env.VITE_PROFILE_PHOTO_API_URL?.trim();
+  if (!apiUrl) {
+    throw new Error('Profile photo service is not configured yet.');
   }
+  return apiUrl.replace(/\/+$/, '');
+}
 
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error('Image must be 5 MB or smaller.');
+async function profilePhotoRequest(user, method, body) {
+  if (!user) throw new Error('Sign in before managing your profile photo.');
+
+  const headers = new Headers({ Authorization: `Bearer ${await user.getIdToken()}` });
+  if (body) headers.set('Content-Type', 'image/webp');
+
+  const response = await fetch(`${getProfilePhotoApiUrl()}/me/photo`, {
+    method,
+    headers,
+    body,
+  });
+  if (!response.ok) {
+    let message = 'Profile photo request failed.';
+    try {
+      const payload = await response.json();
+      if (typeof payload.error === 'string') message = payload.error;
+    } catch {
+      // Keep the generic message if the service returned a non-JSON error.
+    }
+    throw new Error(message);
   }
+  return response;
+}
 
-  const imageRef = ref(storage, `profilePictures/${uid}`);
-  await uploadBytes(imageRef, file);
+export async function getProfilePhoto(user) {
+  if (!user) return null;
+  const response = await fetch(`${getProfilePhotoApiUrl()}/me/photo`, {
+    headers: { Authorization: `Bearer ${await user.getIdToken()}` },
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    let message = 'Could not load your profile photo.';
+    try {
+      const payload = await response.json();
+      if (typeof payload.error === 'string') message = payload.error;
+    } catch {
+      // Keep the generic message if the service returned a non-JSON error.
+    }
+    throw new Error(message);
+  }
+  return response.blob();
+}
 
-  return await getDownloadURL(imageRef);
+export async function uploadProfilePhoto(user, imageBlob) {
+  const response = await profilePhotoRequest(user, 'PUT', imageBlob);
+  return response.json();
+}
+
+export async function deleteProfilePhoto(user) {
+  await profilePhotoRequest(user, 'DELETE');
 }
